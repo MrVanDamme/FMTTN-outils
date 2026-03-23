@@ -692,22 +692,26 @@ function startClassifying() {
   classifyTimer = setInterval(classifyNow, 700);
 }
 
+// ── TRADUCTIONS FRANÇAIS ──
+const LABELS_FR = {'aircraft carrier':'Porte-avions','airplane':'Avion','alarm clock':'Réveil','ambulance':'Ambulance','angel':'Ange','ant':'Fourmi','anvil':'Enclume','apple':'Pomme','arm':'Bras','asparagus':'Asperge','axe':'Hache','backpack':'Sac à dos','banana':'Banane','bandage':'Bandage','barn':'Grange','baseball bat':'Batte de baseball','baseball':'Baseball','basket':'Panier','basketball':'Basketball','bat':'Chauve-souris','bathtub':'Baignoire','beach':'Plage','bear':'Ours','beard':'Barbe','bed':'Lit','bee':'Abeille','belt':'Ceinture','bench':'Banc','bicycle':'Vélo','binoculars':'Jumelles','bird':'Oiseau','blackberry':'Mûre','blueberry':'Myrtille','book':'Livre','boomerang':'Boomerang','bowtie':'Nœud papillon','bracelet':'Bracelet','brain':'Cerveau','bread':'Pain','bridge':'Pont','broccoli':'Brocoli','broom':'Balai','bucket':'Seau','bulldozer':'Bulldozer','bus':'Bus','butterfly':'Papillon','cactus':'Cactus','cake':'Gâteau','calculator':'Calculatrice','calendar':'Calendrier','camel':'Chameau','camera':'Caméra','campfire':'Feu de camp','candle':'Bougie','cannon':'Canon','canoe':'Canoë','car':'Voiture','carrot':'Carotte','castle':'Château','cat':'Chat','ceiling fan':'Ventilateur','cell phone':'Téléphone portable','chair':'Chaise','chandelier':'Lustre','church':'Église','circle':'Cercle','clarinet':'Clarinette','clock':'Horloge','cloud':'Nuage','coffee cup':'Café','compass':'Boussole','computer':'Ordinateur','cookie':'Biscuit','cooler':'Glacière','couch':'Canapé','cow':'Vache','crab':'Crabe','crayon':'Crayon de couleur','crocodile':'Crocodile','crown':'Couronne','cruise ship':'Paquebot','cup':'Tasse','diamond':'Diamant','dishwasher':'Lave-vaisselle','dog':'Chien','dolphin':'Dauphin','donut':'Beignet','door':'Porte','dragon':'Dragon','dresser':'Commode','drill':'Perceuse','drums':'Batterie','duck':'Canard','dumbbell':'Haltère','ear':'Oreille','elephant':'Éléphant','envelope':'Enveloppe','eraser':'Gomme','eye':'Œil','eyeglasses':'Lunettes','face':'Visage','fan':'Ventilateur','feather':'Plume','fence':'Clôture','finger':'Doigt','fire hydrant':'Bouche d\'incendie','fireplace':'Cheminée','firetruck':'Camion de pompiers','fish':'Poisson','flamingo':'Flamant rose','flashlight':'Lampe de poche','flip flops':'Tongs','floor lamp':'Lampadaire','flower':'Fleur','flying saucer':'Soucoupe volante','foot':'Pied','fork':'Fourchette','frog':'Grenouille','frying pan':'Poêle','garden':'Jardin','giraffe':'Girafe','golf club':'Club de golf','grapes':'Raisins','grass':'Herbe','guitar':'Guitare','hamburger':'Hamburger','hammer':'Marteau','hand':'Main','harp':'Harpe','hat':'Chapeau','headphones':'Casque audio','hedgehog':'Hérisson','helicopter':'Hélicoptère','helmet':'Casque','hexagon':'Hexagone','horse':'Cheval','hospital':'Hôpital','hot air balloon':'Montgolfière','hot dog':'Hot-dog','hot tub':'Jacuzzi','hourglass':'Sablier','house plant':'Plante','house':'Maison','hurricane':'Ouragan','ice cream':'Glace','jacket':'Veste','jail':'Prison','kangaroo':'Kangourou','key':'Clé','keyboard':'Clavier','knee':'Genou','ladder':'Échelle','lantern':'Lanterne','laptop':'Ordinateur portable','leaf':'Feuille','leg':'Jambe','lighthouse':'Phare','lightning':'Éclair','line':'Ligne','lion':'Lion','lobster':'Homard','lollipop':'Sucette','mailbox':'Boîte aux lettres','map':'Carte','marker':'Marqueur','matches':'Allumettes','megaphone':'Mégaphone','mermaid':'Sirène','microphone':'Microphone','microwave':'Micro-ondes','monkey':'Singe','moon':'Lune','motorbike':'Moto','mountain':'Montagne','mouse':'Souris','moustache':'Moustache','mouth':'Bouche','mug':'Mug','mushroom':'Champignon','nail':'Clou','necklace':'Collier','nose':'Nez','octagon':'Octogone','octopus':'Pieuvre','onion':'Oignon','oven':'Four','owl':'Hibou','paintbrush':'Pinceau','palm tree':'Palmier','panda':'Panda','pants':'Pantalon','parachute':'Parachute','parrot':'Perroquet','pear':'Poire','pencil':'Crayon','penguin':'Manchot','piano':'Piano','pig':'Cochon','pillow':'Oreiller','pineapple':'Ananas','pizza':'Pizza','police car':'Voiture de police','popsicle':'Glace à l\'eau','potato':'Pomme de terre','purse':'Sac à main','rabbit':'Lapin','raccoon':'Raton laveur','radio':'Radio','rain':'Pluie','rainbow':'Arc-en-ciel','rake':'Râteau','rhinoceros':'Rhinocéros','river':'Rivière','rollerskates':'Patins à roulettes','sailboat':'Voilier','sandwich':'Sandwich','saxophone':'Saxophone','school bus':'Bus scolaire','scissors':'Ciseaux','scorpion':'Scorpion','screwdriver':'Tournevis','sea turtle':'Tortue de mer','shark':'Requin','sheep':'Mouton','shoe':'Chaussure','shorts':'Short','shovel':'Pelle','sink':'Évier','skateboard':'Skateboard','skull':'Crâne','skyscraper':'Gratte-ciel','snail':'Escargot','snake':'Serpent','snowflake':'Flocon de neige','snowman':'Bonhomme de neige','soccer ball':'Ballon de foot','sock':'Chaussette','speedboat':'Hors-bord','spider':'Araignée','spoon':'Cuillère','square':'Carré','squirrel':'Écureuil','stairs':'Escalier','star':'Étoile','steak':'Steak','stop sign':'Panneau stop','stove':'Cuisinière','strawberry':'Fraise','streetlight':'Lampadaire','submarine':'Sous-marin','suitcase':'Valise','sun':'Soleil','swan':'Cygne','sweater':'Pull','sword':'Épée','t-shirt':'T-shirt','table':'Table','teapot':'Théière','teddy-bear':'Nounours','telephone':'Téléphone','television':'Télévision','tennis racquet':'Raquette de tennis','tent':'Tente','tooth':'Dent','toothbrush':'Brosse à dents','tornado':'Tornade','tractor':'Tracteur','traffic light':'Feux de circulation','train':'Train','tree':'Arbre','triangle':'Triangle','truck':'Camion','trumpet':'Trompette','umbrella':'Parapluie','van':'Camionnette','vase':'Vase','violin':'Violon','washing machine':'Machine à laver','watermelon':'Pastèque','whale':'Baleine','wheel':'Roue','windmill':'Moulin à vent','wine bottle':'Bouteille de vin','wine glass':'Verre de vin','wristwatch':'Montre','yoga':'Yoga','zebra':'Zèbre','zigzag':'Zigzag','boat':'Bateau','book':'Livre','cup':'Tasse','eye':'Œil','flower':'Fleur','guitar':'Guitare','hat':'Chapeau','moon':'Lune','pizza':'Pizza','spider':'Araignée','star':'Étoile','sun':'Soleil','tree':'Arbre','bicycle':'Vélo','butterfly':'Papillon','elephant':'Éléphant','banana':'Banane','clock':'Horloge'};
+
+function getLabelFr(label) {
+  return LABELS_FR[label] || (CATEGORIES[label] ? CATEGORIES[label].fr : label);
+}
+
 function showPredictions(results) {
   const callout = document.getElementById('ai-callout');
   const topWord = document.getElementById('ai-top-word');
   const list = document.getElementById('pred-list');
 
   callout.classList.add('show');
-  const cat = CATEGORIES[results[0].label];
-  topWord.textContent = cat ? cat.fr : results[0].label;
+  topWord.textContent = getLabelFr(results[0].label);
 
   list.innerHTML = results.map((r, i) => {
     const pct = Math.round(r.confidence * 100);
-    const cat = CATEGORIES[r.label];
-    const label = cat ? cat.fr : r.label;
     return `
       <div class="pred-item">
-        <div class="pred-label" style="${i===0 ? 'color:var(--accent2);font-weight:600;' : ''}">${label}</div>
+        <div class="pred-label" style="${i===0 ? 'color:var(--accent2);font-weight:600;' : ''}">${getLabelFr(r.label)}</div>
         <div class="pred-bar-wrap">
           <div class="pred-bar" style="width:${pct}%;${i>0 ? 'opacity:0.45;' : ''}"></div>
         </div>
@@ -761,8 +765,16 @@ async function loadCategory() {
 
   try {
     const url = `https://storage.googleapis.com/quickdraw_dataset/full/simplified/${encodeURIComponent(word)}.ndjson`;
-    const response = await fetch(url, { headers: { 'Range': 'bytes=0-25000' } });
-    const text = await response.text();
+    const response = await fetch(url);
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let text = '';
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      text += decoder.decode(value, { stream: true });
+      if (text.length > 30000) { reader.cancel(); break; }
+    }
     const drawings = [];
     for (const line of text.split('\n')) {
       if (!line.trim().startsWith('{')) continue;
