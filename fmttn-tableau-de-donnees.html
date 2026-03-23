@@ -763,9 +763,11 @@ async function loadCategory() {
   grid.innerHTML = '<div class="loader" style="grid-column:1/-1;">Chargement depuis Google Quick, Draw!…</div>';
   tbody.innerHTML = '<tr><td colspan="5" class="loader">Chargement…</td></tr>';
 
-  try {
-    const url = `https://storage.googleapis.com/quickdraw_dataset/full/simplified/${encodeURIComponent(word)}.ndjson`;
+  const ndjsonUrl = `https://storage.googleapis.com/quickdraw_dataset/full/simplified/${encodeURIComponent(word)}.ndjson`;
+
+  async function streamDrawings(url) {
     const response = await fetch(url);
+    if (!response.ok) throw new Error('HTTP ' + response.status);
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
     let text = '';
@@ -780,6 +782,19 @@ async function loadCategory() {
       if (!line.trim().startsWith('{')) continue;
       try { drawings.push(JSON.parse(line)); } catch(e) {}
       if (drawings.length >= 9) break;
+    }
+    if (!drawings.length) throw new Error('No drawings parsed');
+    return drawings;
+  }
+
+  try {
+    let drawings;
+    try {
+      drawings = await streamDrawings(ndjsonUrl);
+    } catch(e) {
+      // Fallback : proxy CORS
+      const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(ndjsonUrl)}`;
+      drawings = await streamDrawings(proxyUrl);
     }
     renderGrid(drawings);
     renderTable(drawings, info ? info.fr : word);
