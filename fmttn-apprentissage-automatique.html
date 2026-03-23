@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>FMTTN - Apprentissage automatique</title>
+<meta name="description" content="Entraîne une vraie intelligence artificielle à reconnaître des objets — activité pédagogique FMTTN par Mr. Van Damme.">
+<meta property="og:title" content="FMTTN — Apprentissage automatique">
+<meta property="og:description" content="Entraîne une vraie IA à reconnaître des objets en quelques minutes. Activité pédagogique pour la 2e secondaire — Mr. Van Damme.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=600&q=80">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f0f13;
+    --surface: #1a1a22;
+    --surface2: #22222e;
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.15);
+    --text: #f0f0f5;
+    --muted: #888899;
+    --accent: #7c6eff;
+    --accent2: #a78bfa;
+    --green: #34d399;
+    --amber: #fbbf24;
+    --red: #f87171;
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  header {
+    padding: 1.25rem 1.25rem 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo {
+    width: 34px; height: 34px;
+    background: linear-gradient(135deg, #7c6eff, #a78bfa);
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+
+  header h1 { font-size: 18px; font-weight: 600; letter-spacing: -0.3px; }
+  header span { font-size: 13px; color: var(--muted); margin-left: auto; }
+
+  /* PHASE INDICATOR */
+  .phases {
+    display: flex;
+    gap: 0;
+    margin: 1rem 1.25rem;
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 4px;
+    border: 0.5px solid var(--border);
+  }
+
+  .phase-btn {
+    flex: 1;
+    text-align: center;
+    padding: 8px 4px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted);
+    border-radius: 10px;
+    cursor: default;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+  }
+
+  .phase-btn.active {
+    background: var(--accent);
+    color: white;
+  }
+
+  .phase-btn.done {
+    color: var(--green);
+  }
+
+  .phase-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.6;
+  }
+
+  /* MAIN CONTENT */
+  .panel { display: none; padding: 0 1.25rem 1.25rem; }
+  .panel.active { display: block; }
+
+  /* STEP 1 — COLLECT */
+  .classes-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 1rem; }
+
+  .class-card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .class-header {
+    display: flex;
+    align-items: center;
+    padding: 12px 14px;
+    gap: 10px;
+    cursor: pointer;
+  }
+
+  .class-color {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .class-name-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-size: 15px;
+    font-weight: 500;
+    outline: none;
+    font-family: inherit;
+    min-width: 0;
+  }
+
+  .class-name-input::placeholder { color: var(--muted); }
+
+  .class-count {
+    font-size: 12px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .class-count.ready { color: var(--green); }
+
+  .class-body { padding: 0 14px 14px; }
+
+  .thumbnails {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+  }
+
+  .thumb {
+    width: 58px; height: 58px;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 0.5px solid var(--border2);
+  }
+
+  .thumb-placeholder {
+    width: 58px; height: 58px;
+    border-radius: 8px;
+    background: var(--surface2);
+    border: 1px dashed var(--border2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: var(--muted);
+    cursor: pointer;
+  }
+
+  .capture-row { display: flex; gap: 8px; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 9px 16px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+    font-family: inherit;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .btn:active { transform: scale(0.97); }
+
+  .btn-ghost {
+    background: var(--surface2);
+    color: var(--text);
+    border: 0.5px solid var(--border2);
+  }
+
+  .btn-accent {
+    background: var(--accent);
+    color: white;
+  }
+
+  .btn-green {
+    background: #065f46;
+    color: var(--green);
+    border: 0.5px solid #047857;
+  }
+
+  .btn-red {
+    background: #450a0a;
+    color: var(--red);
+    border: 0.5px solid #7f1d1d;
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .btn-lg {
+    width: 100%;
+    padding: 14px;
+    font-size: 15px;
+    border-radius: var(--radius);
+    margin-top: 0.75rem;
+  }
+
+  .add-class-btn {
+    border: 1.5px dashed var(--border2);
+    background: transparent;
+    color: var(--muted);
+    width: 100%;
+    padding: 12px;
+    border-radius: var(--radius);
+    font-size: 13px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .add-class-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* CAMERA MODAL */
+  .modal-bg {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.92);
+    z-index: 100;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-bg.open { display: flex; }
+
+  .cam-container {
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  #modal-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: white;
+    text-align: center;
+  }
+
+  #video-el {
+    width: 100%;
+    border-radius: var(--radius);
+    background: #000;
+    aspect-ratio: 4/3;
+    object-fit: cover;
+  }
+
+  .cam-progress {
+    display: flex;
+    gap: 5px;
+  }
+
+  .cam-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.25);
+    transition: background 0.2s;
+  }
+
+  .cam-dot.filled { background: var(--green); }
+
+  .cam-actions { display: flex; gap: 10px; width: 100%; }
+
+  .shutter {
+    flex: 1;
+    padding: 16px;
+    background: white;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    color: #111;
+    font-family: inherit;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .shutter:active { transform: scale(0.97); }
+
+  /* STEP 2 — TRAIN */
+  .train-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 0;
+    gap: 1.5rem;
+  }
+
+  .neural-anim {
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+
+  .n-col { display: flex; flex-direction: column; gap: 8px; align-items: center; }
+
+  .n-node {
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: var(--surface2);
+    border: 1.5px solid var(--border2);
+    transition: all 0.3s;
+  }
+
+  .n-node.lit { background: var(--accent); border-color: var(--accent2); box-shadow: 0 0 8px var(--accent); }
+
+  .n-line {
+    width: 24px;
+    height: 1px;
+    background: var(--border2);
+  }
+
+  .train-label {
+    font-size: 14px;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  .train-label strong { color: var(--text); }
+
+  #progress-bar-wrap {
+    width: 100%;
+    background: var(--surface2);
+    border-radius: 99px;
+    height: 6px;
+    overflow: hidden;
+  }
+
+  #progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--green));
+    border-radius: 99px;
+    width: 0%;
+    transition: width 0.4s ease;
+  }
+
+  #train-status {
+    font-size: 13px;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  /* STEP 3 — PREDICT */
+  #predict-video {
+    width: 100%;
+    border-radius: var(--radius);
+    aspect-ratio: 4/3;
+    object-fit: cover;
+    background: var(--surface);
+  }
+
+  .prediction-box {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+    margin-top: 0.75rem;
+  }
+
+  .pred-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .pred-label-dot {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  #pred-name {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+  }
+
+  #pred-conf {
+    font-size: 13px;
+    color: var(--muted);
+    margin-left: auto;
+  }
+
+  .pred-bars { display: flex; flex-direction: column; gap: 8px; }
+
+  .pred-row { }
+
+  .pred-row-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 3px;
+  }
+
+  .pred-row-label span:last-child { color: var(--text); font-weight: 500; }
+
+  .bar-bg {
+    height: 5px;
+    background: var(--surface2);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.2s ease;
+  }
+
+  .info-strip {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 0.75rem;
+    line-height: 1.5;
+  }
+
+  .info-strip strong { color: var(--accent2); }
+
+  canvas#hidden-canvas { display: none; }
+
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 99px;
+    font-weight: 500;
+  }
+
+  .badge-amber { background: #451a03; color: var(--amber); }
+  .badge-green { background: #022c22; color: var(--green); }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  .pulse { animation: pulse 1.2s infinite; }
+
+  .warn-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #2a1a0a;
+    border: 0.5px solid #854F0B;
+    border-radius: var(--radius-sm);
+    padding: 8px 12px;
+    font-size: 13px;
+    color: var(--amber);
+  }
+  .warn-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  /* WELCOME MODAL */
+  .welcome-bg {
+    display: flex;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.92);
+    z-index: 300;
+    align-items: center;
+    justify-content: center;
+    padding: 1.25rem;
+  }
+  .welcome-bg.hidden { display: none; }
+
+  .welcome-box {
+    background: var(--surface);
+    border: 0.5px solid var(--border2);
+    border-radius: 20px;
+    width: 100%;
+    max-width: 480px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 2rem 1.5rem;
+    text-align: center;
+  }
+
+  .welcome-emoji { font-size: 48px; margin-bottom: 0.75rem; }
+  .welcome-box h2 { font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 0.5rem; }
+  .welcome-box .subtitle { font-size: 13px; color: var(--muted); margin-bottom: 1.5rem; }
+
+  .welcome-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 1.5rem;
+    text-align: left;
+  }
+  .welcome-step {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    background: var(--surface2);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+  }
+  .welcome-step-icon { font-size: 22px; flex-shrink: 0; margin-top: 1px; }
+  .welcome-step-body { }
+  .welcome-step-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+  .welcome-step-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+  .btn-welcome {
+    width: 100%;
+    padding: 14px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: opacity 0.15s;
+  }
+  .btn-welcome:hover { opacity: 0.88; }
+  .btn-welcome:active { transform: scale(0.98); }
+
+  .welcome-teacher {
+    margin-top: 1rem;
+    font-size: 11px;
+    color: var(--muted);
+    opacity: 0.6;
+  }
+
+
+  .name-empty {
+    border-bottom: 1.5px solid var(--amber) !important;
+  }
+  .class-name-input::placeholder { color: var(--amber); opacity: 0.8; }
+  .info-btn {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: var(--surface2);
+    border: 0.5px solid var(--border2);
+    color: var(--accent2);
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.15s;
+    font-family: inherit;
+  }
+  .info-btn:hover { background: var(--accent); color: white; border-color: transparent; }
+
+  .info-modal-bg {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 200;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 0;
+  }
+  .info-modal-bg.open { display: flex; }
+
+  .info-modal {
+    background: var(--surface);
+    border-radius: 20px 20px 0 0;
+    border: 0.5px solid var(--border2);
+    width: 100%;
+    max-width: 600px;
+    max-height: 88vh;
+    overflow-y: auto;
+    padding: 1.5rem 1.25rem 2rem;
+  }
+
+  .info-modal-handle {
+    width: 36px; height: 4px;
+    background: var(--border2);
+    border-radius: 2px;
+    margin: 0 auto 1.25rem;
+  }
+
+  .info-close {
+    float: right;
+    background: var(--surface2);
+    border: 0.5px solid var(--border2);
+    color: var(--muted);
+    border-radius: 50%;
+    width: 28px; height: 28px;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-family: inherit;
+  }
+
+  .info-modal h2 { font-size: 18px; font-weight: 600; margin-bottom: 1rem; color: var(--text); }
+  .info-modal h3 { font-size: 14px; font-weight: 600; color: var(--accent2); margin: 1.25rem 0 0.4rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  .info-modal p { font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 0.75rem; }
+  .info-modal strong { color: var(--text); }
+
+  .analogy-card {
+    background: var(--surface2);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    margin: 0.75rem 0;
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+    border-left: 3px solid var(--accent);
+  }
+  .analogy-card strong { color: var(--text); }
+
+  .step-explainer {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0.75rem 0;
+  }
+  .step-ex {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .step-ex-num {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .step-ex-text { font-size: 13px; color: var(--muted); line-height: 1.6; }
+  .step-ex-text strong { color: var(--text); }
+
+</style>
+</head>
+<body>
+
+<!-- WELCOME MODAL -->
+<div class="welcome-bg" id="welcome-modal">
+  <div class="welcome-box">
+    <div class="welcome-emoji">🧠</div>
+    <h2>FMTTN — Apprentissage automatique</h2>
+    <p class="subtitle">Mr. Van Damme</p>
+
+    <div style="background:var(--surface2);border-radius:var(--radius);padding:14px 16px;margin-bottom:1.25rem;text-align:left;">
+      <p style="font-size:14px;color:var(--text);font-weight:600;margin-bottom:6px;">🎯 Quel est l'objectif ?</p>
+      <p style="font-size:13px;color:var(--muted);line-height:1.65;margin:0;">
+        Dans cette activité, tu vas <strong style="color:var(--text);">entraîner une vraie intelligence artificielle</strong> à reconnaître des objets — exactement comme le font les ingénieurs dans les grandes entreprises tech.<br><br>
+        Tu choisiras 2 objets ou plus, tu montreras des exemples à l'IA, et tu observeras comment elle apprend à les distinguer. L'objectif est de <strong style="color:var(--text);">comprendre concrètement</strong> ce qu'est le machine learning : pas juste la théorie, mais en le faisant toi-même !
+      </p>
+    </div>
+
+    <div class="welcome-steps">
+      <div class="welcome-step">
+        <div class="welcome-step-icon">✏️</div>
+        <div class="welcome-step-body">
+          <div class="welcome-step-title">Nomme tes objets</div>
+          <div class="welcome-step-desc">Choisis 2 objets ou plus et donne-leur un nom (ex : crayon, gomme, règle...).</div>
+        </div>
+      </div>
+      <div class="welcome-step">
+        <div class="welcome-step-icon">📸</div>
+        <div class="welcome-step-body">
+          <div class="welcome-step-title">Prends 15 photos par objet</div>
+          <div class="welcome-step-desc">Varie les angles, la lumière et la distance — c'est ce qu'on appelle les <strong>données d'entraînement</strong>.</div>
+        </div>
+      </div>
+      <div class="welcome-step">
+        <div class="welcome-step-icon">⚡</div>
+        <div class="welcome-step-body">
+          <div class="welcome-step-title">Entraîne l'IA</div>
+          <div class="welcome-step-desc">En quelques secondes, l'IA analyse tes photos et apprend à reconnaître chaque objet.</div>
+        </div>
+      </div>
+      <div class="welcome-step">
+        <div class="welcome-step-icon">🎯</div>
+        <div class="welcome-step-body">
+          <div class="welcome-step-title">Teste et améliore</div>
+          <div class="welcome-step-desc">Montre un objet à la caméra et observe les résultats. Est-ce que l'IA se trompe ? Pourquoi ? Tu peux toujours rajouter des photos pour l'améliorer !</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-welcome" onclick="closeWelcome()">C'est parti ! 🚀</button>
+    <div class="welcome-teacher">Clique sur le <strong>?</strong> en haut à droite pour en savoir plus sur le fonctionnement de l'IA.</div>
+  </div>
+</div>
+
+<header>
+  <div class="logo">🧠</div>
+  <div style="flex:1;">
+    <h1 style="margin:0;line-height:1.2;">FMTTN — Apprentissage automatique</h1>
+    <div style="font-size:11px;color:var(--muted);margin-top:1px;">Mr. Van Damme</div>
+  </div>
+  <span id="header-phase">Phase 1 / 3</span>
+  <button class="info-btn" onclick="document.getElementById('info-modal').classList.add('open')" title="Comment ça marche ?">?</button>
+</header>
+
+<!-- INFO MODAL -->
+<div class="info-modal-bg" id="info-modal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="info-modal">
+    <div class="info-modal-handle"></div>
+    <button class="info-close" onclick="document.getElementById('info-modal').classList.remove('open')">✕</button>
+    <h2>🧠 Comment l'IA apprend-elle ?</h2>
+
+    <p>Cette application utilise ce qu'on appelle l'<strong>intelligence artificielle</strong>. Mais comment une machine peut-elle reconnaître un objet ? Voici l'explication !</p>
+
+    <h3>📸 Étape 1 — Tu lui montres des exemples</h3>
+    <p>L'IA ne sait rien au départ. C'est <strong>toi</strong> qui lui apprends en lui montrant des photos. Plus tu lui donnes d'exemples variés (angles différents, lumières différentes), mieux elle comprendra.</p>
+    <div class="analogy-card">
+      <strong>Imagine :</strong> tu apprends à un enfant ce qu'est un chat. Tu lui montres plein de photos de chats différents — noir, blanc, gros, petit, assis, debout. Plus tu lui en montres, mieux il saura reconnaître un chat. L'IA fonctionne exactement pareil !
+    </div>
+
+    <h3>🔢 Étape 2 — Elle transforme les images en chiffres</h3>
+    <p>Un ordinateur ne "voit" pas comme nous. Il transforme chaque image en une longue liste de chiffres — des milliers de valeurs qui décrivent les couleurs, les formes, les contours de l'image.</p>
+    <div class="analogy-card">
+      <strong>Imagine :</strong> une image de 224×224 pixels, c'est en réalité <strong>150 000 chiffres</strong> ! L'IA cherche des patterns (des répétitions, des ressemblances) dans ces chiffres pour reconnaître les objets.
+    </div>
+
+    <h3>⚡ Étape 3 — Le transfer learning</h3>
+    <p>Cette app utilise une technique appelée le <strong>transfer learning</strong> (apprentissage par transfert). Au lieu de partir de zéro, elle utilise un modèle appelé <strong>MobileNet</strong>, déjà entraîné sur <strong>1,2 million d'images</strong> par des ingénieurs de Google.</p>
+    <div class="step-explainer">
+      <div class="step-ex"><div class="step-ex-num">1</div><div class="step-ex-text">MobileNet sait déjà reconnaître des formes générales : des bords, des textures, des couleurs...</div></div>
+      <div class="step-ex"><div class="step-ex-num">2</div><div class="step-ex-text">Ton app lui dit : <em>"maintenant, utilise tout ce que tu sais pour différencier <strong>mes</strong> objets"</em></div></div>
+      <div class="step-ex"><div class="step-ex-num">3</div><div class="step-ex-text">En quelques secondes, l'IA apprend à distinguer tes objets spécifiques — c'est pour ça que 15 photos suffisent !</div></div>
+    </div>
+
+    <h3>📊 Étape 4 — Elle calcule des probabilités</h3>
+    <p>Quand tu lui montres un objet, l'IA ne dit pas "c'est ça à 100%". Elle calcule une <strong>probabilité</strong> pour chaque objet : "Je pense que c'est un crayon à 87%, une règle à 10%, une gomme à 3%". Elle affiche toujours sa meilleure réponse, même si elle n'est pas sûre !</p>
+    <div class="analogy-card">
+      <strong>C'est pour ça qu'on peut la tromper !</strong> Si tu montres un objet dans une lumière bizarre ou sous un angle inhabituel, elle va hésiter — et parfois se tromper. C'est une limite réelle des IA actuelles.
+    </div>
+
+    <h3>🌍 Les IA dans la vraie vie</h3>
+    <p>Ce principe est utilisé partout : la reconnaissance de visages sur ton téléphone, les filtres Snapchat, la détection de maladies sur des radios médicales, les voitures autonomes... Tout ça repose sur le même principe que ce que tu viens de faire !</p>
+  </div>
+</div>
+
+<div class="phases">
+  <div class="phase-btn active" id="ph1"><div class="phase-dot"></div>Capturer</div>
+  <div class="phase-btn" id="ph2"><div class="phase-dot"></div>Entraîner</div>
+  <div class="phase-btn" id="ph3"><div class="phase-dot"></div>Tester</div>
+</div>
+
+<!-- PANEL 1: CAPTURE -->
+<div class="panel active" id="panel-collect">
+  <div class="classes-list" id="classes-list"></div>
+  <button class="add-class-btn" onclick="addClass()">+ Ajouter un objet</button>
+
+  <button class="btn btn-accent btn-lg" id="btn-go-train" onclick="goTrain()" disabled>
+    Entraîner l'IA →
+  </button>
+  <div id="train-warning" style="margin-top:0.75rem; display:flex; flex-direction:column; gap:6px;"></div>
+  <div class="info-strip" style="margin-top:0.75rem;">
+    <strong>Comment ça marche :</strong> Choisis 15 photos de chaque objet depuis ta galerie ou via la caméra. Plus tu varies les angles, la lumière et la distance, mieux l'IA apprendra à reconnaître l'objet.<br>
+    <span id="load-status" style="color:var(--amber);">⏳ Chargement du modèle IA en cours...</span>
+  </div>
+</div>
+
+<!-- PANEL 2: TRAIN -->
+<div class="panel" id="panel-train">
+  <div class="train-center">
+    <div class="neural-anim" id="neural-anim">
+      <!-- generated by JS -->
+    </div>
+    <div>
+      <div class="train-label" id="train-label-main">Préparation...</div>
+      <div id="train-status" style="margin-top:4px;"></div>
+    </div>
+    <div style="width:100%;">
+      <div id="progress-bar-wrap"><div id="progress-bar-fill"></div></div>
+    </div>
+    <button class="btn btn-accent btn-lg" id="btn-go-predict" onclick="goPredict()" style="display:none;">
+      Tester l'IA →
+    </button>
+  </div>
+</div>
+
+<!-- PANEL 3: PREDICT -->
+<div class="panel" id="panel-predict">
+  <video id="predict-video" autoplay playsinline muted></video>
+  <div class="prediction-box">
+    <div class="pred-top">
+      <div class="pred-label-dot" id="pred-dot"></div>
+      <div id="pred-name">—</div>
+      <div id="pred-conf">—</div>
+    </div>
+    <div class="pred-bars" id="pred-bars"></div>
+  </div>
+  <div class="info-strip">
+    <strong>Transfer learning :</strong> L'IA a utilisé MobileNet (déjà entraîné sur 1,2M d'images) comme base, puis elle a appris uniquement la différence entre TES objets. C'est pour ça que 15 photos suffisent !
+  </div>
+  <button class="btn btn-accent btn-lg" onclick="improve()" style="margin-top:0.75rem;">Pas assez précis ? Améliore-moi !</button>
+  <button class="btn btn-ghost btn-lg" onclick="restart()" style="margin-top:0.5rem;">↩ Recommencer depuis zéro</button>
+</div>
+
+<!-- CAMERA MODAL -->
+<div class="modal-bg" id="cam-modal">
+  <div class="cam-container">
+    <div id="modal-title">Objet : <span id="modal-class-name">—</span></div>
+    <video id="video-el" autoplay playsinline muted></video>
+    <div class="cam-progress" id="cam-progress"></div>
+    <div style="font-size:13px; color:rgba(255,255,255,0.5);" id="cam-count-label">0 / 15 photos</div>
+    <div class="cam-actions">
+      <button class="btn btn-ghost" style="flex:0 0 auto;" onclick="closeModal()">Annuler</button>
+      <label class="btn btn-ghost" style="flex:0 0 auto; cursor:pointer;" title="Choisir depuis la galerie">
+        🖼️
+        <input type="file" id="gallery-input" accept="image/*" multiple style="display:none;" onchange="importFromGallery(event)">
+      </label>
+      <button class="shutter" id="shutter-btn" onclick="takePhoto()">📸 Photo</button>
+    </div>
+  </div>
+</div>
+
+<canvas id="hidden-canvas"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js"></script>
+
+<script>
+const COLORS = ['#7c6eff','#34d399','#fbbf24','#f87171','#60a5fa','#f472b6','#a3e635'];
+const TARGET = 15;
+
+let classes = [];
+let mobileNet = null;
+let classifier = null;
+let currentClassIdx = null;
+let camStream = null;
+let predictStream = null;
+let predicting = false;
+let predInterval = null;
+
+/* ── KNN CLASSIFIER (vanilla, no extra lib) ── */
+class KNNClassifier {
+  constructor() { this.data = {}; }
+
+  addExample(embedding, label) {
+    if (!this.data[label]) this.data[label] = [];
+    this.data[label].push(embedding);
+  }
+
+  async predict(embedding, k = 3) {
+    const labels = Object.keys(this.data);
+    if (labels.length < 2) return null;
+    const emb = await embedding.array();
+
+    let allDists = [];
+    for (const label of labels) {
+      for (const stored of this.data[label]) {
+        const s = await stored.array ? await stored.array() : stored;
+        const dist = euclidean(emb[0], s[0] !== undefined ? s[0] : s);
+        allDists.push({ label, dist });
+      }
+    }
+
+    allDists.sort((a, b) => a.dist - b.dist);
+    const kNearest = allDists.slice(0, k);
+    const counts = {};
+    labels.forEach(l => counts[l] = 0);
+    kNearest.forEach(n => counts[n.label]++);
+
+    const total = kNearest.length;
+    const confidences = {};
+    labels.forEach(l => confidences[l] = counts[l] / total);
+
+    const top = labels.reduce((a, b) => confidences[a] > confidences[b] ? a : b);
+    return { label: top, confidences };
+  }
+}
+
+function euclidean(a, b) {
+  let sum = 0;
+  for (let i = 0; i < a.length; i++) sum += (a[i] - b[i]) ** 2;
+  return Math.sqrt(sum);
+}
+
+/* ── INIT ── */
+window.addEventListener('load', async () => {
+  addClass();
+  addClass();
+  await loadMobileNet();
+});
+
+async function loadMobileNet() {
+  mobileNet = await mobilenet.load({ version: 2, alpha: 0.5 });
+  classifier = new KNNClassifier();
+  updateTrainBtn();
+  document.getElementById('load-status').textContent = 'Mod\u00e8le IA pr\u00eat \u2714';
+  document.getElementById('load-status').style.color = 'var(--green)';
+}
+
+/* ── CLASS MANAGEMENT ── */
+function addClass(name = '') {
+  const idx = classes.length;
+  classes.push({ name: name || '', photos: [], color: COLORS[idx % COLORS.length], placeholder: `Ex : crayon, gomme, règle...` });
+  renderClasses();
+}
+
+function renderClasses() {
+  const list = document.getElementById('classes-list');
+  list.innerHTML = '';
+  classes.forEach((cls, i) => {
+    const needed = TARGET - cls.photos.length;
+    const ready = cls.photos.length >= TARGET;
+    const card = document.createElement('div');
+    card.className = 'class-card';
+    card.innerHTML = `
+      <div class="class-header">
+        <div class="class-color" style="background:${cls.color}"></div>
+        <input class="class-name-input ${!cls.name ? 'name-empty' : ''}" value="${cls.name}" placeholder="✏️ Donne un nom à cet objet..."
+          onchange="classes[${i}].name=this.value.trim(); renderClasses();"
+          oninput="classes[${i}].name=this.value.trim(); updateTrainBtn();">
+        <span class="class-count ${ready ? 'ready' : ''}">
+          ${ready ? '✓ ' : ''}${cls.photos.length} photo${cls.photos.length > 1 ? 's' : ''} ${ready ? '' : `(min. ${TARGET})`}
+        </span>
+      </div>
+      <div class="class-body">
+        <div class="thumbnails" id="thumbs-${i}"></div>
+        <div class="capture-row">
+          <button class="btn btn-ghost" style="flex:1;" onclick="openCamera(${i})">
+            📷 ${cls.photos.length === 0 ? 'Caméra' : needed > 0 ? `Caméra (${needed} restantes)` : 'Modifier'}
+          </button>
+          <label class="btn btn-ghost" style="flex:1; cursor:pointer;">
+            🖼️ Galerie
+            <input type="file" accept="image/*" multiple style="display:none;"
+              onchange="importFromGalleryDirect(event, ${i})">
+          </label>
+          ${i > 1 ? `<button class="btn btn-red" onclick="removeClass(${i})">✕</button>` : ''}
+        </div>
+      </div>
+    `;
+    list.appendChild(card);
+    const thumbBox = card.querySelector(`#thumbs-${i}`);
+    cls.photos.forEach(src => {
+      const img = document.createElement('img');
+      img.className = 'thumb';
+      img.src = src;
+      thumbBox.appendChild(img);
+    });
+    const remaining = TARGET - cls.photos.length;
+    if (remaining > 0) {
+      for (let r = 0; r < Math.min(remaining, 15); r++) {
+        const ph = document.createElement('div');
+        ph.className = 'thumb-placeholder';
+        ph.textContent = '＋';
+        ph.onclick = () => openCamera(i);
+        thumbBox.appendChild(ph);
+      }
+    }
+  });
+  updateTrainBtn();
+}
+
+function removeClass(i) {
+  classes.splice(i, 1);
+  renderClasses();
+}
+
+function updateTrainBtn() {
+  const btn = document.getElementById('btn-go-train');
+  const warning = document.getElementById('train-warning');
+  const allNamed = classes.every(c => c.name.trim() !== '');
+  const allReady = mobileNet !== null && classes.length >= 2 && allNamed && classes.every(c => c.photos.length >= TARGET);
+
+  btn.disabled = !allReady;
+
+  if (mobileNet === null) {
+    btn.textContent = '⏳ Chargement du modèle IA...';
+    warning.innerHTML = '';
+    return;
+  }
+
+  btn.textContent = 'Entraîner l\'IA →';
+
+  const warnings = [];
+  classes.forEach((c, i) => {
+    if (!c.name.trim()) {
+      warnings.push(`<div class="warn-row"><div class="warn-dot" style="background:${c.color}"></div><span>L'objet ${i+1} n'a pas de nom — clique sur le champ et donne-lui un vrai nom !</span></div>`);
+    } else if (c.photos.length < TARGET) {
+      const missing = TARGET - c.photos.length;
+      warnings.push(`<div class="warn-row"><div class="warn-dot" style="background:${c.color}"></div><span><strong>${c.name}</strong> — il manque <strong>${missing} photo${missing > 1 ? 's' : ''}</strong></span></div>`);
+    }
+  });
+  warning.innerHTML = warnings.join('');
+}
+
+function importFromGalleryDirect(event, classIdx) {
+  const files = Array.from(event.target.files);
+  if (!files.length) return;
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      classes[classIdx].photos.push(e.target.result);
+      renderClasses();
+    };
+    reader.readAsDataURL(file);
+  });
+  event.target.value = '';
+}
+
+function importFromGallery(event) {
+  const files = Array.from(event.target.files);
+  if (!files.length) return;
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      classes[currentClassIdx].photos.push(e.target.result);
+      updateCamProgress();
+      renderClasses();
+    };
+    reader.readAsDataURL(file);
+  });
+  event.target.value = '';
+}
+
+/* ── CAMERA CAPTURE ── */
+async function openCamera(classIdx) {
+  currentClassIdx = classIdx;
+  document.getElementById('modal-class-name').textContent = classes[classIdx].name;
+  updateCamProgress();
+  document.getElementById('cam-modal').classList.add('open');
+  try {
+    camStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 640 } }, audio: false });
+    document.getElementById('video-el').srcObject = camStream;
+  } catch(e) {
+    alert('Accès caméra refusé. Vérifiez les permissions dans les réglages Safari.');
+    closeModal();
+  }
+}
+
+function updateCamProgress() {
+  const i = currentClassIdx;
+  const count = classes[i] ? classes[i].photos.length : 0;
+  const prog = document.getElementById('cam-progress');
+  prog.innerHTML = '';
+  for (let d = 0; d < TARGET; d++) {
+    const dot = document.createElement('div');
+    dot.className = 'cam-dot' + (d < count ? ' filled' : '');
+    prog.appendChild(dot);
+  }
+  document.getElementById('cam-count-label').textContent = `${count} / ${TARGET} photos`;
+  const btn = document.getElementById('shutter-btn');
+  if (count >= TARGET) {
+    btn.textContent = '✓ Terminé !';
+    btn.onclick = closeModal;
+  } else {
+    btn.textContent = '📸 Photo';
+    btn.onclick = takePhoto;
+  }
+}
+
+function takePhoto() {
+  const video = document.getElementById('video-el');
+  const canvas = document.getElementById('hidden-canvas');
+  canvas.width = video.videoWidth || 224;
+  canvas.height = video.videoHeight || 224;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0);
+  const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+  classes[currentClassIdx].photos.push(dataUrl);
+  updateCamProgress();
+  renderClasses();
+
+  // flash effect
+  const v = document.getElementById('video-el');
+  v.style.opacity = '0';
+  setTimeout(() => v.style.opacity = '1', 120);
+
+  if (classes[currentClassIdx].photos.length >= TARGET) {
+    setTimeout(closeModal, 800);
+  }
+}
+
+function closeModal() {
+  document.getElementById('cam-modal').classList.remove('open');
+  if (camStream) { camStream.getTracks().forEach(t => t.stop()); camStream = null; }
+}
+
+/* ── TRAINING ── */
+function goTrain() {
+  if (!mobileNet) { alert('Le modèle IA est encore en cours de chargement. Patiente quelques secondes.'); return; }
+  setPanel('train');
+  buildNeuralAnim();
+  setTimeout(runTraining, 400);
+}
+
+function buildNeuralAnim() {
+  const el = document.getElementById('neural-anim');
+  const layers = [3, 5, 5, 3, classes.length];
+  el.innerHTML = '';
+  layers.forEach((n, li) => {
+    const col = document.createElement('div');
+    col.className = 'n-col';
+    col.id = `ncol-${li}`;
+    for (let ni = 0; ni < n; ni++) {
+      const node = document.createElement('div');
+      node.className = 'n-node';
+      node.id = `node-${li}-${ni}`;
+      col.appendChild(node);
+    }
+    el.appendChild(col);
+    if (li < layers.length - 1) {
+      const line = document.createElement('div');
+      line.className = 'n-line';
+      el.appendChild(line);
+    }
+  });
+}
+
+async function runTraining() {
+  document.getElementById('train-label-main').textContent = 'Extraction des caractéristiques...';
+  document.getElementById('train-status').textContent = 'MobileNet analyse chaque photo...';
+
+  classifier = new KNNClassifier();
+  const canvas = document.getElementById('hidden-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = 224; canvas.height = 224;
+
+  const total = classes.reduce((s, c) => s + c.photos.length, 0);
+  let done = 0;
+
+  for (let ci = 0; ci < classes.length; ci++) {
+    const cls = classes[ci];
+    lightColumn(ci);
+    for (let pi = 0; pi < cls.photos.length; pi++) {
+      await new Promise(res => {
+        const img = new Image();
+        img.onload = async () => {
+          ctx.drawImage(img, 0, 0, 224, 224);
+          const tensor = tf.browser.fromPixels(canvas).expandDims(0).toFloat().div(127.5).sub(1);
+          const emb = mobileNet.infer(tensor, true);
+          classifier.addExample(emb, cls.name);
+          tensor.dispose();
+          done++;
+          const pct = Math.round(done / total * 70);
+          setProgress(pct);
+          document.getElementById('train-status').textContent = `Photo ${done}/${total} analysée`;
+          res();
+        };
+        img.src = cls.photos[pi];
+      });
+      await tf.nextFrame();
+    }
+  }
+
+  document.getElementById('train-label-main').textContent = 'Mémorisation des patterns...';
+  animateLayers();
+  setProgress(80);
+  await sleep(600);
+  setProgress(90);
+  await sleep(400);
+  setProgress(100);
+  await sleep(300);
+
+  document.getElementById('train-label-main').innerHTML = '<strong>Entraînement terminé !</strong>';
+  document.getElementById('train-status').textContent = `${total} photos mémorisées — ${classes.length} objets reconnus`;
+  document.getElementById('btn-go-predict').style.display = 'block';
+}
+
+function lightColumn(ci) {
+  document.querySelectorAll('.n-node').forEach(n => n.classList.remove('lit'));
+  const col = document.getElementById(`ncol-${ci % 3}`);
+  if (col) col.querySelectorAll('.n-node').forEach(n => n.classList.add('lit'));
+}
+
+function animateLayers() {
+  let l = 0;
+  const iv = setInterval(() => {
+    document.querySelectorAll('.n-node').forEach(n => n.classList.remove('lit'));
+    const col = document.getElementById(`ncol-${l}`);
+    if (col) col.querySelectorAll('.n-node').forEach(n => n.classList.add('lit'));
+    l++;
+    if (l > 4) clearInterval(iv);
+  }, 200);
+}
+
+function setProgress(pct) {
+  document.getElementById('progress-bar-fill').style.width = pct + '%';
+}
+
+/* ── PREDICT ── */
+async function goPredict() {
+  setPanel('predict');
+  buildPredBars();
+  try {
+    predictStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false });
+    document.getElementById('predict-video').srcObject = predictStream;
+    await sleep(500);
+    predicting = true;
+    predictLoop();
+  } catch(e) {
+    alert('Accès caméra refusé.');
+  }
+}
+
+function buildPredBars() {
+  const bars = document.getElementById('pred-bars');
+  bars.innerHTML = '';
+  classes.forEach((cls, i) => {
+    bars.innerHTML += `
+      <div class="pred-row">
+        <div class="pred-row-label">
+          <span style="display:flex;align-items:center;gap:6px;">
+            <span style="width:8px;height:8px;border-radius:50%;background:${cls.color};display:inline-block;"></span>
+            ${cls.name}
+          </span>
+          <span id="pct-${i}">—</span>
+        </div>
+        <div class="bar-bg">
+          <div class="bar-fill" id="bar-${i}" style="width:0%;background:${cls.color};"></div>
+        </div>
+      </div>`;
+  });
+}
+
+async function predictLoop() {
+  if (!predicting) return;
+  const video = document.getElementById('predict-video');
+  const canvas = document.getElementById('hidden-canvas');
+  canvas.width = 224; canvas.height = 224;
+  const ctx = canvas.getContext('2d');
+
+  ctx.drawImage(video, 0, 0, 224, 224);
+  const tensor = tf.browser.fromPixels(canvas).expandDims(0).toFloat().div(127.5).sub(1);
+  const emb = mobileNet.infer(tensor, true);
+  const result = await classifier.predict(emb, 5);
+  tensor.dispose(); emb.dispose();
+
+  if (result) {
+    const topClass = classes.find(c => c.name === result.label);
+    document.getElementById('pred-name').textContent = result.label;
+    document.getElementById('pred-conf').textContent = Math.round((result.confidences[result.label] || 0) * 100) + '%';
+    document.getElementById('pred-dot').style.background = topClass ? topClass.color : '#888';
+
+    classes.forEach((cls, i) => {
+      const conf = result.confidences[cls.name] || 0;
+      const pct = Math.round(conf * 100);
+      document.getElementById(`pct-${i}`).textContent = pct + '%';
+      document.getElementById(`bar-${i}`).style.width = pct + '%';
+    });
+  }
+
+  await tf.nextFrame();
+  if (predicting) requestAnimationFrame(predictLoop);
+}
+
+/* ── NAVIGATION ── */
+function setPanel(name) {
+  ['collect','train','predict'].forEach(p => {
+    document.getElementById(`panel-${p}`).classList.toggle('active', p === name);
+  });
+  const idx = ['collect','train','predict'].indexOf(name) + 1;
+  document.getElementById('header-phase').textContent = `Phase ${idx} / 3`;
+  ['ph1','ph2','ph3'].forEach((id, i) => {
+    const el = document.getElementById(id);
+    el.classList.toggle('active', i + 1 === idx);
+    el.classList.toggle('done', i + 1 < idx);
+  });
+}
+
+function goTrain_check() { }
+
+function improve() {
+  predicting = false;
+  if (predictStream) { predictStream.getTracks().forEach(t => t.stop()); predictStream = null; }
+  renderClasses();
+  setPanel('collect');
+}
+
+function restart() {
+  predicting = false;
+  if (predictStream) { predictStream.getTracks().forEach(t => t.stop()); predictStream = null; }
+  classes.forEach(c => c.photos = []);
+  classifier = new KNNClassifier();
+  renderClasses();
+  setPanel('collect');
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function closeWelcome() {
+  document.getElementById('welcome-modal').classList.add('hidden');
+}
+
+/* ── initial render ── */
+renderClasses();
+</script>
+</body>
+</html>
