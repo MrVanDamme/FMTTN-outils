@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>FMTTN — Défi Aléatoire</title>
+  <meta name="description" content="Teste tes connaissances FMTTN avec 10 défis aléatoires sur tous les thèmes !">
+  <meta property="og:title" content="FMTTN — Défi Aléatoire">
+  <meta property="og:description" content="Quiz interactif sur les matériaux, l'électricité, les outils et plus encore !">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://mrvandamme.github.io/FMTTN-outils/preview.png">
+  <style>
+    :root {
+      --bg: #0f0f13;
+      --surface: #1a1a22;
+      --surface2: #22222e;
+      --border: rgba(255,255,255,0.08);
+      --border2: rgba(255,255,255,0.15);
+      --text: #f0f0f5;
+      --muted: #888899;
+      --accent: #7c6eff;
+      --accent2: #a78bfa;
+      --green: #34d399;
+      --amber: #fbbf24;
+      --red: #f87171;
+      --radius: 14px;
+      --radius-sm: 8px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      overscroll-behavior: none;
+    }
+
+    /* HEADER */
+    header {
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 0.5px solid var(--border2);
+      background: var(--surface);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .logo {
+      width: 34px; height: 34px;
+      background: linear-gradient(135deg, #7c6eff, #a78bfa);
+      border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0;
+    }
+    .info-btn {
+      width: 28px; height: 28px;
+      background: var(--surface2);
+      border: 0.5px solid var(--border2);
+      border-radius: 50%;
+      color: var(--muted);
+      font-size: 13px; font-weight: 600;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      -webkit-tap-highlight-color: transparent;
+      font-family: inherit;
+    }
+
+    /* PROGRESS */
+    .progress-wrap {
+      padding: 14px 16px 0;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .progress-info {
+      display: flex; justify-content: space-between;
+      font-size: 12px; color: var(--muted); margin-bottom: 6px;
+    }
+    .progress-bar {
+      height: 4px; background: var(--surface2);
+      border-radius: 2px; overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 2px;
+      transition: width 0.4s ease;
+    }
+    .score-track {
+      display: flex; gap: 5px; margin-top: 10px;
+    }
+    .score-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--surface2);
+      border: 0.5px solid var(--border2);
+      transition: background 0.3s;
+    }
+    .score-dot.correct { background: var(--green); border-color: var(--green); }
+    .score-dot.wrong   { background: var(--red);   border-color: var(--red); }
+
+    /* MAIN */
+    .main { max-width: 600px; margin: 0 auto; padding: 16px; }
+
+    /* QUESTION CARD */
+    .question-card {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px; margin-bottom: 14px;
+      animation: fadeIn 0.25s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .question-badges { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+    .badge {
+      padding: 3px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 500;
+      border: 0.5px solid var(--border2);
+    }
+    .badge-theme { background: rgba(124,110,255,0.12); color: var(--accent2); }
+    .badge-type  { background: var(--surface2); color: var(--muted); }
+    .question-text {
+      font-size: 16px; font-weight: 600;
+      line-height: 1.5; letter-spacing: -0.2px;
+    }
+
+    /* OPTIONS */
+    .options { display: flex; flex-direction: column; gap: 9px; }
+    .option-btn {
+      background: var(--surface2);
+      border: 0.5px solid var(--border2);
+      border-radius: var(--radius-sm);
+      padding: 13px 16px;
+      color: var(--text); font-size: 14px; font-weight: 500;
+      text-align: left; cursor: pointer; font-family: inherit;
+      display: flex; align-items: center; gap: 10px;
+      transition: all 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .option-btn:active:not(:disabled) { transform: scale(0.98); }
+    .option-btn:disabled { cursor: default; }
+    .option-btn.correct {
+      background: rgba(52,211,153,0.15);
+      border-color: var(--green); color: var(--green);
+    }
+    .option-btn.wrong {
+      background: rgba(248,113,113,0.12);
+      border-color: var(--red); color: var(--red);
+    }
+    .option-letter {
+      width: 24px; height: 24px;
+      background: var(--surface);
+      border: 0.5px solid var(--border2);
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 600; flex-shrink: 0;
+      transition: all 0.15s;
+    }
+    .option-btn.correct .option-letter { background: var(--green); border-color: var(--green); color: #022c22; }
+    .option-btn.wrong   .option-letter { background: var(--red);   border-color: var(--red);   color: #450a0a; }
+
+    /* FEEDBACK */
+    .feedback {
+      background: var(--surface);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      font-size: 13px; line-height: 1.55; color: var(--muted);
+      display: none;
+    }
+    .feedback.show { display: block; animation: fadeIn 0.2s ease; }
+    .feedback strong { color: var(--text); }
+    .feedback.correct-fb { background: rgba(52,211,153,0.08); border: 0.5px solid rgba(52,211,153,0.3); }
+    .feedback.wrong-fb   { background: rgba(248,113,113,0.08); border: 0.5px solid rgba(248,113,113,0.3); }
+
+    /* NEXT BTN */
+    .btn-next {
+      width: 100%; padding: 14px; border-radius: var(--radius);
+      font-size: 15px; font-weight: 600; cursor: pointer;
+      font-family: inherit; background: var(--accent);
+      color: white; border: none;
+      -webkit-tap-highlight-color: transparent;
+      transition: all 0.15s; display: none; margin-top: 12px;
+    }
+    .btn-next.show { display: block; animation: fadeIn 0.2s ease; }
+    .btn-next:active { transform: scale(0.98); }
+
+    /* RESULTS */
+    .results {
+      display: none; text-align: center;
+      padding: 30px 16px;
+      max-width: 600px; margin: 0 auto;
+      animation: fadeIn 0.3s ease;
+    }
+    .results.show { display: block; }
+    .results-emoji { font-size: 60px; margin-bottom: 16px; }
+    .results h2 { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 6px; }
+    .score-big {
+      font-size: 52px; font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; margin: 10px 0;
+    }
+    .score-label { font-size: 14px; color: var(--muted); margin-bottom: 24px; }
+    .results-breakdown {
+      background: var(--surface); border: 0.5px solid var(--border);
+      border-radius: var(--radius); padding: 16px;
+      margin-bottom: 20px; text-align: left;
+    }
+    .results-breakdown h3 {
+      font-size: 12px; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 10px;
+    }
+    .theme-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 6px 0; border-bottom: 0.5px solid var(--border); font-size: 13px;
+    }
+    .theme-row:last-child { border-bottom: none; }
+    .btn-replay {
+      width: 100%; padding: 14px; border-radius: var(--radius);
+      font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit;
+      background: var(--accent); color: white; border: none;
+      -webkit-tap-highlight-color: transparent; transition: all 0.15s; margin-bottom: 10px;
+    }
+    .btn-replay:active { transform: scale(0.98); }
+    .btn-home {
+      background: var(--surface2); color: var(--text);
+      border: 0.5px solid var(--border2);
+      width: 100%; padding: 14px; border-radius: var(--radius);
+      font-size: 15px; font-weight: 500; cursor: pointer; font-family: inherit;
+      text-decoration: none; display: block;
+      -webkit-tap-highlight-color: transparent; transition: all 0.15s;
+    }
+    .btn-home:active { transform: scale(0.98); }
+
+    /* WELCOME MODAL */
+    .welcome-bg {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(6px);
+      z-index: 100;
+      display: flex; align-items: flex-end; justify-content: center;
+    }
+    .welcome-bg.hidden { display: none; }
+    .welcome-box {
+      background: var(--surface);
+      border-radius: 24px 24px 0 0;
+      padding: 28px 20px 36px;
+      max-width: 600px; width: 100%;
+      border-top: 0.5px solid var(--border2);
+      animation: slideUp 0.3s ease;
+      max-height: 90vh; overflow-y: auto;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to   { transform: translateY(0); opacity: 1; }
+    }
+    .welcome-emoji { font-size: 48px; text-align: center; margin-bottom: 12px; }
+    .welcome-box h2 {
+      text-align: center; font-size: 20px; font-weight: 700;
+      letter-spacing: -0.3px; margin-bottom: 4px;
+    }
+    .welcome-subtitle { text-align: center; font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+    .welcome-desc {
+      background: var(--surface2); border-radius: var(--radius-sm);
+      padding: 14px; font-size: 13px; color: var(--muted);
+      line-height: 1.6; margin-bottom: 16px;
+    }
+    .welcome-desc strong { color: var(--accent2); }
+    .welcome-steps { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+    .welcome-step { display: flex; align-items: flex-start; gap: 12px; }
+    .welcome-step-icon {
+      width: 36px; height: 36px; background: var(--surface2);
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0;
+    }
+    .welcome-step-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+    .welcome-step-desc { font-size: 12px; color: var(--muted); line-height: 1.45; }
+    .btn-start {
+      width: 100%; padding: 15px; border-radius: var(--radius);
+      font-size: 16px; font-weight: 700; cursor: pointer; font-family: inherit;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: white; border: none;
+      -webkit-tap-highlight-color: transparent; transition: all 0.15s; margin-bottom: 12px;
+    }
+    .btn-start:active { transform: scale(0.98); }
+    .welcome-note { text-align: center; font-size: 11px; color: var(--muted); }
+
+    /* INFO MODAL */
+    .info-modal-bg {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.75); backdrop-filter: blur(6px);
+      z-index: 100;
+      display: flex; align-items: flex-end; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.2s;
+    }
+    .info-modal-bg.open { opacity: 1; pointer-events: all; }
+    .info-modal {
+      background: var(--surface); border-radius: 24px 24px 0 0;
+      padding: 20px 20px 40px;
+      max-width: 600px; width: 100%;
+      border-top: 0.5px solid var(--border2);
+      max-height: 80vh; overflow-y: auto; position: relative;
+    }
+    .info-modal-handle {
+      width: 36px; height: 4px; background: var(--border2);
+      border-radius: 2px; margin: 0 auto 16px;
+    }
+    .info-close {
+      position: absolute; top: 16px; right: 16px;
+      background: var(--surface2); border: 0.5px solid var(--border2);
+      border-radius: 50%; width: 28px; height: 28px;
+      font-size: 13px; color: var(--muted); cursor: pointer;
+      font-family: inherit; display: flex; align-items: center; justify-content: center;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .info-modal h2 { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 16px; }
+    .info-modal h3 { font-size: 14px; font-weight: 600; color: var(--accent2); margin: 16px 0 6px; }
+    .info-modal p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+    .themes-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+    .theme-chip {
+      background: var(--surface2); border: 0.5px solid var(--border);
+      border-radius: var(--radius-sm); padding: 8px 10px;
+      font-size: 12px; display: flex; align-items: center; gap: 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- WELCOME MODAL -->
+  <div class="welcome-bg" id="welcome-modal">
+    <div class="welcome-box">
+      <div class="welcome-emoji">🎯</div>
+      <h2>FMTTN — Défi Aléatoire</h2>
+      <div class="welcome-subtitle">Mr. Van Damme</div>
+      <div class="welcome-desc">
+        Tu as <strong>quelques minutes devant toi</strong> ? Lance un défi ! Tu vas recevoir <strong>10 questions aléatoires</strong> sur tous les thèmes FMTTN. Matériaux, électricité, outils, technologie… à toi de jouer !
+      </div>
+      <div class="welcome-steps">
+        <div class="welcome-step">
+          <div class="welcome-step-icon">🎲</div>
+          <div>
+            <div class="welcome-step-title">Questions aléatoires</div>
+            <div class="welcome-step-desc">Chaque défi est unique — les questions changent à chaque partie !</div>
+          </div>
+        </div>
+        <div class="welcome-step">
+          <div class="welcome-step-icon">✅</div>
+          <div>
+            <div class="welcome-step-title">Réponds et apprends</div>
+            <div class="welcome-step-desc">Après chaque réponse, une explication t'aide à mieux comprendre.</div>
+          </div>
+        </div>
+        <div class="welcome-step">
+          <div class="welcome-step-icon">🏆</div>
+          <div>
+            <div class="welcome-step-title">Vois ton score</div>
+            <div class="welcome-step-desc">À la fin des 10 questions, découvre ton résultat et rejoue !</div>
+          </div>
+        </div>
+      </div>
+      <button class="btn-start" onclick="startQuiz()">C'est parti ! 🚀</button>
+      <div class="welcome-note">Clique sur le <strong>?</strong> en haut à droite pour en savoir plus.</div>
+    </div>
+  </div>
+
+  <!-- INFO MODAL -->
+  <div class="info-modal-bg" id="info-modal" onclick="if(event.target===this)this.classList.remove('open')">
+    <div class="info-modal">
+      <div class="info-modal-handle"></div>
+      <button class="info-close" onclick="document.getElementById('info-modal').classList.remove('open')">✕</button>
+      <h2>🎯 Comment ça marche ?</h2>
+      <h3>🎲 Des questions au hasard</h3>
+      <p>À chaque défi, 10 questions sont tirées au sort parmi plus de 50 questions. Les thèmes et les types changent à chaque fois.</p>
+      <h3>📚 Les thèmes couverts</h3>
+      <div class="themes-grid">
+        <div class="theme-chip">🪵 Matériaux</div>
+        <div class="theme-chip">⚡ Électricité</div>
+        <div class="theme-chip">🔧 Outils</div>
+        <div class="theme-chip">🦺 Sécurité</div>
+        <div class="theme-chip">📐 Dessin technique</div>
+        <div class="theme-chip">💻 Numérique</div>
+        <div class="theme-chip">♻️ Énergie</div>
+      </div>
+      <h3>❓ Les types de questions</h3>
+      <p>
+        <strong style="color:var(--text)">QCM</strong> — 4 réponses possibles, une seule est juste.<br><br>
+        <strong style="color:var(--text)">Vrai / Faux</strong> — Une affirmation à valider ou corriger.<br><br>
+        <strong style="color:var(--text)">Trouver l'intrus</strong> — Un élément ne va pas avec les autres. Lequel ?
+      </p>
+      <h3>💡 Astuce</h3>
+      <p>Lis bien l'explication après chaque réponse — même quand tu as juste ! C'est là que tu apprends vraiment.</p>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo">🎯</div>
+    <div style="flex:1;">
+      <div style="font-size:17px;font-weight:600;letter-spacing:-0.3px;">FMTTN — Défi Aléatoire</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:1px;">Mr. Van Damme</div>
+    </div>
+    <button class="info-btn" onclick="document.getElementById('info-modal').classList.add('open')">?</button>
+  </header>
+
+  <!-- PROGRESS -->
+  <div class="progress-wrap" id="progress-wrap">
+    <div class="progress-info">
+      <span id="progress-label">Question 1 / 10</span>
+      <span id="score-label">Score : 0</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress-fill" style="width:10%"></div>
+    </div>
+    <div class="score-track" id="score-track"></div>
+  </div>
+
+  <!-- QUIZ AREA -->
+  <div class="main" id="quiz-area">
+    <div class="question-card" id="question-card">
+      <div class="question-badges" id="question-badges"></div>
+      <div class="question-text" id="question-text"></div>
+    </div>
+    <div class="options" id="options"></div>
+    <div class="feedback" id="feedback"></div>
+    <button class="btn-next" id="btn-next" onclick="nextQuestion()">Question suivante →</button>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="results" id="results">
+    <div class="results-emoji" id="results-emoji">🏆</div>
+    <h2 id="results-title">Défi terminé !</h2>
+    <div class="score-big" id="results-score">8/10</div>
+    <div class="score-label" id="results-message"></div>
+    <div class="results-breakdown">
+      <h3>Détail par thème</h3>
+      <div id="theme-breakdown"></div>
+    </div>
+    <button class="btn-replay" onclick="restartQuiz()">🎲 Nouveau défi</button>
+    <a class="btn-home" href="index.html">← Retour aux outils</a>
+  </div>
+
+  <script>
+    const QUESTIONS = [
+      // MATÉRIAUX
+      { theme:'Matériaux', icon:'🪵', type:'QCM', q:'Quel matériau est le meilleur conducteur d\'électricité ?', opts:['Cuivre','Bois','Plastique','Verre'], a:0, xp:'Le cuivre conduit très bien l\'électricité. C\'est pourquoi il est utilisé dans les câbles électriques.' },
+      { theme:'Matériaux', icon:'🪵', type:'QCM', q:'Le chêne est quel type de bois ?', opts:['Bois dur','Bois tendre','Bois composite','Bois exotique'], a:0, xp:'Le chêne est un bois dur, contrairement au pin ou sapin qui sont des bois tendres. On l\'utilise pour les meubles et les parquets.' },
+      { theme:'Matériaux', icon:'🪵', type:'QCM', q:'Quelle matière première sert à fabriquer le verre ?', opts:['Sable (silice)','Pétrole','Argile','Charbon'], a:0, xp:'Le verre est fabriqué à partir de sable (silice) fondu à très haute température (environ 1700°C).' },
+      { theme:'Matériaux', icon:'🪵', type:'QCM', q:'L\'acier est un alliage composé de...', opts:['Fer et carbone','Cuivre et zinc','Aluminium et silicium','Plomb et étain'], a:0, xp:'L\'acier est du fer auquel on a ajouté du carbone (moins de 2%). Le carbone lui donne sa dureté.' },
+      { theme:'Matériaux', icon:'🪵', type:'QCM', q:'Quel matériau est fabriqué à partir du pétrole ?', opts:['Plastique','Béton','Acier','Céramique'], a:0, xp:'La plupart des plastiques sont issus du pétrole ou du gaz naturel. C\'est pourquoi ils sont difficiles à biodégrader.' },
+      { theme:'Matériaux', icon:'🪵', type:'VF', q:'L\'aluminium est plus léger que l\'acier.', opts:['VRAI','FAUX'], a:0, xp:'VRAI. L\'aluminium pèse ~2,7 kg/dm³ contre ~7,8 kg/dm³ pour l\'acier. C\'est pourquoi on l\'utilise dans les avions et les vélos.' },
+      { theme:'Matériaux', icon:'🪵', type:'VF', q:'Le bois sec est un bon conducteur électrique.', opts:['VRAI','FAUX'], a:1, xp:'FAUX. Le bois sec est un isolant électrique. Attention : le bois humide peut conduire l\'électricité !' },
+      { theme:'Matériaux', icon:'🪵', type:'VF', q:'Le plastique se dégrade rapidement dans la nature.', opts:['VRAI','FAUX'], a:1, xp:'FAUX. La plupart des plastiques mettent des centaines d\'années à se dégrader. Une bouteille PET prend ~400 ans !' },
+      { theme:'Matériaux', icon:'🪵', type:'INTRUS', q:'Quel est l\'intrus parmi ces matériaux ?', opts:['Chêne','Hêtre','Pin','Cuivre'], a:3, xp:'Le cuivre est un métal, pas un bois. Chêne, hêtre et pin sont tous des bois.' },
+      { theme:'Matériaux', icon:'🪵', type:'INTRUS', q:'Quel est l\'intrus parmi ces métaux ?', opts:['Aluminium','Acier','Cuivre','Balsa'], a:3, xp:'Le balsa est un bois très léger, pas un métal. Aluminium, acier et cuivre sont bien des métaux.' },
+      { theme:'Matériaux', icon:'🪵', type:'QCM', q:'Pourquoi utilise-t-on le cuivre pour les fils électriques ?', opts:['Il conduit très bien l\'électricité','Il est très léger','Il est transparent','Il résiste à la chaleur'], a:0, xp:'Le cuivre a une excellente conductivité électrique. Il est aussi flexible et relativement facile à mettre en forme.' },
+
+      // ÉLECTRICITÉ
+      { theme:'Électricité', icon:'⚡', type:'QCM', q:'Quelle est l\'unité de mesure du courant électrique ?', opts:['Ampère (A)','Volt (V)','Watt (W)','Ohm (Ω)'], a:0, xp:'L\'intensité du courant se mesure en ampères (A). Le volt mesure la tension, l\'ohm la résistance, le watt la puissance.' },
+      { theme:'Électricité', icon:'⚡', type:'QCM', q:'Quelle est l\'unité de mesure de la tension électrique ?', opts:['Volt (V)','Ampère (A)','Ohm (Ω)','Watt (W)'], a:0, xp:'La tension (différence de potentiel) se mesure en volts (V). En Europe, la tension du secteur est de 230 V.' },
+      { theme:'Électricité', icon:'⚡', type:'QCM', q:'À quoi sert un fusible dans un circuit ?', opts:['Protéger le circuit en cas de surcharge','Mesurer le voltage','Amplifier le courant','Stocker de l\'énergie'], a:0, xp:'Le fusible est un composant de sécurité. Quand le courant est trop fort, il "fond" et coupe le circuit pour éviter un incendie.' },
+      { theme:'Électricité', icon:'⚡', type:'QCM', q:'Quelle est la couleur du fil de terre dans une installation électrique ?', opts:['Vert-jaune','Rouge','Bleu','Marron'], a:0, xp:'Convention européenne : marron = phase, bleu = neutre, vert-jaune = terre (protection contre l\'électrocution).' },
+      { theme:'Électricité', icon:'⚡', type:'QCM', q:'Dans un circuit en série, que se passe-t-il si une lampe grille ?', opts:['Toutes les lampes s\'éteignent','Seule cette lampe s\'éteint','Les autres brillent plus fort','Rien ne change'], a:0, xp:'En série, le courant passe par un seul chemin. Si une lampe grille, le circuit est coupé et tout s\'éteint. En parallèle, les autres continuent.' },
+      { theme:'Électricité', icon:'⚡', type:'QCM', q:'Qu\'est-ce qu\'une LED ?', opts:['Une diode qui émet de la lumière','Un type de câble','Un circuit intégré','Une résistance variable'], a:0, xp:'LED = Light Emitting Diode (diode électroluminescente). Elle émet de la lumière quand le courant la traverse dans le bon sens.' },
+      { theme:'Électricité', icon:'⚡', type:'VF', q:'Un ampèremètre se branche en série dans le circuit.', opts:['VRAI','FAUX'], a:0, xp:'VRAI. L\'ampèremètre se met en série pour que tout le courant le traverse. Le voltmètre, lui, se branche en parallèle.' },
+      { theme:'Électricité', icon:'⚡', type:'VF', q:'Plus la résistance est grande, plus le courant qui la traverse est fort.', opts:['VRAI','FAUX'], a:1, xp:'FAUX. Loi d\'Ohm : I = U/R. Plus la résistance (R) augmente, plus le courant (I) diminue.' },
+      { theme:'Électricité', icon:'⚡', type:'VF', q:'Une LED peut fonctionner dans les deux sens.', opts:['VRAI','FAUX'], a:1, xp:'FAUX. Une LED est polarisée : elle ne fonctionne que dans un sens. À l\'envers, elle ne s\'allume pas.' },
+      { theme:'Électricité', icon:'⚡', type:'INTRUS', q:'Quel est l\'intrus parmi ces unités ?', opts:['Ampère','Volt','Ohm','Kilogramme'], a:3, xp:'Le kilogramme est une unité de masse, pas une unité électrique. Ampère, volt et ohm sont bien des unités électriques.' },
+
+      // OUTILS
+      { theme:'Outils', icon:'🔧', type:'QCM', q:'À quoi sert un calibre à coulisse ?', opts:['Mesurer des dimensions avec précision','Couper le métal','Percer des trous','Poncer le bois'], a:0, xp:'Le calibre à coulisse mesure épaisseurs, diamètres et profondeurs avec une précision au dixième de millimètre.' },
+      { theme:'Outils', icon:'🔧', type:'QCM', q:'Quel outil trace une ligne perpendiculaire à un bord ?', opts:['Équerre','Mètre ruban','Compas','Trusquin'], a:0, xp:'L\'équerre permet de vérifier et tracer des angles droits (90°). Elle est essentielle pour le traçage et le contrôle.' },
+      { theme:'Outils', icon:'🔧', type:'QCM', q:'Un tournevis cruciforme sert pour les vis...', opts:['Avec empreinte en croix (+)','À fente (-)','Hexagonales (Allen)','Étoile (Torx)'], a:0, xp:'Cruciforme = croix (+). Plat = fente (-). Allen = hexagone. Torx = étoile. Utiliser le bon tournevis évite d\'abîmer la vis.' },
+      { theme:'Outils', icon:'🔧', type:'QCM', q:'Quel outil mesure l\'épaisseur avec une précision au centième de mm ?', opts:['Micromètre (palmer)','Mètre ruban','Règle graduée','Fil à plomb'], a:0, xp:'Le micromètre (palmer) est plus précis que le calibre à coulisse. Il permet des mesures au centième de millimètre.' },
+      { theme:'Outils', icon:'🔧', type:'VF', q:'On peut utiliser un tournevis plat pour les vis cruciformes sans problème.', opts:['VRAI','FAUX'], a:1, xp:'FAUX. Utiliser le mauvais tournevis abîme l\'empreinte de la vis et rend le dévissage impossible ensuite.' },
+      { theme:'Outils', icon:'🔧', type:'VF', q:'Une perceuse à colonne garantit des trous parfaitement verticaux.', opts:['VRAI','FAUX'], a:0, xp:'VRAI. La perceuse à colonne est fixe : le foret descend toujours à la verticale, contrairement à une perceuse portative.' },
+      { theme:'Outils', icon:'🔧', type:'INTRUS', q:'Quel est l\'intrus parmi ces outils de l\'atelier ?', opts:['Marteau','Scie','Ciseau à bois','Voltmètre'], a:3, xp:'Le voltmètre est un instrument de mesure électrique, pas un outil pour travailler la matière.' },
+
+      // SÉCURITÉ
+      { theme:'Sécurité', icon:'🦺', type:'QCM', q:'Quels équipements faut-il porter pour poncer du bois ?', opts:['Lunettes + masque anti-poussières','Seulement des gants','Une blouse seule','Rien si c\'est rapide'], a:0, xp:'La poussière de bois est dangereuse pour les yeux et les poumons. Lunettes + masque sont indispensables !' },
+      { theme:'Sécurité', icon:'🦺', type:'QCM', q:'Que faire si tu vois un câble électrique dénudé en atelier ?', opts:['Prévenir immédiatement le professeur','L\'ignorer si tu n\'y touches pas','Le réparer toi-même','Mettre des gants et continuer'], a:0, xp:'Tout problème électrique doit être signalé immédiatement au professeur. Ne jamais manipuler soi-même une installation défectueuse.' },
+      { theme:'Sécurité', icon:'🦺', type:'QCM', q:'Pourquoi faut-il toujours fixer une pièce avant de la percer ?', opts:['Pour qu\'elle ne tourne pas et éviter les blessures','Pour faire un trou plus beau','Pour que le foret dure plus longtemps','Ce n\'est pas obligatoire'], a:0, xp:'Une pièce non fixée peut tourner brusquement avec le foret et provoquer des coupures graves. Règle de sécurité fondamentale !' },
+      { theme:'Sécurité', icon:'🦺', type:'VF', q:'On peut utiliser une machine tournante avec des manches larges.', opts:['VRAI','FAUX'], a:1, xp:'FAUX. Les vêtements amples peuvent se coincer dans les parties tournantes et provoquer des accidents très graves.' },
+      { theme:'Sécurité', icon:'🦺', type:'VF', q:'Les lunettes de protection sont obligatoires en atelier.', opts:['VRAI','FAUX'], a:0, xp:'VRAI. Les lunettes protègent des éclats, copeaux et poussières. Les yeux ne se réparent pas !' },
+      { theme:'Sécurité', icon:'🦺', type:'VF', q:'On peut laisser ses cheveux lâches quand on utilise une perceuse.', opts:['VRAI','FAUX'], a:1, xp:'FAUX. Les cheveux peuvent se coincer dans le foret en rotation et provoquer des blessures très graves. Il faut les attacher.' },
+
+      // DESSIN TECHNIQUE
+      { theme:'Dessin technique', icon:'📐', type:'QCM', q:'En dessin technique, comment représente-t-on les arêtes cachées ?', opts:['Traits discontinus (pointillés)','Traits pleins épais','Traits mixtes fins','Des croix'], a:0, xp:'Arêtes visibles → traits pleins épais. Arêtes cachées → traits discontinus (pointillés). Axes de symétrie → traits mixtes fins.' },
+      { theme:'Dessin technique', icon:'📐', type:'QCM', q:'Que signifie l\'échelle 1:2 sur un dessin ?', opts:['Le dessin est 2x plus petit que l\'objet réel','Le dessin est 2x plus grand','Même taille','L\'objet fait 2 cm'], a:0, xp:'Échelle 1:2 = dessin deux fois plus petit que l\'objet. Échelle 2:1 = dessin deux fois plus grand (pour de petits objets).' },
+      { theme:'Dessin technique', icon:'📐', type:'QCM', q:'En projection européenne, où se place la vue de gauche de l\'objet ?', opts:['À droite de la vue de face','À gauche de la vue de face','En dessous','Au-dessus'], a:0, xp:'En méthode européenne, la vue de gauche se place à droite, la vue de droite à gauche. C\'est l\'inverse de la méthode américaine !' },
+      { theme:'Dessin technique', icon:'📐', type:'VF', q:'Un plan de coupe permet de voir l\'intérieur d\'un objet.', opts:['VRAI','FAUX'], a:0, xp:'VRAI. La vue en coupe "tranche" virtuellement l\'objet pour révéler sa structure intérieure (trous, épaisseurs, cavités).' },
+      { theme:'Dessin technique', icon:'📐', type:'VF', q:'Les lignes de cote servent à indiquer les dimensions d\'un objet.', opts:['VRAI','FAUX'], a:0, xp:'VRAI. Les cotes (lignes + chiffres) donnent toutes les dimensions nécessaires pour fabriquer l\'objet.' },
+
+      // NUMÉRIQUE
+      { theme:'Numérique', icon:'💻', type:'QCM', q:'Qu\'est-ce qu\'un CPU dans un ordinateur ?', opts:['Le processeur (cerveau)','La mémoire vive','La carte graphique','Le disque dur'], a:0, xp:'CPU = Central Processing Unit = processeur. C\'est lui qui effectue tous les calculs et exécute les programmes.' },
+      { theme:'Numérique', icon:'💻', type:'QCM', q:'Qu\'est-ce que la RAM ?', opts:['Mémoire vive (temporaire)','Le processeur','La carte réseau','L\'alimentation'], a:0, xp:'La RAM stocke temporairement les données en cours d\'utilisation. Quand tu éteins l\'ordi, elle se vide complètement !' },
+      { theme:'Numérique', icon:'💻', type:'QCM', q:'Qu\'est-ce qu\'un algorithme ?', opts:['Suite d\'instructions pour résoudre un problème','Un virus informatique','Un type de câble','Un programme payant'], a:0, xp:'Un algorithme = suite d\'instructions précises pour résoudre un problème. Une recette de cuisine est un algorithme !' },
+      { theme:'Numérique', icon:'💻', type:'QCM', q:'Quelle différence entre Internet et le Web ?', opts:['Internet est le réseau, le Web est un service dessus','C\'est exactement pareil','Le Web est plus rapide','Internet = uniquement les emails'], a:0, xp:'Internet est le réseau physique mondial. Le Web est un des services sur Internet (les pages web). Les emails aussi utilisent Internet.' },
+      { theme:'Numérique', icon:'💻', type:'VF', q:'Un réseau WiFi fonctionne grâce à des ondes radio.', opts:['VRAI','FAUX'], a:0, xp:'VRAI. Le WiFi utilise des ondes radio à 2,4 GHz ou 5 GHz, comme la radio FM mais à des fréquences différentes.' },
+      { theme:'Numérique', icon:'💻', type:'VF', q:'Un ordinateur peut fonctionner sans système d\'exploitation.', opts:['VRAI','FAUX'], a:1, xp:'FAUX. Le système d\'exploitation (Windows, macOS, Linux…) est indispensable : il fait le lien entre le matériel et les applications.' },
+      { theme:'Numérique', icon:'💻', type:'INTRUS', q:'Quel est l\'intrus parmi ces composants informatiques ?', opts:['CPU','RAM','Disque dur','Équerre'], a:3, xp:'L\'équerre est un outil de traçage. CPU, RAM et disque dur sont bien des composants d\'un ordinateur.' },
+
+      // ÉNERGIE
+      { theme:'Énergie', icon:'♻️', type:'QCM', q:'Que produit un panneau solaire photovoltaïque ?', opts:['De l\'électricité','De la chaleur uniquement','Du son','Du mouvement'], a:0, xp:'Photovoltaïque = lumière → électricité directement. Les panneaux thermiques, eux, produisent de la chaleur pour l\'eau chaude.' },
+      { theme:'Énergie', icon:'♻️', type:'QCM', q:'Quel est l\'avantage principal de l\'énergie éolienne ?', opts:['Pas de CO₂ lors de la production','Fonctionne 24h/24','La moins chère de toutes','Ne prend pas de place'], a:0, xp:'Les éoliennes produisent de l\'électricité sans CO₂. Mais elles dépendent du vent — s\'il n\'y a pas de vent, pas d\'électricité.' },
+      { theme:'Énergie', icon:'♻️', type:'QCM', q:'Un kWh (kilowattheure) est une unité de...', opts:['Énergie consommée','Puissance électrique','Tension électrique','Intensité du courant'], a:0, xp:'Le kWh mesure l\'énergie. 1 ampoule de 100W allumée 10h = 1 kWh. C\'est l\'unité sur ta facture d\'électricité !' },
+      { theme:'Énergie', icon:'♻️', type:'VF', q:'L\'énergie nucléaire est une énergie renouvelable.', opts:['VRAI','FAUX'], a:1, xp:'FAUX. L\'énergie nucléaire utilise de l\'uranium, une ressource limitée. Elle est "bas carbone" (peu de CO₂) mais pas renouvelable.' },
+      { theme:'Énergie', icon:'♻️', type:'VF', q:'Recycler l\'aluminium consomme beaucoup moins d\'énergie qu\'en produire du neuf.', opts:['VRAI','FAUX'], a:0, xp:'VRAI. Recycler l\'aluminium consomme ~95% moins d\'énergie que de le produire depuis le minerai. Recycler les canettes, c\'est vraiment utile !' },
+      { theme:'Énergie', icon:'♻️', type:'INTRUS', q:'Quelle énergie n\'est pas renouvelable ?', opts:['Éolienne','Solaire','Hydraulique','Centrale à charbon'], a:3, xp:'La centrale à charbon brûle du charbon, une ressource fossile non renouvelable. Les trois autres utilisent des ressources naturelles renouvelables.' },
+    ];
+
+    let session = [], currentIndex = 0, score = 0, answered = false, sessionResults = [];
+
+    function shuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function startQuiz() {
+      document.getElementById('welcome-modal').classList.add('hidden');
+      session = shuffle(QUESTIONS).slice(0, 10);
+      currentIndex = 0; score = 0; answered = false; sessionResults = [];
+      buildScoreDots();
+      showQuestion();
+    }
+
+    function restartQuiz() {
+      document.getElementById('results').classList.remove('show');
+      document.getElementById('quiz-area').style.display = 'block';
+      document.getElementById('progress-wrap').style.display = 'block';
+      session = shuffle(QUESTIONS).slice(0, 10);
+      currentIndex = 0; score = 0; answered = false; sessionResults = [];
+      buildScoreDots();
+      showQuestion();
+    }
+
+    function buildScoreDots() {
+      const track = document.getElementById('score-track');
+      track.innerHTML = '';
+      for (let i = 0; i < 10; i++) {
+        const d = document.createElement('div');
+        d.className = 'score-dot';
+        d.id = 'dot-' + i;
+        track.appendChild(d);
+      }
+    }
+
+    function showQuestion() {
+      const q = session[currentIndex];
+      answered = false;
+
+      document.getElementById('progress-label').textContent = `Question ${currentIndex + 1} / 10`;
+      document.getElementById('score-label').textContent = `Score : ${score}`;
+      document.getElementById('progress-fill').style.width = `${(currentIndex / 10) * 100 + 10}%`;
+
+      document.getElementById('question-badges').innerHTML =
+        `<span class="badge badge-theme">${q.icon} ${q.theme}</span>` +
+        `<span class="badge badge-type">${q.type === 'VF' ? 'Vrai / Faux' : q.type === 'INTRUS' ? "Trouver l'intrus" : 'QCM'}</span>`;
+
+      document.getElementById('question-text').textContent = q.q;
+
+      let opts = q.opts.map((text, idx) => ({ text, original: idx }));
+      if (q.type !== 'VF') opts = shuffle(opts);
+      const correctNewIndex = opts.findIndex(o => o.original === q.a);
+
+      const letters = ['A','B','C','D'];
+      const optContainer = document.getElementById('options');
+      optContainer.innerHTML = '';
+      opts.forEach((opt, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.onclick = () => selectAnswer(i, correctNewIndex);
+        const letter = q.type === 'VF' ? (i === 0 ? '✓' : '✗') : letters[i];
+        btn.innerHTML = `<span class="option-letter">${letter}</span>${opt.text}`;
+        optContainer.appendChild(btn);
+      });
+
+      const fb = document.getElementById('feedback');
+      fb.className = 'feedback';
+      fb.innerHTML = '';
+      document.getElementById('btn-next').classList.remove('show');
+
+      const card = document.getElementById('question-card');
+      card.style.animation = 'none';
+      requestAnimationFrame(() => { card.style.animation = 'fadeIn 0.25s ease'; });
+    }
+
+    function selectAnswer(selected, correct) {
+      if (answered) return;
+      answered = true;
+      const q = session[currentIndex];
+      const btns = document.querySelectorAll('.option-btn');
+      const isCorrect = selected === correct;
+
+      btns.forEach((btn, i) => {
+        btn.disabled = true;
+        if (i === correct) btn.classList.add('correct');
+        else if (i === selected && !isCorrect) btn.classList.add('wrong');
+      });
+
+      const fb = document.getElementById('feedback');
+      fb.className = 'feedback show ' + (isCorrect ? 'correct-fb' : 'wrong-fb');
+      fb.innerHTML = (isCorrect ? '✅ <strong>Bravo !</strong> ' : '❌ <strong>Pas tout à fait.</strong> ') + q.xp;
+
+      document.getElementById('dot-' + currentIndex).classList.add(isCorrect ? 'correct' : 'wrong');
+      if (isCorrect) score++;
+      sessionResults.push({ theme: q.theme, icon: q.icon, correct: isCorrect });
+
+      const btnNext = document.getElementById('btn-next');
+      btnNext.textContent = currentIndex < 9 ? 'Question suivante →' : 'Voir mes résultats 🏆';
+      btnNext.classList.add('show');
+    }
+
+    function nextQuestion() {
+      currentIndex++;
+      if (currentIndex >= 10) {
+        showResults();
+      } else {
+        showQuestion();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    function showResults() {
+      document.getElementById('quiz-area').style.display = 'none';
+      document.getElementById('progress-wrap').style.display = 'none';
+      document.getElementById('results').classList.add('show');
+      document.getElementById('results-score').textContent = `${score}/10`;
+
+      let emoji, title, message;
+      if (score <= 3)      { emoji='💪'; title='Continue tes efforts !'; message='Tu es sur la bonne voie. Relis tes notes et retente le défi !'; }
+      else if (score <= 5) { emoji='📚'; title='Pas mal !'; message='Tu maîtrises certains thèmes. Identifie ceux à retravailler.'; }
+      else if (score <= 7) { emoji='👍'; title='Bien joué !'; message='Tu as de bonnes bases. Encore un peu de pratique et ce sera parfait !'; }
+      else if (score <= 9) { emoji='🌟'; title='Excellent !'; message='Tu maîtrises très bien le programme FMTTN. Bravo !'; }
+      else                 { emoji='🏆'; title='Parfait !'; message='10/10 ! Tu es un(e) expert(e) FMTTN. Impressionnant !'; }
+
+      document.getElementById('results-emoji').textContent = emoji;
+      document.getElementById('results-title').textContent = title;
+      document.getElementById('results-message').textContent = message;
+
+      const themeMap = {};
+      sessionResults.forEach(r => {
+        if (!themeMap[r.theme]) themeMap[r.theme] = { icon: r.icon, correct: 0, total: 0 };
+        themeMap[r.theme].total++;
+        if (r.correct) themeMap[r.theme].correct++;
+      });
+
+      document.getElementById('theme-breakdown').innerHTML = Object.entries(themeMap).map(([theme, d]) => {
+        const pct = d.correct / d.total;
+        const color = pct >= 0.67 ? 'var(--green)' : pct >= 0.33 ? 'var(--amber)' : 'var(--red)';
+        return `<div class="theme-row"><span>${d.icon} ${theme}</span><span style="color:${color};font-weight:600;">${d.correct}/${d.total}</span></div>`;
+      }).join('');
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>
