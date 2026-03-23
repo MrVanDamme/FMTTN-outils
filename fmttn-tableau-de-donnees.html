@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>FMTTN — Tableau de données</title>
+  <meta name="description" content="Dessine un objet et découvre comment l'IA le reconnaît grâce à une base de données de millions de dessins humains.">
+  <meta property="og:title" content="FMTTN — Tableau de données & IA">
+  <meta property="og:description" content="Dessine un objet et découvre comment une IA entraînée sur des millions de dessins humains reconnaît ce que tu dessines.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=600&q=80">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0f0f13;
+      --surface: #1a1a22;
+      --surface2: #22222e;
+      --border: rgba(255,255,255,0.08);
+      --border2: rgba(255,255,255,0.15);
+      --text: #f0f0f5;
+      --muted: #888899;
+      --accent: #7c6eff;
+      --accent2: #a78bfa;
+      --green: #34d399;
+      --amber: #fbbf24;
+      --red: #f87171;
+      --radius: 14px;
+      --radius-sm: 8px;
+    }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── HEADER ── */
+    header {
+      padding: 1.25rem 1.25rem 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .back-btn {
+      display: flex; align-items: center; justify-content: center;
+      width: 34px; height: 34px;
+      border-radius: 9px;
+      background: var(--surface2);
+      border: 0.5px solid var(--border2);
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 16px;
+      flex-shrink: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .logo {
+      width: 34px; height: 34px;
+      background: linear-gradient(135deg, #7c6eff, #a78bfa);
+      border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0;
+    }
+    .info-btn {
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      background: var(--surface2);
+      border: 0.5px solid var(--border2);
+      color: var(--muted);
+      font-size: 13px; font-weight: 600;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      -webkit-tap-highlight-color: transparent;
+      flex-shrink: 0;
+    }
+
+    /* ── PHASES ── */
+    .phases {
+      display: flex;
+      margin: 1rem 1.25rem;
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 4px;
+      border: 0.5px solid var(--border);
+      gap: 0;
+    }
+    .phase-btn {
+      flex: 1;
+      text-align: center;
+      padding: 8px 4px;
+      font-size: 12px; font-weight: 500;
+      color: var(--muted);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center;
+      gap: 5px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .phase-btn.active { background: var(--surface2); color: var(--text); }
+    .phase-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border2); transition: background 0.2s; }
+    .phase-btn.active .phase-dot { background: var(--accent); }
+    .phase-btn.done .phase-dot { background: var(--green); }
+
+    /* ── PANELS ── */
+    .panel { padding: 0 1.25rem 2rem; display: none; }
+    .panel.active { display: block; }
+
+    /* ── BUTTONS ── */
+    .btn {
+      padding: 9px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 13px; font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      -webkit-tap-highlight-color: transparent;
+      transition: all 0.15s;
+      border: none;
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-accent { background: var(--accent); color: white; }
+    .btn-ghost { background: var(--surface2); color: var(--text); border: 0.5px solid var(--border2); }
+    .btn-lg { width: 100%; padding: 14px; font-size: 15px; border-radius: var(--radius); }
+
+    /* ── CANVAS ── */
+    #draw-canvas {
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: var(--radius);
+      border: 2px solid var(--border2);
+      cursor: crosshair;
+      touch-action: none;
+      display: block;
+      background: white;
+      margin-bottom: 10px;
+    }
+
+    /* ── STATUS ── */
+    .status-strip {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      font-size: 12px; color: var(--muted);
+      margin-bottom: 12px;
+      display: flex; align-items: center; gap: 8px;
+      line-height: 1.5;
+    }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--amber); flex-shrink: 0; }
+    .status-dot.ready { background: var(--green); }
+    .status-dot.loading { background: var(--accent); animation: pulse 1s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    /* ── PREDICTIONS ── */
+    .section-title {
+      font-size: 11px; font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 10px; margin-top: 16px;
+    }
+    .pred-item {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 7px;
+    }
+    .pred-label {
+      width: 110px; font-size: 13px;
+      color: var(--text); text-align: right;
+      text-transform: capitalize; flex-shrink: 0;
+    }
+    .pred-bar-wrap {
+      flex: 1; height: 18px;
+      background: var(--surface2);
+      border-radius: 5px; overflow: hidden;
+      border: 0.5px solid var(--border);
+    }
+    .pred-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 5px;
+      transition: width 0.35s ease;
+    }
+    .pred-pct { width: 36px; font-size: 12px; color: var(--muted); text-align: right; flex-shrink: 0; }
+    .pred-empty { color: var(--muted); font-size: 13px; text-align: center; padding: 1.5rem 0; }
+
+    /* ── DATABASE ── */
+    .stat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+    .stat-card {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px; text-align: center;
+    }
+    .stat-value { font-size: 20px; font-weight: 700; color: var(--accent2); }
+    .stat-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    .category-select {
+      width: 100%;
+      background: var(--surface2);
+      border: 0.5px solid var(--border2);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      padding: 10px 12px;
+      font-size: 13px; font-family: inherit;
+      outline: none;
+      margin-bottom: 14px;
+      -webkit-appearance: none;
+    }
+
+    .db-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .db-item {
+      background: var(--surface);
+      border: 0.5px solid var(--border2);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      transition: border-color 0.15s;
+    }
+    .db-item canvas { width: 100%; aspect-ratio: 1; display: block; background: white; }
+    .db-item-label { padding: 4px 6px; font-size: 10px; color: var(--muted); text-align: center; }
+
+    /* ── DATA TABLE ── */
+    .data-table-wrap {
+      overflow-x: auto;
+      border-radius: var(--radius-sm);
+      border: 0.5px solid var(--border2);
+      margin-bottom: 12px;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th {
+      background: var(--surface2); color: var(--muted);
+      padding: 8px 10px; text-align: left;
+      font-weight: 500; white-space: nowrap;
+    }
+    td {
+      padding: 6px 10px;
+      border-top: 0.5px solid var(--border);
+      color: var(--text); vertical-align: middle;
+    }
+    .badge-green { color: var(--green); }
+    .badge-red { color: var(--red); }
+
+    .info-box {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      font-size: 12px; color: var(--muted);
+      margin-bottom: 14px; line-height: 1.6;
+    }
+    .info-box strong { color: var(--accent2); }
+
+    .loader { color: var(--muted); font-size: 13px; text-align: center; padding: 2rem 0; }
+
+    /* ── WELCOME MODAL ── */
+    .welcome-bg {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.88);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100; padding: 1rem;
+    }
+    .welcome-box {
+      background: var(--surface);
+      border: 0.5px solid var(--border2);
+      border-radius: 20px;
+      padding: 1.75rem 1.5rem;
+      max-width: 400px; width: 100%;
+      max-height: 90vh; overflow-y: auto;
+      text-align: center;
+    }
+    .welcome-emoji { font-size: 48px; margin-bottom: 0.75rem; }
+    .welcome-box h2 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+    .welcome-box .subtitle { font-size: 13px; color: var(--muted); margin-bottom: 1.25rem; }
+    .welcome-steps { text-align: left; margin-bottom: 1.25rem; display: flex; flex-direction: column; gap: 10px; }
+    .welcome-step { display: flex; gap: 12px; align-items: flex-start; }
+    .welcome-step-icon {
+      width: 36px; height: 36px;
+      background: var(--surface2);
+      border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0;
+    }
+    .welcome-step-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+    .welcome-step-desc { font-size: 12px; color: var(--muted); line-height: 1.4; }
+    .btn-welcome {
+      width: 100%; padding: 14px;
+      background: var(--accent); color: white;
+      border: none; border-radius: var(--radius);
+      font-size: 15px; font-weight: 600;
+      cursor: pointer; font-family: inherit;
+      margin-bottom: 0.75rem;
+      -webkit-tap-highlight-color: transparent;
+      transition: all 0.15s;
+    }
+    .btn-welcome:active { transform: scale(0.98); }
+    .welcome-teacher { font-size: 11px; color: var(--muted); }
+    .welcome-teacher strong { color: var(--accent2); }
+
+    /* ── INFO MODAL ── */
+    .info-modal-bg {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 200;
+      display: flex; align-items: flex-end; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .info-modal-bg.open { opacity: 1; pointer-events: all; }
+    .info-modal {
+      background: var(--surface);
+      border: 0.5px solid var(--border2);
+      border-radius: 20px 20px 0 0;
+      padding: 1.5rem;
+      max-width: 500px; width: 100%;
+      max-height: 80vh; overflow-y: auto;
+      position: relative;
+      transform: translateY(100%);
+      transition: transform 0.3s ease;
+    }
+    .info-modal-bg.open .info-modal { transform: translateY(0); }
+    .info-modal-handle {
+      width: 36px; height: 4px;
+      background: var(--border2); border-radius: 2px;
+      margin: 0 auto 1.25rem;
+    }
+    .info-close {
+      position: absolute; top: 1rem; right: 1rem;
+      background: var(--surface2); border: 0.5px solid var(--border2);
+      color: var(--muted); border-radius: 50%;
+      width: 28px; height: 28px;
+      cursor: pointer; font-size: 13px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .info-modal h2 { font-size: 18px; font-weight: 700; margin-bottom: 1rem; }
+    .info-modal h3 { font-size: 14px; font-weight: 600; margin: 1rem 0 0.4rem; color: var(--accent2); }
+    .info-modal p { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 0.5rem; }
+    .analogy-card {
+      background: var(--surface2);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      font-size: 12px; color: var(--muted);
+      margin: 0.5rem 0; line-height: 1.5;
+      border-left: 2px solid var(--accent);
+    }
+    .analogy-card strong { color: var(--text); }
+
+    /* ── AI CALLOUT ── */
+    .ai-callout {
+      background: rgba(124,110,255,0.1);
+      border: 0.5px solid rgba(124,110,255,0.3);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      font-size: 13px;
+      margin-bottom: 10px;
+      display: none;
+    }
+    .ai-callout.show { display: block; }
+    .ai-callout-label { color: var(--muted); font-size: 11px; margin-bottom: 2px; }
+    .ai-callout-word { color: var(--accent2); font-size: 18px; font-weight: 700; text-transform: capitalize; }
+  </style>
+</head>
+<body>
+
+<!-- WELCOME MODAL -->
+<div class="welcome-bg" id="welcome-modal">
+  <div class="welcome-box">
+    <div class="welcome-emoji">✏️</div>
+    <h2>FMTTN — Tableau de données</h2>
+    <p class="subtitle">Mr. Van Damme</p>
+
+    <div style="background:var(--surface2);border-radius:var(--radius);padding:14px 16px;margin-bottom:1.25rem;text-align:left;">
+      <p style="font-size:14px;color:var(--text);font-weight:600;margin-bottom:6px;">🎯 Quel est l'objectif ?</p>
+      <p style="font-size:13px;color:var(--muted);line-height:1.65;margin:0;">
+        Tu vas <strong style="color:var(--text)">dessiner des objets</strong> et une IA va tenter de les reconnaître. Tu pourras ensuite <strong style="color:var(--text)">explorer la base de données</strong> qui lui a tout appris — des millions de dessins réalisés par des humains du monde entier. C'est ça, un <strong style="color:var(--text)">tableau de données</strong> !
+      </p>
+    </div>
+
+    <div class="welcome-steps">
+      <div class="welcome-step">
+        <div class="welcome-step-icon">✏️</div>
+        <div>
+          <div class="welcome-step-title">Dessine un objet</div>
+          <div class="welcome-step-desc">Utilise ta souris ou ton doigt dans le cadre blanc.</div>
+        </div>
+      </div>
+      <div class="welcome-step">
+        <div class="welcome-step-icon">🤖</div>
+        <div>
+          <div class="welcome-step-title">L'IA devine en temps réel</div>
+          <div class="welcome-step-desc">Elle affiche ses meilleures hypothèses avec un pourcentage de confiance.</div>
+        </div>
+      </div>
+      <div class="welcome-step">
+        <div class="welcome-step-icon">📊</div>
+        <div>
+          <div class="welcome-step-title">Explore la base de données</div>
+          <div class="welcome-step-desc">Vois les dessins humains que l'IA a étudiés pour apprendre à reconnaître les objets.</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-welcome" onclick="closeWelcome()">C'est parti ! 🚀</button>
+    <div class="welcome-teacher">Clique sur le <strong>?</strong> en haut à droite pour en savoir plus.</div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <a href="index.html" class="back-btn" title="Retour à l'accueil">←</a>
+  <div class="logo">✏️</div>
+  <div style="flex:1;">
+    <h1 style="margin:0;line-height:1.2;font-size:17px;font-weight:600;">FMTTN — Tableau de données</h1>
+    <div style="font-size:11px;color:var(--muted);margin-top:1px;">Mr. Van Damme</div>
+  </div>
+  <button class="info-btn" onclick="document.getElementById('info-modal').classList.add('open')" title="Comment ça marche ?">?</button>
+</header>
+
+<!-- PHASES -->
+<div class="phases">
+  <div class="phase-btn active" id="ph1" onclick="goToPhase(1)"><div class="phase-dot"></div>✏️ Dessiner</div>
+  <div class="phase-btn" id="ph2" onclick="goToPhase(2)"><div class="phase-dot"></div>📊 Base de données</div>
+</div>
+
+<!-- ── PANEL 1 : DESSINER ── -->
+<div class="panel active" id="panel1">
+
+  <div class="status-strip">
+    <div class="status-dot loading" id="model-dot"></div>
+    <span id="model-status">Chargement du modèle IA…</span>
+  </div>
+
+  <canvas id="draw-canvas" width="400" height="400"></canvas>
+
+  <div style="display:flex;gap:8px;margin-bottom:4px;">
+    <button class="btn btn-ghost" onclick="clearCanvas()" style="flex:1;">🗑️ Effacer</button>
+    <button class="btn btn-accent" onclick="goToPhase(2)" style="flex:2;">📊 Voir la base de données →</button>
+  </div>
+
+  <div class="section-title">Ce que l'IA reconnaît</div>
+
+  <div class="ai-callout" id="ai-callout">
+    <div class="ai-callout-label">Meilleure hypothèse</div>
+    <div class="ai-callout-word" id="ai-top-word">—</div>
+  </div>
+
+  <div id="pred-list">
+    <div class="pred-empty">Dessine quelque chose pour voir les prédictions</div>
+  </div>
+
+</div>
+
+<!-- ── PANEL 2 : BASE DE DONNÉES ── -->
+<div class="panel" id="panel2">
+
+  <div class="section-title">Catégorie à explorer</div>
+  <select class="category-select" id="category-select" onchange="loadCategory()"></select>
+
+  <div class="stat-row">
+    <div class="stat-card">
+      <div class="stat-value" id="stat-count">—</div>
+      <div class="stat-label">dessins dans cette catégorie</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">345</div>
+      <div class="stat-label">catégories au total</div>
+    </div>
+  </div>
+
+  <div class="section-title">Exemples de dessins humains</div>
+  <div class="db-grid" id="db-grid">
+    <div class="loader" style="grid-column:1/-1;">Chargement…</div>
+  </div>
+
+  <div class="section-title">Aperçu du tableau de données</div>
+  <div class="info-box">
+    💡 Chaque <strong>ligne</strong> du tableau ci-dessous = <strong>un dessin réalisé par un humain</strong>. L'IA a appris à reconnaître les objets en étudiant des <strong>millions</strong> de ces lignes.
+  </div>
+  <div class="data-table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Dessin</th>
+          <th>Objet</th>
+          <th>Reconnu ?</th>
+          <th>Pays</th>
+        </tr>
+      </thead>
+      <tbody id="table-body">
+        <tr><td colspan="5" class="loader">Chargement…</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <button class="btn btn-ghost btn-lg" onclick="goToPhase(1)" style="margin-top:8px;">← Redessiner</button>
+</div>
+
+<!-- ── INFO MODAL ── -->
+<div class="info-modal-bg" id="info-modal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="info-modal">
+    <div class="info-modal-handle"></div>
+    <button class="info-close" onclick="document.getElementById('info-modal').classList.remove('open')">✕</button>
+    <h2>📊 Le tableau de données</h2>
+
+    <h3>C'est quoi une base de données ?</h3>
+    <p>Une base de données, c'est un <em>tableau géant</em> où chaque ligne contient une information. Pour une IA qui reconnaît des dessins, chaque ligne contient un dessin et le nom de l'objet correspondant.</p>
+    <div class="analogy-card"><strong>Analogie :</strong> Imagine un cahier avec 100 000 pages. Sur chaque page : un dessin de chat et le mot "chat" écrit en dessous. L'IA lit ce cahier en entier et apprend à reconnaître un chat.</div>
+
+    <h3>Quick, Draw! de Google</h3>
+    <p>Le modèle IA utilisé ici a été entraîné sur <strong>Quick, Draw!</strong>, un jeu de Google où des millions de personnes ont dessiné des objets en 20 secondes. Résultat : <strong>50 millions de dessins</strong> dans <strong>345 catégories</strong>, disponibles gratuitement.</p>
+
+    <h3>Comment l'IA apprend ?</h3>
+    <p>L'IA compare ton dessin avec tous les exemples. Elle calcule lequel lui ressemble le plus. Plus il y a d'exemples, plus elle est précise !</p>
+    <div class="analogy-card"><strong>Analogie gaming :</strong> C'est comme une IA dans un jeu qui a regardé des milliers de parties pour apprendre les meilleurs coups. Plus elle a vu de parties, meilleure elle est.</div>
+
+    <h3>Pourquoi parfois elle se trompe ?</h3>
+    <p>Si ton dessin est trop différent des exemples qu'elle a vus (style, angle, détails), elle peut se tromper. C'est pour ça qu'on a besoin d'un maximum de données variées !</p>
+  </div>
+</div>
+
+<!-- ml5.js -->
+<script src="https://unpkg.com/ml5@0.9.4/dist/ml5.min.js"></script>
+<script>
+
+// ── CATÉGORIES (subset du dataset Quick Draw) ──
+const CATEGORIES = {
+  'cat':       { fr: 'Chat',        count: '123 312' },
+  'dog':       { fr: 'Chien',       count: '118 980' },
+  'fish':      { fr: 'Poisson',     count: '114 673' },
+  'bird':      { fr: 'Oiseau',      count: '117 541' },
+  'tree':      { fr: 'Arbre',       count: '116 254' },
+  'house':     { fr: 'Maison',      count: '121 790' },
+  'car':       { fr: 'Voiture',     count: '119 500' },
+  'bicycle':   { fr: 'Vélo',        count: '111 820' },
+  'sun':       { fr: 'Soleil',      count: '108 430' },
+  'moon':      { fr: 'Lune',        count: '104 610' },
+  'star':      { fr: 'Étoile',      count: '109 230' },
+  'apple':     { fr: 'Pomme',       count: '117 100' },
+  'flower':    { fr: 'Fleur',       count: '118 760' },
+  'clock':     { fr: 'Horloge',     count: '113 450' },
+  'guitar':    { fr: 'Guitare',     count: '109 980' },
+  'eye':       { fr: 'Œil',         count: '106 780' },
+  'butterfly': { fr: 'Papillon',    count: '110 540' },
+  'boat':      { fr: 'Bateau',      count: '107 890' },
+  'elephant':  { fr: 'Éléphant',    count: '112 670' },
+  'spider':    { fr: 'Araignée',    count: '105 320' },
+  'pizza':     { fr: 'Pizza',       count: '108 140' },
+  'banana':    { fr: 'Banane',      count: '115 670' },
+  'book':      { fr: 'Livre',       count: '116 990' },
+  'cup':       { fr: 'Tasse',       count: '114 200' },
+  'hat':       { fr: 'Chapeau',     count: '112 100' },
+};
+
+// ── CANVAS SETUP ──
+const canvas = document.getElementById('draw-canvas');
+const ctx = canvas.getContext('2d');
+let isDrawing = false;
+let lastX = 0, lastY = 0;
+let classifier = null;
+let classifyTimer = null;
+let currentTopLabel = 'cat';
+let hasDrawn = false;
+
+function getPos(e) {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  const src = e.touches ? e.touches[0] : e;
+  return {
+    x: (src.clientX - rect.left) * scaleX,
+    y: (src.clientY - rect.top) * scaleY,
+  };
+}
+
+function initCanvas() {
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.strokeStyle = '#111118';
+  ctx.lineWidth = 10;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+}
+
+canvas.addEventListener('mousedown', e => { isDrawing = true; const p = getPos(e); lastX = p.x; lastY = p.y; });
+canvas.addEventListener('mousemove', e => {
+  if (!isDrawing) return;
+  const p = getPos(e);
+  ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(p.x, p.y); ctx.stroke();
+  lastX = p.x; lastY = p.y; hasDrawn = true;
+});
+canvas.addEventListener('mouseup', () => isDrawing = false);
+canvas.addEventListener('mouseleave', () => isDrawing = false);
+
+canvas.addEventListener('touchstart', e => { e.preventDefault(); isDrawing = true; const p = getPos(e); lastX = p.x; lastY = p.y; }, { passive: false });
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+  if (!isDrawing) return;
+  const p = getPos(e);
+  ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(p.x, p.y); ctx.stroke();
+  lastX = p.x; lastY = p.y; hasDrawn = true;
+}, { passive: false });
+canvas.addEventListener('touchend', () => isDrawing = false);
+
+function clearCanvas() {
+  initCanvas();
+  hasDrawn = false;
+  document.getElementById('pred-list').innerHTML = '<div class="pred-empty">Dessine quelque chose pour voir les prédictions</div>';
+  document.getElementById('ai-callout').classList.remove('show');
+}
+
+// ── ML5 DOODLENET ──
+function loadModel() {
+  try {
+    classifier = ml5.imageClassifier('DoodleNet', onModelReady);
+  } catch(e) {
+    onModelError();
+  }
+}
+
+function onModelReady() {
+  const dot = document.getElementById('model-dot');
+  const status = document.getElementById('model-status');
+  dot.className = 'status-dot ready';
+  status.textContent = 'IA prête — dessine quelque chose !';
+  startClassifying();
+}
+
+function onModelError() {
+  const dot = document.getElementById('model-dot');
+  const status = document.getElementById('model-status');
+  dot.className = 'status-dot';
+  dot.style.background = 'var(--red)';
+  status.textContent = 'Modèle non disponible (connexion requise). Explore quand même la base !';
+}
+
+function startClassifying() {
+  if (classifyTimer) clearInterval(classifyTimer);
+  classifyTimer = setInterval(() => {
+    if (!classifier || !hasDrawn) return;
+    classifier.classify(canvas, (err, results) => {
+      if (err || !results || !results.length) return;
+      currentTopLabel = results[0].label;
+      showPredictions(results.slice(0, 5));
+    });
+  }, 700);
+}
+
+function showPredictions(results) {
+  const callout = document.getElementById('ai-callout');
+  const topWord = document.getElementById('ai-top-word');
+  const list = document.getElementById('pred-list');
+
+  callout.classList.add('show');
+  const cat = CATEGORIES[results[0].label];
+  topWord.textContent = cat ? cat.fr : results[0].label;
+
+  list.innerHTML = results.map((r, i) => {
+    const pct = Math.round(r.confidence * 100);
+    const cat = CATEGORIES[r.label];
+    const label = cat ? cat.fr : r.label;
+    return `
+      <div class="pred-item">
+        <div class="pred-label" style="${i===0 ? 'color:var(--accent2);font-weight:600;' : ''}">${label}</div>
+        <div class="pred-bar-wrap">
+          <div class="pred-bar" style="width:${pct}%;${i>0 ? 'opacity:0.45;' : ''}"></div>
+        </div>
+        <div class="pred-pct">${pct}%</div>
+      </div>`;
+  }).join('');
+}
+
+// ── NAVIGATION ──
+function goToPhase(n) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.phase-btn').forEach(b => b.classList.remove('active', 'done'));
+  document.getElementById('panel' + n).classList.add('active');
+  document.getElementById('ph' + n).classList.add('active');
+  for (let i = 1; i < n; i++) document.getElementById('ph' + i).classList.add('done');
+
+  if (n === 2) {
+    const sel = document.getElementById('category-select');
+    if (currentTopLabel && CATEGORIES[currentTopLabel]) {
+      sel.value = currentTopLabel;
+    }
+    loadCategory();
+  }
+}
+
+function closeWelcome() {
+  document.getElementById('welcome-modal').style.display = 'none';
+}
+
+// ── SELECT CATEGORIES ──
+function populateSelect() {
+  const sel = document.getElementById('category-select');
+  Object.entries(CATEGORIES).forEach(([key, val]) => {
+    const opt = document.createElement('option');
+    opt.value = key;
+    opt.textContent = `${val.fr}  —  ${val.count} dessins`;
+    sel.appendChild(opt);
+  });
+}
+
+// ── FETCH QUICKDRAW DATA ──
+async function loadCategory() {
+  const word = document.getElementById('category-select').value;
+  const info = CATEGORIES[word];
+  document.getElementById('stat-count').textContent = info ? info.count : '—';
+
+  const grid = document.getElementById('db-grid');
+  const tbody = document.getElementById('table-body');
+  grid.innerHTML = '<div class="loader" style="grid-column:1/-1;">Chargement depuis Google Quick, Draw!…</div>';
+  tbody.innerHTML = '<tr><td colspan="5" class="loader">Chargement…</td></tr>';
+
+  try {
+    const url = `https://storage.googleapis.com/quickdraw_dataset/full/simplified/${encodeURIComponent(word)}.ndjson`;
+    const response = await fetch(url, { headers: { 'Range': 'bytes=0-25000' } });
+    const text = await response.text();
+    const drawings = [];
+    for (const line of text.split('\n')) {
+      if (!line.trim().startsWith('{')) continue;
+      try { drawings.push(JSON.parse(line)); } catch(e) {}
+      if (drawings.length >= 9) break;
+    }
+    renderGrid(drawings);
+    renderTable(drawings, info ? info.fr : word);
+  } catch(e) {
+    grid.innerHTML = `<div class="loader" style="grid-column:1/-1;color:var(--red);">Impossible de charger les données.<br><small>Vérifie ta connexion internet.</small></div>`;
+    tbody.innerHTML = `<tr><td colspan="5" style="color:var(--red);text-align:center;padding:1rem;">Erreur de chargement</td></tr>`;
+  }
+}
+
+// ── RENDER STROKE ──
+function renderStroke(ctx, drawing, size) {
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  for (const stroke of drawing) {
+    for (const x of stroke[0]) { if (x < minX) minX = x; if (x > maxX) maxX = x; }
+    for (const y of stroke[1]) { if (y < minY) minY = y; if (y > maxY) maxY = y; }
+  }
+  const range = Math.max(maxX - minX, maxY - minY, 1);
+  const scale = (size * 0.8) / range;
+  const ox = (size - (maxX - minX) * scale) / 2 - minX * scale;
+  const oy = (size - (maxY - minY) * scale) / 2 - minY * scale;
+
+  ctx.strokeStyle = '#111118';
+  ctx.lineWidth = Math.max(1.5, size / 55);
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
+  for (const stroke of drawing) {
+    const xs = stroke[0], ys = stroke[1];
+    if (!xs.length) continue;
+    ctx.beginPath();
+    ctx.moveTo(xs[0] * scale + ox, ys[0] * scale + oy);
+    for (let i = 1; i < xs.length; i++) ctx.lineTo(xs[i] * scale + ox, ys[i] * scale + oy);
+    ctx.stroke();
+  }
+}
+
+function makeThumb(drawing, size) {
+  const c = document.createElement('canvas');
+  c.width = size; c.height = size;
+  const cx = c.getContext('2d');
+  cx.fillStyle = 'white';
+  cx.fillRect(0, 0, size, size);
+  renderStroke(cx, drawing, size);
+  return c;
+}
+
+function renderGrid(drawings) {
+  const grid = document.getElementById('db-grid');
+  if (!drawings.length) { grid.innerHTML = '<div class="loader" style="grid-column:1/-1;">Aucun dessin trouvé.</div>'; return; }
+  grid.innerHTML = '';
+  drawings.slice(0, 9).forEach((d, i) => {
+    const item = document.createElement('div');
+    item.className = 'db-item';
+    item.appendChild(makeThumb(d.drawing, 120));
+    const lbl = document.createElement('div');
+    lbl.className = 'db-item-label';
+    lbl.textContent = `#${i + 1} · ${d.countrycode || '?'}`;
+    item.appendChild(lbl);
+    grid.appendChild(item);
+  });
+}
+
+function renderTable(drawings, wordFr) {
+  const tbody = document.getElementById('table-body');
+  tbody.innerHTML = '';
+  if (!drawings.length) return;
+  drawings.slice(0, 6).forEach((d, i) => {
+    const thumb = makeThumb(d.drawing, 40);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="color:var(--muted)">${i + 1}</td>
+      <td><img src="${thumb.toDataURL()}" width="36" height="36" style="border-radius:4px;display:block;"></td>
+      <td>${wordFr}</td>
+      <td class="${d.recognized ? 'badge-green' : 'badge-red'}">${d.recognized ? '✓ Oui' : '✗ Non'}</td>
+      <td style="color:var(--muted)">${d.countrycode || '?'}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+// ── INIT ──
+initCanvas();
+populateSelect();
+loadModel();
+</script>
+</body>
+</html>
