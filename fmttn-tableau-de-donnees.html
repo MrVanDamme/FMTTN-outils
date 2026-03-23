@@ -523,8 +523,9 @@
   </div>
 </div>
 
-<!-- TensorFlow.js -->
+<!-- ml5.js v1 + TensorFlow.js -->
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
+<script src="https://unpkg.com/ml5@1.0.1/dist/ml5.min.js"></script>
 <script>
 
 // ── DOODLENET LABELS (345 catégories Quick Draw) ──
@@ -619,46 +620,71 @@ function clearCanvas() {
   document.getElementById('ai-callout').classList.remove('show');
 }
 
-// ── TENSORFLOW.JS DOODLENET ──
+// ── ML5 + TENSORFLOW.JS DOODLENET ──
 let tfModel = null;
+let ml5Classifier = null;
 
 async function loadModel() {
   const dot = document.getElementById('model-dot');
   const status = document.getElementById('model-status');
+
+  // Essai 1 : ml5.js v1
+  try {
+    if (typeof ml5 !== 'undefined') {
+      ml5Classifier = await ml5.imageClassifier('DoodleNet');
+      dot.className = 'status-dot ready';
+      status.textContent = 'IA prête — dessine quelque chose !';
+      startClassifying();
+      return;
+    }
+  } catch(e) {}
+
+  // Essai 2 : TensorFlow.js direct
   try {
     tfModel = await tf.loadLayersModel(
       'https://storage.googleapis.com/tfjs-models/tfjs/doodlenet_025_0.5/model.json'
     );
-    // Warm up
     const dummy = tf.zeros([1, 28, 28, 1]);
     tfModel.predict(dummy).dispose();
     dummy.dispose();
     dot.className = 'status-dot ready';
     status.textContent = 'IA prête — dessine quelque chose !';
     startClassifying();
-  } catch(e) {
-    dot.className = 'status-dot';
-    dot.style.background = 'var(--red)';
-    status.textContent = 'Modèle IA non disponible. Explore quand même la base de données !';
-  }
+    return;
+  } catch(e) {}
+
+  dot.className = 'status-dot';
+  dot.style.background = 'var(--red)';
+  status.textContent = 'Modèle IA non disponible. Explore quand même la base de données !';
 }
 
-function classifyNow() {
-  if (!tfModel || !hasDrawn) return;
-  tf.tidy(() => {
-    const img = tf.browser.fromPixels(canvas, 1).toFloat();
-    const resized = tf.image.resizeBilinear(img, [28, 28]);
-    const inverted = tf.scalar(255).sub(resized).div(255);
-    const batched = inverted.expandDims(0);
-    const pred = tfModel.predict(batched);
-    const values = pred.dataSync();
-    const results = Array.from(values)
-      .map((confidence, i) => ({ label: DOODLENET_LABELS[i] || String(i), confidence }))
-      .sort((a, b) => b.confidence - a.confidence)
-      .slice(0, 5);
-    currentTopLabel = results[0]?.label || 'cat';
-    showPredictions(results);
-  });
+async function classifyNow() {
+  if (!hasDrawn) return;
+
+  if (ml5Classifier) {
+    try {
+      const results = await ml5Classifier.classify(canvas);
+      currentTopLabel = results[0]?.label || 'cat';
+      showPredictions(results.slice(0, 5));
+    } catch(e) {}
+    return;
+  }
+
+  if (tfModel) {
+    tf.tidy(() => {
+      const img = tf.browser.fromPixels(canvas, 1).toFloat();
+      const resized = tf.image.resizeBilinear(img, [28, 28]);
+      const inverted = tf.scalar(255).sub(resized).div(255);
+      const batched = inverted.expandDims(0);
+      const values = tfModel.predict(batched).dataSync();
+      const results = Array.from(values)
+        .map((confidence, i) => ({ label: DOODLENET_LABELS[i] || String(i), confidence }))
+        .sort((a, b) => b.confidence - a.confidence)
+        .slice(0, 5);
+      currentTopLabel = results[0]?.label || 'cat';
+      showPredictions(results);
+    });
+  }
 }
 
 function startClassifying() {
