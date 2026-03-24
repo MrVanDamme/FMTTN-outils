@@ -387,6 +387,7 @@
     aspect-ratio: 4/3;
     object-fit: cover;
     background: var(--surface);
+    max-height: 42vh;
   }
 
   .prediction-box {
@@ -789,6 +790,10 @@
 
 <!-- PANEL 1: CAPTURE -->
 <div class="panel active" id="panel-collect">
+  <div id="restore-banner" style="display:none;background:var(--surface2);border:0.5px solid #34d399;border-radius:var(--radius);padding:12px 16px;margin-bottom:12px;color:#34d399;font-size:13px;gap:10px;align-items:center;justify-content:space-between;">
+    <span>✅ Tes photos ont été restaurées ! Clique sur <strong>Entraîner l'IA</strong> pour continuer.</span>
+    <button onclick="clearSavedState()" style="background:transparent;border:0.5px solid var(--border2);color:var(--muted);border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;">Recommencer à zéro</button>
+  </div>
   <div class="classes-list" id="classes-list"></div>
   <button class="add-class-btn" onclick="addClass()">+ Ajouter un objet</button>
 
@@ -919,11 +924,47 @@ function euclidean(a, b) {
   return Math.sqrt(sum);
 }
 
+/* ── PERSISTENCE ── */
+function saveState() {
+  try {
+    const hasPhotos = classes.some(c => c.photos && c.photos.length > 0);
+    if (!hasPhotos) return;
+    localStorage.setItem('fmttn-aa', JSON.stringify({
+      classes: classes.map(c => ({ name: c.name, color: c.color, photos: c.photos }))
+    }));
+  } catch(e) {}
+}
+
+function restoreState() {
+  try {
+    const raw = localStorage.getItem('fmttn-aa');
+    if (!raw) return false;
+    const saved = JSON.parse(raw);
+    if (!saved.classes || saved.classes.length < 2 || saved.classes.every(c => !c.photos || !c.photos.length)) return false;
+    classes = saved.classes.map(c => ({ name: c.name, color: c.color, photos: c.photos || [] }));
+    renderClasses();
+    document.getElementById('restore-banner').style.display = 'flex';
+    return true;
+  } catch(e) { return false; }
+}
+
+function clearSavedState() {
+  localStorage.removeItem('fmttn-aa');
+  document.getElementById('restore-banner').style.display = 'none';
+  classes = [];
+  classifier = new KNNClassifier();
+  addClass();
+  addClass();
+}
+
 /* ── INIT ── */
 window.addEventListener('load', async () => {
-  addClass();
-  addClass();
   await loadMobileNet();
+  const restored = restoreState();
+  if (!restored) {
+    addClass();
+    addClass();
+  }
 });
 
 async function loadMobileNet() {
@@ -942,6 +983,7 @@ function addClass(name = '') {
 }
 
 function renderClasses() {
+  saveState();
   const list = document.getElementById('classes-list');
   list.innerHTML = '';
   classes.forEach((cls, i) => {
@@ -1272,10 +1314,12 @@ async function predictLoop() {
   tensor.dispose(); emb.dispose();
 
   if (result) {
+    const topConf = result.confidences[result.label] || 0;
     const topClass = classes.find(c => c.name === result.label);
-    document.getElementById('pred-name').textContent = result.label;
-    document.getElementById('pred-conf').textContent = Math.round((result.confidences[result.label] || 0) * 100) + '%';
-    document.getElementById('pred-dot').style.background = topClass ? topClass.color : '#888';
+    const identified = topConf >= 0.4;
+    document.getElementById('pred-name').textContent = identified ? result.label : 'Objet non-identifié';
+    document.getElementById('pred-conf').textContent = identified ? Math.round(topConf * 100) + '%' : '—';
+    document.getElementById('pred-dot').style.background = identified ? (topClass ? topClass.color : '#888') : '#888';
 
     classes.forEach((cls, i) => {
       const conf = result.confidences[cls.name] || 0;
