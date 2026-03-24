@@ -1214,10 +1214,11 @@ async function runTraining() {
         const img = new Image();
         img.onload = async () => {
           ctx.drawImage(img, 0, 0, 224, 224);
-          const tensor = tf.browser.fromPixels(canvas).expandDims(0).toFloat().div(127.5).sub(1);
-          const emb = mobileNet.infer(tensor, true);
+          const emb = tf.tidy(() => {
+            const t = tf.browser.fromPixels(canvas).expandDims(0).toFloat().div(127.5).sub(1);
+            return mobileNet.infer(t, true);
+          });
           classifier.addExample(emb, cls.name);
-          tensor.dispose();
           done++;
           const pct = Math.round(done / total * 70);
           setProgress(pct);
@@ -1272,6 +1273,8 @@ async function goPredict() {
   try {
     predictStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false });
     document.getElementById('predict-video').srcObject = predictStream;
+    const canvas = document.getElementById('hidden-canvas');
+    canvas.width = 224; canvas.height = 224;
     await sleep(500);
     predicting = true;
     predictLoop();
@@ -1304,14 +1307,15 @@ async function predictLoop() {
   if (!predicting) return;
   const video = document.getElementById('predict-video');
   const canvas = document.getElementById('hidden-canvas');
-  canvas.width = 224; canvas.height = 224;
   const ctx = canvas.getContext('2d');
 
   ctx.drawImage(video, 0, 0, 224, 224);
-  const tensor = tf.browser.fromPixels(canvas).expandDims(0).toFloat().div(127.5).sub(1);
-  const emb = mobileNet.infer(tensor, true);
+  const emb = tf.tidy(() => {
+    const t = tf.browser.fromPixels(canvas).expandDims(0).toFloat().div(127.5).sub(1);
+    return mobileNet.infer(t, true);
+  });
   const result = await classifier.predict(emb, 5);
-  tensor.dispose(); emb.dispose();
+  emb.dispose();
 
   if (result) {
     const topConf = result.confidences[result.label] || 0;
