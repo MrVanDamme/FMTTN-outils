@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>FMTTN - Tutoriel Tinkercad sur iPad</title>
+<meta name="description" content="Apprends à utiliser Tinkercad sur iPad — tutoriel interactif étape par étape pour la 2e secondaire.">
+<meta property="og:title" content="FMTTN — Tutoriel Tinkercad sur iPad">
+<meta property="og:description" content="Découvre la modélisation 3D avec Tinkercad sur iPad. Tutoriel interactif pour la 2e secondaire — Mr. Van Damme.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&q=80">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f0f13;
+    --surface: #1a1a22;
+    --surface2: #22222e;
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.15);
+    --text: #f0f0f5;
+    --muted: #888899;
+    --accent: #7c6eff;
+    --accent2: #a78bfa;
+    --green: #34d399;
+    --amber: #fbbf24;
+    --red: #f87171;
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  header {
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--surface);
+    border-bottom: 0.5px solid var(--border2);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+
+  .logo {
+    width: 34px; height: 34px;
+    background: linear-gradient(135deg, #7c6eff, #a78bfa);
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .header-phase {
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--muted);
+    background: var(--surface2);
+    border: 0.5px solid var(--border2);
+    border-radius: 20px;
+    padding: 4px 10px;
+    white-space: nowrap;
+  }
+
+  .info-btn {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: var(--surface2);
+    border: 0.5px solid var(--border2);
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .phases {
+    display: flex;
+    gap: 6px;
+    padding: 0.75rem 1.25rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+    background: var(--surface);
+    border-bottom: 0.5px solid var(--border);
+  }
+  .phases::-webkit-scrollbar { display: none; }
+
+  .phase-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: var(--surface2);
+    border: 0.5px solid var(--border);
+    border-radius: 20px;
+    font-size: 12px;
+    color: var(--muted);
+    cursor: pointer;
+    white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
+    transition: all 0.15s;
+  }
+  .phase-btn.active {
+    background: rgba(124,110,255,0.18);
+    border-color: var(--accent);
+    color: var(--accent2);
+  }
+  .phase-btn.done {
+    color: var(--green);
+    border-color: rgba(52,211,153,0.4);
+    background: rgba(52,211,153,0.08);
+  }
+  .phase-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--muted);
+    transition: background 0.15s;
+  }
+  .phase-btn.active .phase-dot { background: var(--accent); }
+  .phase-btn.done .phase-dot { background: var(--green); }
+
+  .progress-wrap {
+    padding: 0.5rem 1.25rem 0;
+    max-width: 640px;
+    margin: 0 auto;
+  }
+  .progress-bar-bg {
+    height: 3px;
+    background: var(--surface2);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+
+  .panel {
+    display: none;
+    padding: 1.25rem;
+    max-width: 640px;
+    margin: 0 auto;
+    padding-bottom: 2rem;
+  }
+  .panel.active { display: block; }
+
+  .section-label {
+    font-size: 11px;
+    color: var(--accent2);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 0.75rem;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+  .card-body { padding: 14px 16px; }
+  .card-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .card-text {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.65;
+  }
+
+  .step-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 16px;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .step-row:last-child { border-bottom: none; }
+
+  .step-num {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: rgba(124,110,255,0.2);
+    border: 1px solid var(--accent);
+    color: var(--accent2);
+    font-size: 12px;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .step-title {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 3px;
+  }
+  .step-desc {
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .gesture-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .gesture-card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 12px;
+    text-align: center;
+  }
+  .gesture-icon { font-size: 30px; margin-bottom: 8px; }
+  .gesture-name { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+  .gesture-desc { font-size: 11px; color: var(--muted); line-height: 1.5; }
+
+  .info-strip {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.55;
+    margin-bottom: 10px;
+  }
+  .info-strip strong { color: var(--accent2); }
+
+  .warn-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    background: #2a1a0a;
+    border: 0.5px solid #854F0B;
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    font-size: 13px;
+    color: var(--amber);
+    margin-bottom: 10px;
+    line-height: 1.5;
+  }
+  .success-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    background: #022c22;
+    border: 0.5px solid #047857;
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    font-size: 13px;
+    color: var(--green);
+    margin-bottom: 10px;
+    line-height: 1.5;
+  }
+
+  .btn {
+    padding: 9px 16px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    -webkit-tap-highlight-color: transparent;
+    transition: all 0.15s;
+    border: none;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-accent { background: var(--accent); color: white; }
+  .btn-ghost {
+    background: var(--surface2);
+    color: var(--text);
+    border: 0.5px solid var(--border2);
+  }
+  .btn-lg { width: 100%; padding: 14px; font-size: 15px; border-radius: var(--radius); }
+  .nav-btns { display: flex; gap: 10px; margin-top: 1.5rem; }
+  .nav-btns .btn { flex: 1; }
+
+  .key-tag {
+    display: inline-block;
+    background: var(--surface2);
+    border: 0.5px solid var(--border2);
+    border-radius: 5px;
+    padding: 1px 7px;
+    font-size: 11.5px;
+    color: var(--text);
+    font-family: monospace;
+  }
+
+  /* legend badge */
+  .legend-badge {
+    width: 22px; height: 22px;
+    border-radius: 5px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  /* ── QUIZ ── */
+  .quiz-q {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  .quiz-q-num {
+    font-size: 11px;
+    color: var(--accent2);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 6px;
+  }
+  .quiz-q-text {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    line-height: 1.4;
+  }
+  .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+  .quiz-option {
+    background: var(--surface2);
+    border: 0.5px solid var(--border2);
+    border-radius: var(--radius-sm);
+    padding: 11px 14px;
+    font-size: 13px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: all 0.15s;
+    text-align: left;
+    color: var(--text);
+    font-family: inherit;
+    width: 100%;
+    line-height: 1.4;
+  }
+  .quiz-option:active { transform: scale(0.98); }
+  .quiz-option.correct { background: #022c22; border-color: #047857; color: var(--green); }
+  .quiz-option.wrong   { background: #450a0a; border-color: #7f1d1d; color: var(--red); }
+  .quiz-option.show-correct { background: rgba(52,211,153,0.08); border-color: #047857; color: var(--green); opacity: 0.7; }
+  .quiz-option.disabled { pointer-events: none; }
+  .quiz-feedback {
+    margin-top: 10px;
+    font-size: 12.5px;
+    line-height: 1.5;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    display: none;
+  }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.correct { background: #022c22; border: 0.5px solid #047857; color: var(--green); }
+  .quiz-feedback.wrong   { background: #450a0a; border: 0.5px solid #7f1d1d; color: var(--red); }
+
+  .quiz-score {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 20px;
+    text-align: center;
+    margin-bottom: 12px;
+    display: none;
+  }
+  .quiz-score.show { display: block; }
+  .score-emoji { font-size: 48px; margin-bottom: 10px; }
+  .score-num { font-size: 36px; font-weight: 700; color: var(--accent2); }
+  .score-label { font-size: 13px; color: var(--muted); margin-top: 4px; }
+  .score-msg { font-size: 14px; color: var(--text); margin-top: 12px; line-height: 1.5; }
+
+  /* ── MOCKUP ── */
+  .mockup-container {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+  .mockup-label {
+    padding: 8px 14px;
+    font-size: 11px;
+    color: var(--muted);
+    background: var(--surface2);
+    border-bottom: 0.5px solid var(--border);
+    text-align: center;
+  }
+
+  /* ── WELCOME MODAL ── */
+  .welcome-bg {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.88);
+    z-index: 200;
+    display: flex;
+    align-items: flex-end;
+  }
+  .welcome-box {
+    background: var(--surface);
+    border: 0.5px solid var(--border2);
+    border-radius: 20px 20px 0 0;
+    padding: 2rem 1.5rem 2.5rem;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    text-align: center;
+  }
+  .welcome-emoji { font-size: 48px; margin-bottom: 0.75rem; }
+  .welcome-box h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 2px; }
+  .subtitle { font-size: 13px; color: var(--muted); margin-bottom: 1.25rem; }
+  .welcome-steps { display: flex; flex-direction: column; gap: 8px; text-align: left; margin-bottom: 1.5rem; }
+  .welcome-step {
+    display: flex; align-items: flex-start; gap: 10px;
+    background: var(--surface2);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+  }
+  .welcome-step-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+  .welcome-step-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+  .welcome-step-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+  .btn-welcome {
+    width: 100%; padding: 14px;
+    background: var(--accent); color: white;
+    border: none; border-radius: var(--radius);
+    font-size: 15px; font-weight: 600;
+    cursor: pointer; font-family: inherit;
+    margin-bottom: 1rem;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn-welcome:active { transform: scale(0.98); }
+  .welcome-teacher { font-size: 11.5px; color: var(--muted); line-height: 1.5; }
+  .welcome-teacher strong { color: var(--accent2); }
+
+  /* ── INFO MODAL ── */
+  .info-modal-bg {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 150;
+    display: flex; align-items: flex-end;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .info-modal-bg.open { opacity: 1; pointer-events: all; }
+  .info-modal {
+    background: var(--surface);
+    border: 0.5px solid var(--border2);
+    border-radius: 20px 20px 0 0;
+    padding: 1.25rem 1.5rem 2.5rem;
+    width: 100%; max-height: 85vh; overflow-y: auto;
+    position: relative;
+    transform: translateY(20px);
+    transition: transform 0.2s;
+  }
+  .info-modal-bg.open .info-modal { transform: translateY(0); }
+  .info-modal-handle { width: 36px; height: 4px; background: var(--border2); border-radius: 2px; margin: 0 auto 1rem; }
+  .info-close {
+    position: absolute; top: 1rem; right: 1.25rem;
+    background: var(--surface2); border: 0.5px solid var(--border2);
+    color: var(--muted); width: 28px; height: 28px; border-radius: 50%;
+    font-size: 12px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .info-modal h2 { font-size: 17px; font-weight: 700; margin-bottom: 1.25rem; }
+  .info-modal h3 { font-size: 13px; font-weight: 600; color: var(--accent2); margin-bottom: 6px; margin-top: 1.25rem; }
+  .info-modal p { font-size: 13px; color: var(--muted); line-height: 1.65; margin-bottom: 8px; }
+  .analogy-card {
+    background: var(--surface2); border: 0.5px solid var(--border);
+    border-radius: var(--radius-sm); padding: 10px 12px;
+    font-size: 12.5px; color: var(--muted); line-height: 1.55; margin-top: 6px;
+  }
+  .analogy-card strong { color: var(--accent2); }
+</style>
+</head>
+<body>
+
+<!-- ── WELCOME MODAL ── -->
+<div class="welcome-bg" id="welcome-modal">
+  <div class="welcome-box">
+    <div class="welcome-emoji">📐</div>
+    <h2>FMTTN — Tutoriel Tinkercad</h2>
+    <p class="subtitle">Mr. Van Damme</p>
+    <div style="background:var(--surface2);border-radius:var(--radius);padding:14px 16px;margin-bottom:1.25rem;text-align:left;">
+      <p style="font-size:14px;color:var(--text);font-weight:600;margin-bottom:6px;">🎯 Quel est l'objectif ?</p>
+      <p style="font-size:13px;color:var(--muted);line-height:1.65;margin:0;">
+        Apprends à utiliser <strong style="color:var(--accent2)">Tinkercad</strong> sur ton iPad pour créer des objets en 3D !
+        Tu vas découvrir l'interface, les gestes tactiles et comment assembler des formes.
+      </p>
+    </div>
+    <div class="welcome-steps">
+      <div class="welcome-step">
+        <div class="welcome-step-icon">🖥️</div>
+        <div>
+          <div class="welcome-step-title">C'est quoi Tinkercad ?</div>
+          <div class="welcome-step-desc">Un logiciel de modélisation 3D gratuit, dans le navigateur.</div>
+        </div>
+      </div>
+      <div class="welcome-step">
+        <div class="welcome-step-icon">📱</div>
+        <div>
+          <div class="welcome-step-title">L'interface sur iPad</div>
+          <div class="welcome-step-desc">Repère les différentes zones de l'écran.</div>
+        </div>
+      </div>
+      <div class="welcome-step">
+        <div class="welcome-step-icon">👆</div>
+        <div>
+          <div class="welcome-step-title">Les gestes tactiles</div>
+          <div class="welcome-step-desc">Navigue dans l'espace 3D avec tes doigts.</div>
+        </div>
+      </div>
+      <div class="welcome-step">
+        <div class="welcome-step-icon">🎲</div>
+        <div>
+          <div class="welcome-step-title">Formes & outils</div>
+          <div class="welcome-step-desc">Ajoute, modifie et assemble des formes 3D.</div>
+        </div>
+      </div>
+      <div class="welcome-step">
+        <div class="welcome-step-icon">🏆</div>
+        <div>
+          <div class="welcome-step-title">Quiz final</div>
+          <div class="welcome-step-desc">Valide tes connaissances en 5 questions.</div>
+        </div>
+      </div>
+    </div>
+    <button class="btn-welcome" onclick="closeWelcome()">C'est parti ! 🚀</button>
+    <div class="welcome-teacher">Clique sur le bouton <strong>?</strong> en haut à droite pour en savoir plus sur Tinkercad.</div>
+  </div>
+</div>
+
+<!-- ── HEADER ── -->
+<header>
+  <div class="logo">📐</div>
+  <div style="flex:1;">
+    <h1 style="font-size:16px;font-weight:600;letter-spacing:-0.3px;margin:0;line-height:1.2;">FMTTN — Tutoriel Tinkercad</h1>
+    <div style="font-size:11px;color:var(--muted);margin-top:1px;">Mr. Van Damme</div>
+  </div>
+  <span class="header-phase" id="header-phase">Étape 1 / 5</span>
+  <button class="info-btn" onclick="document.getElementById('info-modal').classList.add('open')" title="En savoir plus">?</button>
+</header>
+
+<!-- ── PHASES ── -->
+<div class="phases">
+  <div class="phase-btn active" id="ph1" onclick="goPhase(1)"><div class="phase-dot"></div>Introduction</div>
+  <div class="phase-btn" id="ph2" onclick="goPhase(2)"><div class="phase-dot"></div>Interface</div>
+  <div class="phase-btn" id="ph3" onclick="goPhase(3)"><div class="phase-dot"></div>Gestes</div>
+  <div class="phase-btn" id="ph4" onclick="goPhase(4)"><div class="phase-dot"></div>Formes</div>
+  <div class="phase-btn" id="ph5" onclick="goPhase(5)"><div class="phase-dot"></div>Quiz</div>
+</div>
+
+<!-- ── PROGRESS BAR ── -->
+<div class="progress-wrap">
+  <div class="progress-bar-bg">
+    <div class="progress-bar-fill" id="progress-bar" style="width:20%"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ PANEL 1 — INTRODUCTION ══════════════════════════ -->
+<div class="panel active" id="panel1">
+  <div class="section-label">📖 Étape 1 — Introduction</div>
+
+  <div class="card">
+    <div class="card-body">
+      <div class="card-title">🖥️ C'est quoi Tinkercad ?</div>
+      <div class="card-text">
+        <strong style="color:var(--text)">Tinkercad</strong> est un logiciel de <strong style="color:var(--accent2)">modélisation 3D</strong> gratuit, développé par Autodesk.
+        Il fonctionne directement dans ton navigateur — pas besoin d'installer quoi que ce soit !
+      </div>
+    </div>
+  </div>
+
+  <div class="info-strip">
+    💡 <strong>À quoi ça sert ?</strong> Tinkercad te permet de créer des objets en 3 dimensions que tu peux imprimer avec une <strong>imprimante 3D</strong>. Boîtiers, figurines, pièces sur mesure…
+  </div>
+
+  <div class="card">
+    <div class="step-row">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-title">Ouvre Safari sur ton iPad</div>
+        <div class="step-desc">Tinkercad fonctionne dans le navigateur. Safari offre les meilleures performances sur iPad.</div>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-title">Va sur tinkercad.com</div>
+        <div class="step-desc">Tape l'adresse dans la barre de Safari. Tu peux aussi la retrouver sur le site du cours.</div>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-title">Connecte-toi</div>
+        <div class="step-desc">Utilise le compte fourni par Mr. Van Damme, ou crée ton propre compte Autodesk (gratuit).</div>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">4</div>
+      <div>
+        <div class="step-title">Crée un nouveau design</div>
+        <div class="step-desc">Clique sur <strong style="color:var(--accent2)">"Créer un nouveau design"</strong> pour ouvrir l'éditeur 3D.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="warn-row">
+    <span>⚠️</span>
+    <span>Sur iPad, certaines fonctions avancées sont limitées. Ce tutoriel couvre les fonctions de base, qui marchent très bien en tactile.</span>
+  </div>
+
+  <div class="nav-btns">
+    <button class="btn btn-accent btn-lg" onclick="goPhase(2)">Suivant : L'interface →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════ PANEL 2 — INTERFACE ══════════════════════════ -->
+<div class="panel" id="panel2">
+  <div class="section-label">📱 Étape 2 — L'interface</div>
+
+  <div class="mockup-container">
+    <div class="mockup-label">Schéma de l'interface Tinkercad sur iPad</div>
+    <svg viewBox="0 0 360 230" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;">
+      <!-- Fond -->
+      <rect width="360" height="230" fill="#111827"/>
+      <!-- Barre du haut -->
+      <rect x="0" y="0" width="360" height="30" fill="#0d3b6e"/>
+      <text x="12" y="19" font-family="sans-serif" font-size="10" fill="#93c5fd">Tinkercad</text>
+      <rect x="140" y="7" width="80" height="16" rx="4" fill="#1565c0"/>
+      <text x="180" y="18" font-family="sans-serif" font-size="9" fill="white" text-anchor="middle">Mon design</text>
+      <rect x="258" y="7" width="22" height="16" rx="3" fill="#1e3a5f"/>
+      <text x="269" y="18" font-family="sans-serif" font-size="10" fill="#93c5fd" text-anchor="middle">↩</text>
+      <rect x="283" y="7" width="22" height="16" rx="3" fill="#1e3a5f"/>
+      <text x="294" y="18" font-family="sans-serif" font-size="10" fill="#93c5fd" text-anchor="middle">↪</text>
+      <rect x="309" y="7" width="44" height="16" rx="4" fill="#1976d2"/>
+      <text x="331" y="18" font-family="sans-serif" font-size="9" fill="white" text-anchor="middle">Exporter</text>
+
+      <!-- Zone centrale viewport -->
+      <rect x="0" y="30" width="268" height="200" fill="#1a2744"/>
+      <!-- Grille perspective -->
+      <g stroke="#1e3a5f" stroke-width="0.5" opacity="0.7">
+        <line x1="0" y1="80" x2="268" y2="80"/><line x1="0" y1="130" x2="268" y2="130"/>
+        <line x1="0" y1="180" x2="268" y2="180"/>
+        <line x1="50" y1="30" x2="50" y2="230"/><line x1="100" y1="30" x2="100" y2="230"/>
+        <line x1="150" y1="30" x2="150" y2="230"/><line x1="200" y1="30" x2="200" y2="230"/>
+        <line x1="250" y1="30" x2="250" y2="230"/>
+      </g>
+      <!-- Plan de travail quadrillé (bleu) -->
+      <rect x="15" y="155" width="240" height="65" fill="rgba(29,78,216,0.12)" rx="2"/>
+      <g stroke="#1d4ed8" stroke-width="0.4" opacity="0.6">
+        <line x1="15" y1="170" x2="255" y2="170"/><line x1="15" y1="185" x2="255" y2="185"/>
+        <line x1="15" y1="200" x2="255" y2="200"/><line x1="15" y1="215" x2="255" y2="215"/>
+        <line x1="45" y1="155" x2="45" y2="220"/><line x1="75" y1="155" x2="75" y2="220"/>
+        <line x1="105" y1="155" x2="105" y2="220"/><line x1="135" y1="155" x2="135" y2="220"/>
+        <line x1="165" y1="155" x2="165" y2="220"/><line x1="195" y1="155" x2="195" y2="220"/>
+        <line x1="225" y1="155" x2="225" y2="220"/>
+      </g>
+      <!-- Cube isométrique bleu (sélectionné) -->
+      <polygon points="70,125 100,110 130,125 130,155 100,170 70,155" fill="#2563eb" opacity="0.9"/>
+      <polygon points="70,125 100,110 130,125 100,140" fill="#1d4ed8"/>
+      <polygon points="130,125 130,155 100,170 100,140" fill="#1e40af"/>
+      <!-- Poignées blanches (sélection) -->
+      <rect x="66" y="121" width="7" height="7" rx="1.5" fill="white" opacity="0.9"/>
+      <rect x="126" y="121" width="7" height="7" rx="1.5" fill="white" opacity="0.9"/>
+      <rect x="66" y="151" width="7" height="7" rx="1.5" fill="white" opacity="0.9"/>
+      <rect x="126" y="151" width="7" height="7" rx="1.5" fill="white" opacity="0.9"/>
+      <!-- Cylindre vert -->
+      <ellipse cx="183" cy="137" rx="18" ry="7" fill="#16a34a"/>
+      <rect x="165" y="137" width="36" height="20" fill="#15803d"/>
+      <ellipse cx="183" cy="157" rx="18" ry="7" fill="#22c55e"/>
+      <!-- Cube orientation (haut droite viewport) -->
+      <rect x="234" y="36" width="28" height="28" rx="4" fill="#1e3a5f" stroke="#2563eb" stroke-width="0.5"/>
+      <polygon points="248,40 262,47 248,54 234,47" fill="#1d4ed8" opacity="0.85"/>
+      <polygon points="248,40 262,47 262,54 248,47" fill="#1e40af"/>
+      <polygon points="234,47 248,54 248,61 234,54" fill="#172554"/>
+      <text x="248" y="51" font-family="sans-serif" font-size="5.5" fill="white" text-anchor="middle">DESSUS</text>
+      <!-- Label A flèche plan de travail -->
+      <line x1="135" y1="195" x2="28" y2="224" stroke="#fbbf24" stroke-width="1" stroke-dasharray="3,2"/>
+      <circle cx="26" cy="225" r="2.5" fill="#fbbf24"/>
+      <!-- Label B flèche forme sélectionnée -->
+      <line x1="90" y1="128" x2="18" y2="100" stroke="#34d399" stroke-width="1" stroke-dasharray="3,2"/>
+      <circle cx="16" cy="99" r="2.5" fill="#34d399"/>
+      <!-- Label C flèche cube orientation -->
+      <line x1="262" y1="48" x2="355" y2="44" stroke="#a78bfa" stroke-width="1" stroke-dasharray="3,2"/>
+      <circle cx="357" cy="44" r="2.5" fill="#a78bfa"/>
+      <!-- Annotations -->
+      <text x="3" y="229" font-family="sans-serif" font-size="9" fill="#fbbf24" font-weight="bold">A</text>
+      <text x="4" y="103" font-family="sans-serif" font-size="9" fill="#34d399" font-weight="bold">B</text>
+
+      <!-- Panneau droit — bibliothèque -->
+      <rect x="268" y="30" width="92" height="200" fill="#0d1f33"/>
+      <line x1="268" y1="30" x2="268" y2="230" stroke="#1e3a5f" stroke-width="0.5"/>
+      <text x="314" y="46" font-family="sans-serif" font-size="8" fill="#60a5fa" text-anchor="middle">FORMES</text>
+      <!-- Formes -->
+      <rect x="273" y="52" width="34" height="22" rx="3" fill="#1565c0"/>
+      <text x="290" y="66" font-family="sans-serif" font-size="7" fill="white" text-anchor="middle">Cube</text>
+      <rect x="313" y="52" width="34" height="22" rx="3" fill="#1565c0"/>
+      <text x="330" y="66" font-family="sans-serif" font-size="7" fill="white" text-anchor="middle">Sphère</text>
+      <rect x="273" y="78" width="34" height="22" rx="3" fill="#1565c0"/>
+      <text x="290" y="92" font-family="sans-serif" font-size="7" fill="white" text-anchor="middle">Cylindre</text>
+      <rect x="313" y="78" width="34" height="22" rx="3" fill="#1565c0"/>
+      <text x="330" y="92" font-family="sans-serif" font-size="7" fill="white" text-anchor="middle">Cône</text>
+      <rect x="273" y="104" width="34" height="22" rx="3" fill="#1565c0"/>
+      <text x="290" y="118" font-family="sans-serif" font-size="7" fill="white" text-anchor="middle">Tore</text>
+      <rect x="313" y="104" width="34" height="22" rx="3" fill="#1565c0"/>
+      <text x="330" y="118" font-family="sans-serif" font-size="7" fill="white" text-anchor="middle">Texte</text>
+      <!-- Séparateur inspecteur -->
+      <line x1="268" y1="132" x2="360" y2="132" stroke="#1a3a5c" stroke-width="0.5"/>
+      <text x="314" y="144" font-family="sans-serif" font-size="8" fill="#60a5fa" text-anchor="middle">INSPECTEUR</text>
+      <rect x="273" y="149" width="74" height="13" rx="2" fill="#1e3a5f"/>
+      <text x="280" y="158" font-family="sans-serif" font-size="7" fill="#93c5fd">L: 20 mm</text>
+      <rect x="273" y="165" width="74" height="13" rx="2" fill="#1e3a5f"/>
+      <text x="280" y="174" font-family="sans-serif" font-size="7" fill="#93c5fd">l: 20 mm</text>
+      <rect x="273" y="181" width="74" height="13" rx="2" fill="#1e3a5f"/>
+      <text x="280" y="190" font-family="sans-serif" font-size="7" fill="#93c5fd">H: 20 mm</text>
+      <rect x="278" y="200" width="64" height="16" rx="4" fill="#b91c1c"/>
+      <text x="310" y="211" font-family="sans-serif" font-size="7.5" fill="white" text-anchor="middle">🕳 Trou</text>
+      <!-- Label D flèche panneau -->
+      <text x="346" y="44" font-family="sans-serif" font-size="9" fill="#a78bfa" font-weight="bold">C</text>
+      <!-- Label D -->
+      <text x="346" y="140" font-family="sans-serif" font-size="9" fill="#60a5fa" font-weight="bold">D</text>
+    </svg>
+  </div>
+
+  <!-- Légende -->
+  <div class="card">
+    <div class="step-row">
+      <div class="legend-badge" style="background:rgba(251,191,36,0.15);border:1px solid #fbbf24;color:#fbbf24;">A</div>
+      <div>
+        <div class="step-title">Plan de travail (Workplane)</div>
+        <div class="step-desc">La surface bleue quadrillée = le "sol" sur lequel tu poses tes formes. Comme une table virtuelle en 3D.</div>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="legend-badge" style="background:rgba(52,211,153,0.15);border:1px solid #34d399;color:#34d399;">B</div>
+      <div>
+        <div class="step-title">Forme sélectionnée</div>
+        <div class="step-desc">Quand tu touches une forme, des petits carrés blancs (poignées) apparaissent autour d'elle.</div>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="legend-badge" style="background:rgba(167,139,250,0.15);border:1px solid #a78bfa;color:#a78bfa;">C</div>
+      <div>
+        <div class="step-title">Cube d'orientation</div>
+        <div class="step-desc">Indique de quel côté tu regardes l'objet. Touche-le pour choisir une vue (Dessus, Face, Côté…).</div>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="legend-badge" style="background:rgba(96,165,250,0.15);border:1px solid #60a5fa;color:#60a5fa;">D</div>
+      <div>
+        <div class="step-title">Bibliothèque + Inspecteur</div>
+        <div class="step-desc">Le panneau droit contient les formes disponibles (cube, sphère…) et l'inspecteur pour modifier les dimensions et la couleur.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-btns">
+    <button class="btn btn-ghost" onclick="goPhase(1)">← Retour</button>
+    <button class="btn btn-accent" onclick="goPhase(3)">Suivant : Gestes →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════ PANEL 3 — GESTES ══════════════════════════ -->
+<div class="panel" id="panel3">
+  <div class="section-label">👆 Étape 3 — Les gestes sur iPad</div>
+
+  <div class="info-strip">
+    💡 Sur iPad, tu utilises tes doigts pour naviguer dans l'espace 3D. Voici les 4 gestes essentiels.
+  </div>
+
+  <div class="gesture-grid">
+    <div class="gesture-card">
+      <div class="gesture-icon">☝️</div>
+      <div class="gesture-name">1 doigt — Toucher</div>
+      <div class="gesture-desc">Sélectionne une forme. Touche le fond pour désélectionner.</div>
+    </div>
+    <div class="gesture-card">
+      <div class="gesture-icon">✌️</div>
+      <div class="gesture-name">2 doigts — Rotation</div>
+      <div class="gesture-desc">Pose 2 doigts sur le fond et tourne-les pour faire pivoter la vue.</div>
+    </div>
+    <div class="gesture-card">
+      <div class="gesture-icon">🤌</div>
+      <div class="gesture-name">Pincer — Zoom</div>
+      <div class="gesture-desc">Écarte 2 doigts pour zoomer, rapproche pour dézoomer.</div>
+    </div>
+    <div class="gesture-card">
+      <div class="gesture-icon">👆</div>
+      <div class="gesture-name">1 doigt — Déplacer</div>
+      <div class="gesture-desc">Glisse une forme sélectionnée pour la déplacer sur le plan.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body" style="padding-bottom:8px;">
+      <div class="card-title">🧭 Naviguer sans se perdre</div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-title">Rotation de la vue</div>
+        <div class="step-desc">Place <strong style="color:var(--accent2)">2 doigts sur le fond</strong> (pas sur un objet) et fais-les tourner ensemble. La scène 3D pivote.</div>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-title">Vues prédéfinies</div>
+        <div class="step-desc">Touche le <strong style="color:var(--accent2)">cube d'orientation</strong> en haut à droite du viewport → choisis "Dessus", "Face" ou "Côté".</div>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-title">Recentrer la vue</div>
+        <div class="step-desc">Utilise le bouton <span class="key-tag">Tout montrer</span> pour recentrer la vue sur tous tes objets d'un coup.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="warn-row">
+    <span>⚠️</span>
+    <span><strong>Tu es perdu ?</strong> Touche le cube d'orientation → "Dessus" pour retrouver tes formes depuis le haut.</span>
+  </div>
+
+  <div class="nav-btns">
+    <button class="btn btn-ghost" onclick="goPhase(2)">← Retour</button>
+    <button class="btn btn-accent" onclick="goPhase(4)">Suivant : Formes →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════ PANEL 4 — FORMES ══════════════════════════ -->
+<div class="panel" id="panel4">
+  <div class="section-label">🎲 Étape 4 — Formes & outils</div>
+
+  <div class="card">
+    <div class="card-body" style="padding-bottom:8px;">
+      <div class="card-title">➕ Ajouter une forme</div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-title">Ouvre la bibliothèque</div>
+        <div class="step-desc">Dans le panneau droit, tu vois les <strong style="color:var(--accent2)">Formes de base</strong> : cube, sphère, cylindre, cône…</div>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-title">Touche ou fais glisser une forme</div>
+        <div class="step-desc">Touche une forme pour l'ajouter au centre du plan, ou fais-la glisser directement où tu veux. Elle est automatiquement sélectionnée.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body" style="padding-bottom:8px;">
+      <div class="card-title">✏️ Modifier une forme</div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-title">Sélectionner</div>
+        <div class="step-desc">Touche la forme → des <strong style="color:var(--accent2)">poignées blanches</strong> apparaissent aux coins.</div>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-title">Redimensionner</div>
+        <div class="step-desc">Tire les poignées blanches pour changer la taille. Ou modifie <span class="key-tag">L</span> <span class="key-tag">l</span> <span class="key-tag">H</span> dans l'inspecteur à droite pour des valeurs précises en mm.</div>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-title">Changer la couleur</div>
+        <div class="step-desc">Forme sélectionnée → touche le carré de couleur dans l'inspecteur → choisis ta couleur.</div>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">4</div>
+      <div>
+        <div class="step-title">Déplacer en hauteur</div>
+        <div class="step-desc">La flèche noire au-dessus de la forme permet de la soulever du plan (changer sa hauteur Z).</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body" style="padding-bottom:8px;">
+      <div class="card-title">🕳️ Créer un trou</div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-title">Sélectionne une forme</div>
+        <div class="step-desc">Touche une forme (ex : un cylindre) pour la sélectionner.</div>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-title">Touche "Trou" dans l'inspecteur</div>
+        <div class="step-desc">La forme devient <strong style="color:var(--accent2)">transparente grisée</strong> — c'est un outil de découpe !</div>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-title">Positionne le trou dans une autre forme</div>
+        <div class="step-desc">Déplace la forme-trou à l'intérieur d'une forme solide (ex : un cube).</div>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">4</div>
+      <div>
+        <div class="step-title">Sélectionne les deux + Grouper</div>
+        <div class="step-desc">Sélectionne les 2 formes, puis touche <span class="key-tag">Grouper</span> → le trou est creusé dans le solide !</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-strip">
+    💡 <strong>Grouper :</strong> Sélectionne plusieurs formes (touche la 1ère, puis les autres), puis touche <strong>Grouper</strong>. Elles deviennent un seul objet solide.
+  </div>
+
+  <div class="success-row">
+    <span>✅</span>
+    <span>Essaie de créer un cube avec un trou cylindrique au centre — c'est la base de beaucoup d'objets utiles !</span>
+  </div>
+
+  <div class="nav-btns">
+    <button class="btn btn-ghost" onclick="goPhase(3)">← Retour</button>
+    <button class="btn btn-accent" onclick="goPhase(5)">Quiz final 🏆</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════ PANEL 5 — QUIZ ══════════════════════════ -->
+<div class="panel" id="panel5">
+  <div class="section-label">🏆 Étape 5 — Quiz final</div>
+
+  <div class="info-strip" id="quiz-intro">
+    <strong style="color:var(--accent2)">5 questions</strong> sur Tinkercad — choisis la bonne réponse pour chacune !
+  </div>
+
+  <!-- Q1 -->
+  <div class="quiz-q" id="q1">
+    <div class="quiz-q-num">Question 1 / 5</div>
+    <div class="quiz-q-text">C'est quoi Tinkercad ?</div>
+    <div class="quiz-options">
+      <button class="quiz-option" data-correct="false" onclick="answer(1,this)">Un logiciel de dessin 2D comme Paint</button>
+      <button class="quiz-option" data-correct="true"  onclick="answer(1,this)">Un logiciel de modélisation 3D gratuit, dans le navigateur</button>
+      <button class="quiz-option" data-correct="false" onclick="answer(1,this)">Un logiciel à installer sur iPad</button>
+      <button class="quiz-option" data-correct="false" onclick="answer(1,this)">Une application Apple dédiée aux iPad</button>
+    </div>
+    <div class="quiz-feedback" id="fb1"></div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="quiz-q" id="q2" style="display:none;">
+    <div class="quiz-q-num">Question 2 / 5</div>
+    <div class="quiz-q-text">Comment faire pivoter la vue 3D sur iPad ?</div>
+    <div class="quiz-options">
+      <button class="quiz-option" data-correct="false" onclick="answer(2,this)">Glisser avec 1 doigt sur le fond</button>
+      <button class="quiz-option" data-correct="false" onclick="answer(2,this)">Pincer avec 2 doigts</button>
+      <button class="quiz-option" data-correct="true"  onclick="answer(2,this)">Tourner avec 2 doigts sur le fond</button>
+      <button class="quiz-option" data-correct="false" onclick="answer(2,this)">Double-taper sur l'écran</button>
+    </div>
+    <div class="quiz-feedback" id="fb2"></div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="quiz-q" id="q3" style="display:none;">
+    <div class="quiz-q-num">Question 3 / 5</div>
+    <div class="quiz-q-text">Que se passe-t-il quand tu appuies sur "Trou" dans l'inspecteur ?</div>
+    <div class="quiz-options">
+      <button class="quiz-option" data-correct="false" onclick="answer(3,this)">La forme disparaît de l'écran</button>
+      <button class="quiz-option" data-correct="false" onclick="answer(3,this)">La forme se duplique</button>
+      <button class="quiz-option" data-correct="true"  onclick="answer(3,this)">La forme devient transparente et sert à découper une autre forme</button>
+      <button class="quiz-option" data-correct="false" onclick="answer(3,this)">La forme devient rouge</button>
+    </div>
+    <div class="quiz-feedback" id="fb3"></div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="quiz-q" id="q4" style="display:none;">
+    <div class="quiz-q-num">Question 4 / 5</div>
+    <div class="quiz-q-text">À quoi servent les lettres L, l et H dans l'inspecteur ?</div>
+    <div class="quiz-options">
+      <button class="quiz-option" data-correct="false" onclick="answer(4,this)">Choisir la couleur de la forme</button>
+      <button class="quiz-option" data-correct="true"  onclick="answer(4,this)">Modifier les dimensions : Longueur, largeur et Hauteur (en mm)</button>
+      <button class="quiz-option" data-correct="false" onclick="answer(4,this)">Faire tourner la forme sur elle-même</button>
+      <button class="quiz-option" data-correct="false" onclick="answer(4,this)">Des raccourcis clavier</button>
+    </div>
+    <div class="quiz-feedback" id="fb4"></div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="quiz-q" id="q5" style="display:none;">
+    <div class="quiz-q-num">Question 5 / 5</div>
+    <div class="quiz-q-text">Tu ne vois plus tes formes dans l'espace 3D. Que fais-tu ?</div>
+    <div class="quiz-options">
+      <button class="quiz-option" data-correct="false" onclick="answer(5,this)">Fermer l'onglet Safari et recommencer</button>
+      <button class="quiz-option" data-correct="false" onclick="answer(5,this)">Supprimer toutes les formes</button>
+      <button class="quiz-option" data-correct="true"  onclick="answer(5,this)">Toucher le cube d'orientation → "Dessus", ou utiliser "Tout montrer"</button>
+      <button class="quiz-option" data-correct="false" onclick="answer(5,this)">Secouer l'iPad</button>
+    </div>
+    <div class="quiz-feedback" id="fb5"></div>
+  </div>
+
+  <!-- Score final -->
+  <div class="quiz-score" id="quiz-score">
+    <div class="score-emoji" id="score-emoji">🎉</div>
+    <div class="score-num" id="score-num">0/5</div>
+    <div class="score-label">bonne(s) réponse(s)</div>
+    <div class="score-msg" id="score-msg"></div>
+    <button class="btn btn-ghost btn-lg" style="margin-top:1.25rem;" onclick="resetQuiz()">🔄 Recommencer le quiz</button>
+    <div style="margin-top:10px;">
+      <a href="index.html">
+        <button class="btn btn-accent btn-lg">🏠 Retour aux outils</button>
+      </a>
+    </div>
+  </div>
+
+  <div id="quiz-back-btn" class="nav-btns">
+    <button class="btn btn-ghost" onclick="goPhase(4)">← Retour</button>
+  </div>
+</div>
+
+<!-- ── INFO MODAL ── -->
+<div class="info-modal-bg" id="info-modal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="info-modal">
+    <div class="info-modal-handle"></div>
+    <button class="info-close" onclick="document.getElementById('info-modal').classList.remove('open')">✕</button>
+    <h2>📐 Tinkercad — Pour aller plus loin</h2>
+
+    <h3>🧊 C'est quoi la modélisation 3D ?</h3>
+    <p>Modéliser en 3D, c'est créer des objets virtuels avec une longueur, une largeur ET une hauteur. Ces objets peuvent ensuite être imprimés en vrai avec une imprimante 3D.</p>
+    <div class="analogy-card">
+      <strong>Analogie :</strong> C'est comme jouer avec de la pâte à modeler, mais sur écran. Tu peux ajouter des morceaux (formes), les coller (grouper) ou en découper (trou).
+    </div>
+
+    <h3>🏭 Qui a créé Tinkercad ?</h3>
+    <p>Tinkercad est développé par <strong>Autodesk</strong>, une grande entreprise de logiciels 3D. Ils font aussi AutoCAD (pour les architectes) et Fusion 360. Tinkercad est leur version simplifiée et gratuite pour débutants.</p>
+
+    <h3>📱 Tinkercad sur iPad — Limitations</h3>
+    <div class="analogy-card">
+      <strong>Ce qui fonctionne bien :</strong> ajouter des formes, les modifier, créer des trous, grouper, exporter en STL.<br><br>
+      <strong>Ce qui peut être difficile :</strong> sélectionner plusieurs formes en même temps, certains raccourcis clavier.
+    </div>
+
+    <h3>🎯 Pourquoi on utilise Tinkercad en FMTTN ?</h3>
+    <p>En FMTTN, on apprend à concevoir des objets avec les outils numériques modernes. Tinkercad développe ta <strong>pensée spatiale</strong> et te fait découvrir la chaîne numérique complète : design → modèle 3D → impression.</p>
+
+    <h3>💾 Où sont sauvegardées tes créations ?</h3>
+    <p>Tes designs sont automatiquement sauvegardés dans le <strong>cloud Autodesk</strong>. Tu peux y accéder depuis n'importe quel appareil en te reconnectant à ton compte.</p>
+  </div>
+</div>
+
+<script>
+  const feedbacks = {
+    1: { t: '✅ Exact ! Tinkercad est un logiciel de modélisation 3D gratuit qui fonctionne directement dans Safari, sans installation.', f: '❌ Non — Tinkercad crée des objets en 3D et fonctionne dans le navigateur, sans installation.' },
+    2: { t: '✅ Parfait ! 2 doigts en rotation sur le fond (pas sur un objet) fait pivoter la vue 3D.', f: '❌ Non — le pincement sert à zoomer/dézoomer. Pour pivoter la vue, utilise 2 doigts en rotation sur le fond.' },
+    3: { t: '✅ Exact ! La forme devient transparente/grisée. En la groupant avec une autre forme solide, elle va y creuser un trou.', f: '❌ Non — la forme ne disparaît pas. Elle devient transparente et sert d\'outil de découpe quand tu groupes les deux formes.' },
+    4: { t: '✅ Bravo ! L = longueur, l = largeur, H = hauteur. Tu peux entrer des valeurs précises en millimètres.', f: '❌ Non — L, l et H servent à modifier les dimensions (longueur, largeur, hauteur) en millimètres.' },
+    5: { t: '✅ Exactement ! Le cube d\'orientation → "Dessus" repositionne la vue. "Tout montrer" recentre sur tous tes objets.', f: '❌ Non — ne ferme pas l\'onglet (tu perdrais ton travail). Utilise le cube d\'orientation → "Dessus" ou "Tout montrer".' }
+  };
+
+  let currentPhase = 1;
+  let quizScore = 0;
+
+  function closeWelcome() {
+    document.getElementById('welcome-modal').style.display = 'none';
+  }
+
+  function goPhase(n) {
+    if (n > currentPhase) {
+      document.getElementById('ph' + currentPhase).classList.remove('active');
+      document.getElementById('ph' + currentPhase).classList.add('done');
+    } else {
+      document.getElementById('ph' + currentPhase).classList.remove('active');
+    }
+    currentPhase = n;
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel' + n).classList.add('active');
+    document.querySelectorAll('.phase-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('ph' + n).classList.add('active');
+    document.getElementById('ph' + n).classList.remove('done');
+    document.getElementById('header-phase').textContent = 'Étape ' + n + ' / 5';
+    document.getElementById('progress-bar').style.width = (n / 5 * 100) + '%';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function answer(qNum, btn) {
+    const isCorrect = btn.dataset.correct === 'true';
+    const q = document.getElementById('q' + qNum);
+
+    // Disable all options
+    q.querySelectorAll('.quiz-option').forEach(opt => {
+      opt.classList.add('disabled');
+      if (opt.dataset.correct === 'true' && !isCorrect) {
+        opt.classList.add('show-correct');
+      }
+    });
+
+    btn.classList.add(isCorrect ? 'correct' : 'wrong');
+
+    const fb = document.getElementById('fb' + qNum);
+    fb.textContent = isCorrect ? feedbacks[qNum].t : feedbacks[qNum].f;
+    fb.className = 'quiz-feedback show ' + (isCorrect ? 'correct' : 'wrong');
+
+    if (isCorrect) quizScore++;
+
+    setTimeout(() => {
+      if (qNum < 5) {
+        const next = document.getElementById('q' + (qNum + 1));
+        next.style.display = 'block';
+        next.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
+        showScore();
+      }
+    }, 1300);
+  }
+
+  function showScore() {
+    document.getElementById('quiz-back-btn').style.display = 'none';
+    const scoreDiv = document.getElementById('quiz-score');
+    scoreDiv.classList.add('show');
+    document.getElementById('score-num').textContent = quizScore + '/5';
+    let emoji, msg;
+    if (quizScore === 5) {
+      emoji = '🏆'; msg = 'Parfait ! Tu maîtrises les bases de Tinkercad sur iPad. Tu es prêt(e) à créer tes premiers objets 3D !';
+    } else if (quizScore >= 3) {
+      emoji = '🎉'; msg = 'Bien joué ! Tu as retenu l\'essentiel. Relis les étapes ratées et retente le quiz pour aller chercher le 5/5 !';
+    } else {
+      emoji = '💪'; msg = 'Pas de panique ! Relis le tutoriel depuis le début et retente le quiz. La pratique, c\'est la clé !';
+    }
+    document.getElementById('score-emoji').textContent = emoji;
+    document.getElementById('score-msg').textContent = msg;
+    scoreDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function resetQuiz() {
+    quizScore = 0;
+    for (let i = 1; i <= 5; i++) {
+      const q = document.getElementById('q' + i);
+      q.querySelectorAll('.quiz-option').forEach(opt => {
+        opt.className = 'quiz-option';
+      });
+      const fb = document.getElementById('fb' + i);
+      fb.className = 'quiz-feedback';
+      fb.textContent = '';
+      if (i > 1) q.style.display = 'none';
+    }
+    document.getElementById('quiz-score').classList.remove('show');
+    document.getElementById('quiz-back-btn').style.display = 'flex';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+</body>
+</html>

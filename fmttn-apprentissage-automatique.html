@@ -9,32 +9,37 @@
 <meta property="og:description" content="Entraîne une vraie IA à reconnaître des objets en quelques minutes. Activité pédagogique pour la 2e secondaire — Mr. Van Damme.">
 <meta property="og:type" content="website">
 <meta property="og:image" content="https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=600&q=80">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --bg: #0f0f13;
-    --surface: #1a1a22;
-    --surface2: #22222e;
-    --border: rgba(255,255,255,0.08);
-    --border2: rgba(255,255,255,0.15);
-    --text: #f0f0f5;
-    --muted: #888899;
-    --accent: #7c6eff;
-    --accent2: #a78bfa;
-    --green: #34d399;
-    --amber: #fbbf24;
-    --red: #f87171;
-    --radius: 14px;
+    --bg: #faf9f7;
+    --surface: #ffffff;
+    --surface2: #f2f1ee;
+    --border: rgba(0,0,0,0.07);
+    --border2: rgba(0,0,0,0.12);
+    --text: #1d1d1f;
+    --muted: #8e8e93;
+    --accent: #1d1d1f;
+    --accent2: #484848;
+    --green: #34a853;
+    --amber: #8e8e93;
+    --red: #ef4444;
+    --radius: 12px;
     --radius-sm: 8px;
   }
 
   body {
     background: var(--bg);
     color: var(--text);
-    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     min-height: 100vh;
     overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   header {
@@ -46,7 +51,8 @@
 
   .logo {
     width: 34px; height: 34px;
-    background: linear-gradient(135deg, #7c6eff, #a78bfa);
+    background: var(--surface2);
+    border: 0.5px solid var(--border2);
     border-radius: 9px;
     display: flex; align-items: center; justify-content: center;
     font-size: 18px;
@@ -209,15 +215,15 @@
   }
 
   .btn-green {
-    background: #065f46;
-    color: var(--green);
-    border: 0.5px solid #047857;
+    background: #dcfce7;
+    color: #15803d;
+    border: 0.5px solid #86efac;
   }
 
   .btn-red {
-    background: #450a0a;
+    background: #fef2f2;
     color: var(--red);
-    border: 0.5px solid #7f1d1d;
+    border: 0.5px solid #fecaca;
     padding: 6px 10px;
     font-size: 12px;
   }
@@ -342,7 +348,7 @@
     transition: all 0.3s;
   }
 
-  .n-node.lit { background: var(--accent); border-color: var(--accent2); box-shadow: 0 0 8px var(--accent); }
+  .n-node.lit { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 8px rgba(88,86,214,0.4); }
 
   .n-line {
     width: 24px;
@@ -461,7 +467,7 @@
     line-height: 1.5;
   }
 
-  .info-strip strong { color: var(--accent2); }
+  .info-strip strong { color: var(--accent); }
 
   canvas#hidden-canvas { display: none; }
 
@@ -473,8 +479,8 @@
     font-weight: 500;
   }
 
-  .badge-amber { background: #451a03; color: var(--amber); }
-  .badge-green { background: #022c22; color: var(--green); }
+  .badge-amber { background: var(--surface2); color: var(--muted); }
+  .badge-green { background: #dcfce7; color: #166534; }
 
   @keyframes pulse {
     0%, 100% { opacity: 1; }
@@ -486,12 +492,12 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    background: #2a1a0a;
-    border: 0.5px solid #854F0B;
+    background: var(--surface2);
+    border: 0.5px solid var(--border2);
     border-radius: var(--radius-sm);
     padding: 8px 12px;
     font-size: 13px;
-    color: var(--amber);
+    color: var(--muted);
   }
   .warn-dot {
     width: 8px; height: 8px;
@@ -503,7 +509,7 @@
     display: flex;
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.92);
+    background: rgba(0,0,0,0.5);
     z-index: 300;
     align-items: center;
     justify-content: center;
@@ -512,7 +518,7 @@
   .welcome-bg.hidden { display: none; }
 
   .welcome-box {
-    background: var(--surface);
+    background: white;
     border: 0.5px solid var(--border2);
     border-radius: 20px;
     width: 100%;
@@ -521,6 +527,7 @@
     overflow-y: auto;
     padding: 2rem 1.5rem;
     text-align: center;
+    color: var(--text);
   }
 
   .welcome-emoji { font-size: 48px; margin-bottom: 0.75rem; }
@@ -572,15 +579,15 @@
 
 
   .name-empty {
-    border-bottom: 1.5px solid var(--amber) !important;
+    border-bottom: 1px solid var(--border2) !important;
   }
-  .class-name-input::placeholder { color: var(--amber); opacity: 0.8; }
+  .class-name-input::placeholder { color: var(--muted); opacity: 0.6; }
   .info-btn {
     width: 30px; height: 30px;
     border-radius: 50%;
     background: var(--surface2);
     border: 0.5px solid var(--border2);
-    color: var(--accent2);
+    color: var(--accent);
     font-size: 15px;
     font-weight: 700;
     cursor: pointer;
@@ -595,7 +602,7 @@
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.85);
+    background: rgba(0,0,0,0.4);
     z-index: 200;
     align-items: flex-end;
     justify-content: center;
@@ -604,7 +611,7 @@
   .info-modal-bg.open { display: flex; }
 
   .info-modal {
-    background: var(--surface);
+    background: white;
     border-radius: 20px 20px 0 0;
     border: 0.5px solid var(--border2);
     width: 100%;
@@ -683,7 +690,7 @@
 <!-- WELCOME MODAL -->
 <div class="welcome-bg" id="welcome-modal">
   <div class="welcome-box">
-    <div class="welcome-emoji">🧠</div>
+    <div class="welcome-emoji" style="font-size:0;"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#1d1d1f" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 12h.01"/><path d="M17 12h.01"/><path d="M7 12h.01"/></svg></div>
     <h2>FMTTN — Apprentissage automatique</h2>
     <p class="subtitle">Mr. Van Damme</p>
 
@@ -733,7 +740,7 @@
 
 <header>
   <a href="index.html" title="Retour à l'accueil" style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:9px;background:var(--surface2);border:0.5px solid var(--border2);color:var(--muted);text-decoration:none;font-size:16px;flex-shrink:0;">←</a>
-  <div class="logo">🧠</div>
+  <div class="logo"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 12h.01"/><path d="M17 12h.01"/><path d="M7 12h.01"/></svg></div>
   <div style="flex:1;">
     <h1 style="margin:0;line-height:1.2;">FMTTN — Apprentissage automatique</h1>
     <div style="font-size:11px;color:var(--muted);margin-top:1px;">Mr. Van Damme</div>
@@ -868,7 +875,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js"></script>
 
 <script>
-const COLORS = ['#7c6eff','#34d399','#fbbf24','#f87171','#60a5fa','#f472b6','#a3e635'];
+const COLORS = ['#1d1d1f','#636366','#8e8e93','#aeaeb2','#48484a','#636366','#8e8e93'];
 const TARGET = 15;
 
 let classes = [];
@@ -994,7 +1001,7 @@ function renderClasses() {
     card.innerHTML = `
       <div class="class-header">
         <div class="class-color" style="background:${cls.color}"></div>
-        <input class="class-name-input ${!cls.name ? 'name-empty' : ''}" value="${cls.name}" placeholder="✏️ Donne un nom à cet objet..."
+        <input class="class-name-input ${!cls.name ? 'name-empty' : ''}" value="${cls.name}" placeholder="Nom de l'objet..."
           onchange="classes[${i}].name=this.value.trim(); renderClasses();"
           oninput="classes[${i}].name=this.value.trim(); updateTrainBtn();">
         <span class="class-count ${ready ? 'ready' : ''}">
