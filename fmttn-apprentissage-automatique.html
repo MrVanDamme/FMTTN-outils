@@ -889,11 +889,34 @@ let predInterval = null;
 
 /* ── KNN CLASSIFIER (vanilla, no extra lib) ── */
 class KNNClassifier {
-  constructor() { this.data = {}; }
+  constructor() { this.data = {}; this.distThreshold = null; }
 
   addExample(embedding, label) {
     if (!this.data[label]) this.data[label] = [];
     this.data[label].push(embedding);
+  }
+
+  // Calcule le seuil adaptatif après l'entraînement :
+  // = médiane des distances intra-classe × 2.5
+  async computeThreshold() {
+    const labels = Object.keys(this.data);
+    const intraDists = [];
+    for (const label of labels) {
+      const examples = this.data[label];
+      for (let i = 0; i < examples.length; i++) {
+        const a = await examples[i].array ? await examples[i].array() : examples[i];
+        const va = a[0] !== undefined ? a[0] : a;
+        for (let j = i + 1; j < examples.length; j++) {
+          const b = await examples[j].array ? await examples[j].array() : examples[j];
+          const vb = b[0] !== undefined ? b[0] : b;
+          intraDists.push(euclidean(va, vb));
+        }
+      }
+    }
+    if (intraDists.length === 0) { this.distThreshold = null; return; }
+    intraDists.sort((a, b) => a - b);
+    const median = intraDists[Math.floor(intraDists.length / 2)];
+    this.distThreshold = median * 2.5;
   }
 
   async predict(embedding, k = 3) {
@@ -1248,6 +1271,7 @@ async function runTraining() {
   setProgress(100);
   await sleep(300);
 
+  await classifier.computeThreshold();
   document.getElementById('train-label-main').innerHTML = '<strong>Entraînement terminé !</strong>';
   document.getElementById('train-status').textContent = `${total} photos mémorisées — ${classes.length} objets reconnus`;
   document.getElementById('btn-go-predict').style.display = 'block';
@@ -1328,9 +1352,9 @@ async function predictLoop() {
   if (result) {
     const topConf = result.confidences[result.label] || 0;
     const topClass = classes.find(c => c.name === result.label);
-    // Seuil de distance : si l'objet est trop éloigné de tous les exemples connus, c'est un inconnu
-    const DIST_THRESHOLD = 12;
-    const identified = result.minDist < DIST_THRESHOLD && topConf >= 0.5;
+    // Seuil adaptatif : calculé à partir des distances intra-classe pendant l'entraînement
+    const threshold = classifier.distThreshold;
+    const identified = threshold !== null ? result.minDist < threshold : topConf >= 0.7;
     document.getElementById('pred-name').textContent = identified ? result.label : 'Objet non identifié';
     document.getElementById('pred-conf').textContent = identified ? Math.round(topConf * 100) + '%' : '—';
     document.getElementById('pred-dot').style.background = identified ? (topClass ? topClass.color : '#888') : '#888';
