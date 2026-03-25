@@ -912,6 +912,7 @@ class KNNClassifier {
 
     allDists.sort((a, b) => a.dist - b.dist);
     const kNearest = allDists.slice(0, k);
+    const minDist = allDists[0].dist;
     const counts = {};
     labels.forEach(l => counts[l] = 0);
     kNearest.forEach(n => counts[n.label]++);
@@ -921,7 +922,7 @@ class KNNClassifier {
     labels.forEach(l => confidences[l] = counts[l] / total);
 
     const top = labels.reduce((a, b) => confidences[a] > confidences[b] ? a : b);
-    return { label: top, confidences };
+    return { label: top, confidences, minDist };
   }
 }
 
@@ -1327,8 +1328,10 @@ async function predictLoop() {
   if (result) {
     const topConf = result.confidences[result.label] || 0;
     const topClass = classes.find(c => c.name === result.label);
-    const identified = topConf >= 0.4;
-    document.getElementById('pred-name').textContent = identified ? result.label : 'Objet non-identifié';
+    // Seuil de distance : si l'objet est trop éloigné de tous les exemples connus, c'est un inconnu
+    const DIST_THRESHOLD = 12;
+    const identified = result.minDist < DIST_THRESHOLD && topConf >= 0.5;
+    document.getElementById('pred-name').textContent = identified ? result.label : 'Objet non identifié';
     document.getElementById('pred-conf').textContent = identified ? Math.round(topConf * 100) + '%' : '—';
     document.getElementById('pred-dot').style.background = identified ? (topClass ? topClass.color : '#888') : '#888';
 
