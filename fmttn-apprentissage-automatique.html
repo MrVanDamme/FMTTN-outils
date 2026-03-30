@@ -1000,17 +1000,16 @@ window.addEventListener('load', async () => {
 });
 
 async function loadMobileNet() {
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  if (isIOS) {
-    tf.wasm.setWasmPaths('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@4.20.0/dist/');
-    await tf.setBackend('wasm');
+  try {
+    mobileNet = await mobilenet.load({ version: 1, alpha: 0.25 });
+    classifier = new KNNClassifier();
+    updateTrainBtn();
+    document.getElementById('load-status').textContent = 'Mod\u00e8le IA pr\u00eat \u2714';
+    document.getElementById('load-status').style.color = 'var(--green)';
+  } catch(e) {
+    document.getElementById('load-status').textContent = '\u274c Erreur chargement mod\u00e8le. Recharge la page.';
+    document.getElementById('load-status').style.color = 'var(--red)';
   }
-  await tf.ready();
-  mobileNet = await mobilenet.load({ version: 2, alpha: 0.25 });
-  classifier = new KNNClassifier();
-  updateTrainBtn();
-  document.getElementById('load-status').textContent = 'Mod\u00e8le IA pr\u00eat \u2714';
-  document.getElementById('load-status').style.color = 'var(--green)';
 }
 
 /* ── CLASS MANAGEMENT ── */
