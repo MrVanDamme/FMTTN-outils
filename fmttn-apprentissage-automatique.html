@@ -810,7 +810,7 @@
   <div id="train-warning" style="margin-top:0.75rem; display:flex; flex-direction:column; gap:6px;"></div>
   <div class="info-strip" style="margin-top:0.75rem;">
     <strong>Comment ça marche :</strong> Choisis 15 photos de chaque objet depuis ta galerie ou via la caméra. Plus tu varies les angles, la lumière et la distance, mieux l'IA apprendra à reconnaître l'objet.<br>
-    <span id="load-status" style="color:var(--amber);">⏳ Chargement du modèle IA en cours...</span>
+    <span id="load-status" style="color:var(--amber);">⏳ Chargement du modèle IA… (peut prendre 20–40 sec sur iPad, c'est normal)</span>
   </div>
 </div>
 
@@ -999,7 +999,7 @@ window.addEventListener('load', async () => {
 });
 
 async function loadMobileNet() {
-  mobileNet = await mobilenet.load({ version: 2, alpha: 0.5 });
+  mobileNet = await mobilenet.load({ version: 2, alpha: 0.25 });
   classifier = new KNNClassifier();
   updateTrainBtn();
   document.getElementById('load-status').textContent = 'Mod\u00e8le IA pr\u00eat \u2714';
