@@ -11,6 +11,8 @@
 <meta property="og:image" content="https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=600&q=80">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="dns-prefetch" href="//cdn.jsdelivr.net">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -565,10 +567,16 @@
     font-weight: 600;
     cursor: pointer;
     font-family: inherit;
-    transition: opacity 0.15s;
+    transition: opacity 0.15s, background 0.3s;
   }
   .btn-welcome:hover { opacity: 0.88; }
   .btn-welcome:active { transform: scale(0.98); }
+  .btn-welcome:disabled {
+    background: var(--border2);
+    color: var(--muted);
+    cursor: not-allowed;
+    opacity: 1;
+  }
 
   .welcome-teacher {
     margin-top: 1rem;
@@ -733,7 +741,7 @@
       </div>
     </div>
 
-    <button class="btn-welcome" onclick="closeWelcome()">C'est parti ! 🚀</button>
+    <button class="btn-welcome" id="btn-welcome" onclick="closeWelcome()" disabled>⏳ Chargement de l'IA…</button>
     <div class="welcome-teacher">Clique sur le <strong>?</strong> en haut à droite pour en savoir plus sur le fonctionnement de l'IA.</div>
   </div>
 </div>
@@ -872,7 +880,6 @@
 <canvas id="hidden-canvas"></canvas>
 
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@4.20.0/dist/tf-backend-wasm.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js"></script>
 
 <script>
@@ -1002,13 +1009,23 @@ window.addEventListener('load', async () => {
 async function loadMobileNet() {
   try {
     mobileNet = await mobilenet.load({ version: 1, alpha: 0.25 });
+    // Warmup : une inférence muette pour précompiler les shaders WebGL
+    const dummy = tf.zeros([1, 224, 224, 3]);
+    mobileNet.infer(dummy, true);
+    dummy.dispose();
     classifier = new KNNClassifier();
     updateTrainBtn();
     document.getElementById('load-status').textContent = 'Mod\u00e8le IA pr\u00eat \u2714';
     document.getElementById('load-status').style.color = 'var(--green)';
+    const btn = document.getElementById('btn-welcome');
+    btn.disabled = false;
+    btn.textContent = 'C\u2019est parti\u00a0! \uD83D\uDE80';
   } catch(e) {
     document.getElementById('load-status').textContent = '\u274c Erreur chargement mod\u00e8le. Recharge la page.';
     document.getElementById('load-status').style.color = 'var(--red)';
+    const btn = document.getElementById('btn-welcome');
+    btn.disabled = false;
+    btn.textContent = '\u274c Erreur \u2014 recharge la page';
   }
 }
 
