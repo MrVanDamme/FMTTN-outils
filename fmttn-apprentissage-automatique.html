@@ -872,6 +872,7 @@
 <canvas id="hidden-canvas"></canvas>
 
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@4.20.0/dist/tf-backend-wasm.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js"></script>
 
 <script>
@@ -999,6 +1000,12 @@ window.addEventListener('load', async () => {
 });
 
 async function loadMobileNet() {
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (isIOS) {
+    tf.wasm.setWasmPaths('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@4.20.0/dist/');
+    await tf.setBackend('wasm');
+  }
+  await tf.ready();
   mobileNet = await mobilenet.load({ version: 2, alpha: 0.25 });
   classifier = new KNNClassifier();
   updateTrainBtn();
