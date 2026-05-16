@@ -36,46 +36,46 @@
     body {
       font-family: 'Nunito', 'Segoe UI', sans-serif;
       overflow: hidden;
-      width: 100vw;
-      height: 100vh;
-      user-select: none;
-      -webkit-user-select: none;
+      width: 100vw; height: 100vh;
+      user-select: none; -webkit-user-select: none;
     }
 
-    /* ========== BUREAU (desktop — fond Windows) ========== */
+    /* ========== BUREAU ========== */
     #desktop {
       position: fixed;
-      top: 0; left: 0; right: 0;
-      bottom: 42px;
+      top: 0; left: 0; right: 0; bottom: 42px;
       background:
         radial-gradient(ellipse at 20% 60%, rgba(0,80,180,0.5) 0%, transparent 55%),
         radial-gradient(ellipse at 75% 30%, rgba(0,120,220,0.35) 0%, transparent 50%),
         radial-gradient(ellipse at 50% 90%, rgba(5,30,100,0.6) 0%, transparent 60%),
         linear-gradient(160deg, #1565c0 0%, #0d47a1 20%, #1a237e 50%, #0d1b5e 75%, #060d30 100%);
-      overflow: hidden;
+      overflow-x: hidden;
+      overflow-y: hidden; /* remplacé en scroll sur mobile via JS */
     }
     #desktop::after {
       content: '';
       position: absolute; inset: 0;
       background: radial-gradient(ellipse at 40% 40%, rgba(255,255,255,0.04) 0%, transparent 60%);
-      pointer-events: none;
+      pointer-events: none; z-index: 0;
     }
 
-    /* ========== ICÔNES (desktop) ========== */
+    /* Conteneur interne — s'étend vers le bas sur mobile */
+    #desktop-inner {
+      position: relative;
+      width: 100%; height: 100%;
+    }
+
+    /* ========== ICÔNES ========== */
     .file-icon {
       position: absolute;
-      width: 76px;
-      text-align: center;
-      cursor: pointer;
-      padding: 5px 3px;
+      width: 76px; text-align: center;
+      cursor: pointer; padding: 5px 3px;
       border-radius: 5px;
       -webkit-tap-highlight-color: transparent;
-      z-index: 10;
-      transition: background 0.1s;
+      z-index: 10; transition: background 0.1s;
     }
     .file-icon .icon-img {
-      font-size: 38px; line-height: 1;
-      display: block; margin-bottom: 3px;
+      font-size: 38px; line-height: 1; display: block; margin-bottom: 3px;
       filter: drop-shadow(0 2px 6px rgba(0,0,0,0.6));
     }
     .file-icon .icon-label {
@@ -91,10 +91,8 @@
     .file-icon.unknown .icon-img { filter: drop-shadow(0 2px 6px rgba(220,38,38,0.4)); }
 
     .folder-icon {
-      position: absolute;
-      width: 80px; text-align: center;
-      cursor: pointer; padding: 5px 3px;
-      border-radius: 5px;
+      position: absolute; width: 80px; text-align: center;
+      cursor: pointer; padding: 5px 3px; border-radius: 5px;
       -webkit-tap-highlight-color: transparent; z-index: 10;
     }
     .folder-icon .icon-img {
@@ -111,27 +109,38 @@
       border: 1px solid rgba(100,180,255,0.45);
     }
 
+    /* Indicateur de scroll sur mobile */
+    #scroll-hint {
+      display: none;
+      position: fixed;
+      bottom: 52px; left: 50%; transform: translateX(-50%);
+      background: rgba(0,0,0,0.5); backdrop-filter: blur(6px);
+      color: rgba(255,255,255,0.9); font-size: 11px; font-weight: 700;
+      padding: 5px 14px; border-radius: 20px; z-index: 500;
+      pointer-events: none; letter-spacing: 0.3px;
+      animation: fadeHint 3s ease forwards;
+    }
+    @keyframes fadeHint {
+      0%   { opacity: 0; } 10% { opacity: 1; }
+      70%  { opacity: 1; } 100%{ opacity: 0; }
+    }
+
     /* ========== BARRE DES TÂCHES ========== */
     #taskbar {
-      position: fixed;
-      bottom: 0; left: 0; right: 0; height: 42px;
-      background: rgba(12,12,18,0.92);
-      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+      position: fixed; bottom: 0; left: 0; right: 0; height: 42px;
+      background: rgba(12,12,18,0.92); backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
       display: flex; align-items: center;
       z-index: 1000; border-top: 0.5px solid rgba(255,255,255,0.1);
     }
     #start-btn {
-      width: 50px; height: 42px;
-      display: flex; align-items: center; justify-content: center;
+      width: 50px; height: 42px; display: flex; align-items: center; justify-content: center;
       cursor: pointer; font-size: 20px; color: #90c8ff; transition: background 0.15s;
     }
     #start-btn:hover { background: rgba(255,255,255,0.1); }
-    #taskbar-apps {
-      flex: 1; display: flex; align-items: center; gap: 2px; padding: 0 4px;
-    }
+    #taskbar-apps { flex: 1; display: flex; align-items: center; gap: 2px; padding: 0 4px; }
     .taskbar-app {
-      width: 46px; height: 38px;
-      display: flex; align-items: center; justify-content: center;
+      width: 46px; height: 38px; display: flex; align-items: center; justify-content: center;
       border-radius: 4px; cursor: pointer; font-size: 20px;
       color: rgba(255,255,255,0.75); transition: background 0.12s;
     }
@@ -146,20 +155,18 @@
     #back-btn {
       position: fixed; top: 10px; left: 10px;
       display: flex; align-items: center; gap: 5px;
-      padding: 6px 12px;
-      background: var(--olive); color: white;
-      font-size: 11px; font-weight: 800;
-      text-decoration: none; border-radius: 10px;
-      z-index: 3000; box-shadow: 0 4px 14px rgba(107,124,45,0.4);
-      letter-spacing: 0.2px; transition: background 0.12s, transform 0.15s;
+      padding: 6px 12px; background: var(--olive); color: white;
+      font-size: 11px; font-weight: 800; text-decoration: none;
+      border-radius: 10px; z-index: 3000;
+      box-shadow: 0 4px 14px rgba(107,124,45,0.4);
+      transition: background 0.12s, transform 0.15s;
     }
     #back-btn:hover { background: var(--olive-dark); transform: translateY(-1px); }
     #info-btn {
       position: fixed; top: 10px; right: 10px;
-      width: 34px; height: 34px;
-      background: var(--olive); border: none; border-radius: 50%;
-      color: white; font-size: 16px; font-weight: 900;
-      cursor: pointer; z-index: 3000;
+      width: 34px; height: 34px; background: var(--olive);
+      border: none; border-radius: 50%; color: white;
+      font-size: 16px; font-weight: 900; cursor: pointer; z-index: 3000;
       box-shadow: 0 4px 14px rgba(107,124,45,0.4);
       font-family: 'Nunito', sans-serif; transition: background 0.12s;
     }
@@ -167,8 +174,7 @@
 
     /* ========== POPUP PROPRIÉTÉS ========== */
     .prop-overlay {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,0.45); z-index: 5000;
+      position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 5000;
       display: flex; align-items: center; justify-content: center;
       backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
     }
@@ -191,9 +197,8 @@
     .btn-x {
       width: 26px; height: 26px; border-radius: 6px;
       background: rgba(220,38,38,0.1); color: var(--red);
-      border: 1px solid rgba(220,38,38,0.25);
-      cursor: pointer; font-size: 11px; font-weight: 900;
-      display: flex; align-items: center; justify-content: center;
+      border: 1px solid rgba(220,38,38,0.25); cursor: pointer;
+      font-size: 11px; font-weight: 900; display: flex; align-items: center; justify-content: center;
       font-family: 'Nunito', sans-serif;
     }
     .btn-x:hover { background: rgba(220,38,38,0.2); }
@@ -236,10 +241,9 @@
 
     /* ========== FENÊTRES DOSSIERS ========== */
     .folder-window {
-      position: fixed; background: var(--white);
-      border: 1.5px solid var(--border); border-radius: var(--radius);
-      box-shadow: 0 8px 40px rgba(0,0,0,0.15); z-index: 2000;
-      width: 500px; max-width: 96vw; overflow: hidden;
+      position: fixed; background: var(--white); border: 1.5px solid var(--border);
+      border-radius: var(--radius); box-shadow: 0 8px 40px rgba(0,0,0,0.15);
+      z-index: 2000; width: 500px; max-width: 96vw; overflow: hidden;
       animation: popIn 0.15s ease;
     }
     .folder-titlebar {
@@ -304,9 +308,8 @@
       backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
     }
     .welcome-box {
-      background: var(--white); border: 1.5px solid var(--border);
-      border-radius: 18px; padding: 28px 24px 22px;
-      width: 430px; max-width: 95vw; max-height: 92vh;
+      background: var(--white); border: 1.5px solid var(--border); border-radius: 18px;
+      padding: 28px 24px 22px; width: 430px; max-width: 95vw; max-height: 92vh;
       overflow-y: auto; text-align: center;
       box-shadow: 0 8px 40px rgba(0,0,0,0.15);
       animation: popIn 0.25s cubic-bezier(0.34,1.5,0.64,1);
@@ -338,14 +341,13 @@
       box-shadow: 0 4px 14px rgba(107,124,45,0.35);
       transition: opacity 0.15s, transform 0.15s;
     }
-    .btn-welcome:hover  { opacity: 0.88; transform: translateY(-1px); }
-    .btn-welcome:active { transform: translateY(0); }
+    .btn-welcome:hover { opacity: 0.88; transform: translateY(-1px); }
     .welcome-note { font-size: 12px; color: var(--muted); font-weight: 600; }
 
     /* ========== PANNEAU D'AIDE ========== */
     .info-modal-bg {
-      position: fixed; inset: 0; background: rgba(30,30,46,0.5);
-      z-index: 7000; display: none; align-items: flex-end; justify-content: center;
+      position: fixed; inset: 0; background: rgba(30,30,46,0.5); z-index: 7000;
+      display: none; align-items: flex-end; justify-content: center;
       backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
     }
     .info-modal-bg.open { display: flex; }
@@ -354,8 +356,7 @@
       border-top-left-radius: 18px; border-top-right-radius: 18px;
       padding: 20px 22px 36px; width: 520px; max-width: 100vw;
       max-height: 80vh; overflow-y: auto; position: relative;
-      box-shadow: 0 -4px 30px rgba(0,0,0,0.1);
-      animation: slideUp 0.2s ease;
+      box-shadow: 0 -4px 30px rgba(0,0,0,0.1); animation: slideUp 0.2s ease;
     }
     @keyframes slideUp {
       from { transform: translateY(40px); opacity: 0; }
@@ -388,9 +389,8 @@
     /* ========== TOAST ========== */
     .toast {
       position: fixed; bottom: 54px; right: 14px;
-      background: var(--white); border: 1.5px solid var(--border);
-      border-radius: 10px; padding: 11px 16px;
-      font-size: 13px; font-weight: 700; color: var(--ink);
+      background: var(--white); border: 1.5px solid var(--border); border-radius: 10px;
+      padding: 11px 16px; font-size: 13px; font-weight: 700; color: var(--ink);
       z-index: 6000; box-shadow: var(--shadow); max-width: 290px;
       line-height: 1.45; animation: toastIn 0.2s ease;
     }
@@ -405,84 +405,48 @@
     ::-webkit-scrollbar-thumb { background: var(--olive-border); border-radius: 3px; }
 
     /* ============================================================
-       RESPONSIVE MOBILE (≤ 640px)
+       RESPONSIVE MOBILE
        ============================================================ */
     @media (max-width: 640px) {
+      /* Bureau scrollable verticalement */
+      #desktop { overflow-y: auto; }
+      /* Zone interne étendue pour avoir de la place */
+      #desktop-inner { height: 230vmax; }
 
-      body { overflow: hidden; }
-
-      /* Bureau = conteneur scrollable en flex */
-      #desktop {
-        overflow-y: auto;
-        overflow-x: hidden;
-        display: flex;
-        flex-wrap: wrap;
-        align-content: flex-start;
-        gap: 6px;
-        padding: 54px 10px 14px;
-      }
-      #desktop::after { display: none; }
-
-      /* Icônes en flux normal (position absolue annulée par JS sur mobile) */
-      .file-icon,
-      .folder-icon {
-        position: relative;
-        width: calc(25% - 6px);
-        min-width: 72px;
-        flex-shrink: 0;
-      }
-      .file-icon .icon-img,
-      .folder-icon .icon-img { font-size: 34px; }
-      .file-icon .icon-label,
+      /* Icônes légèrement plus petites pour tenir sur petit écran */
+      .file-icon { width: 68px; }
+      .file-icon .icon-img { font-size: 32px; }
+      .file-icon .icon-label { font-size: 10px; }
+      .folder-icon { width: 72px; }
+      .folder-icon .icon-img { font-size: 38px; }
       .folder-icon .icon-label { font-size: 10px; }
 
-      /* Séparateur de section mobile */
-      .mobile-section-label {
-        width: 100%;
-        font-size: 10px; font-weight: 800;
-        color: rgba(255,255,255,0.55);
-        text-transform: uppercase; letter-spacing: 1px;
-        padding: 10px 2px 2px;
-        text-shadow: 0 1px 3px rgba(0,0,0,0.6);
-      }
+      /* Hint de scroll visible */
+      #scroll-hint { display: block; }
 
-      /* Fenêtre dossier = plein écran */
+      /* Popup propriétés plein largeur */
+      .prop-window { width: 98vw; max-width: 98vw; }
+      .prop-big-icon { font-size: 42px; }
+
+      /* Fenêtre dossier : plein écran */
       .folder-window {
-        width: 100% !important;
-        max-width: 100% !important;
-        left: 0 !important;
-        top: 0 !important;
-        bottom: 42px;
+        width: 100% !important; max-width: 100% !important;
+        left: 0 !important; top: 0 !important;
         border-radius: 0;
-        border-left: none; border-right: none; border-top: none;
-        display: flex; flex-direction: column;
       }
       .folder-titlebar { cursor: default; }
-      .folder-content { flex: 1; max-height: none; }
-      .folder-toolbar { display: none; }
+      .folder-content { max-height: calc(100vh - 150px); }
 
-      /* Popup propriétés : prend toute la largeur */
-      .prop-window { width: 98vw; max-width: 98vw; }
-      .prop-hero   { padding: 14px 16px 12px; gap: 12px; }
-      .prop-big-icon { font-size: 42px; }
-      .prop-rows { padding: 8px 16px; }
-      .prop-footer { padding: 10px 16px; }
-
-      /* Barre des tâches mobile : cacher les apps, garder horloge */
+      /* Barre des tâches allégée */
       #taskbar-apps { display: none; }
-      #taskbar-right { padding: 0 10px; }
-
-      /* Boutons flottants plus petits */
       #back-btn { font-size: 10px; padding: 5px 10px; top: 8px; left: 8px; }
       #info-btn { width: 30px; height: 30px; font-size: 14px; top: 8px; right: 8px; }
+      .toast { left: 10px; right: 10px; max-width: none; }
 
-      /* Toast en bas au centre sur mobile */
-      .toast { left: 10px; right: 10px; max-width: none; bottom: 50px; }
-
-      /* Welcome : padding réduit */
-      .welcome-box { padding: 22px 18px 18px; }
-      .welcome-emoji { font-size: 42px; margin-bottom: 8px; }
-      .welcome-box h2 { font-size: 18px; }
+      /* Welcome adapté */
+      .welcome-box { padding: 20px 16px 18px; }
+      .welcome-emoji { font-size: 40px; margin-bottom: 8px; }
+      .welcome-box h2 { font-size: 17px; }
     }
   </style>
 </head>
@@ -490,9 +454,12 @@
 
   <a href="index.html" id="back-btn" title="Retour au menu principal">← Accueil</a>
   <button id="info-btn" onclick="document.getElementById('info-modal').classList.add('open')" title="Aide">?</button>
+  <div id="scroll-hint">↕ Fais défiler pour tout voir</div>
 
   <!-- ===== BUREAU ===== -->
-  <div id="desktop" oncontextmenu="showCtxMenu(event)" onclick="onDesktopClick(event)"></div>
+  <div id="desktop" oncontextmenu="showCtxMenu(event)" onclick="onDesktopClick(event)">
+    <div id="desktop-inner"></div>
+  </div>
 
   <!-- ===== BARRE DES TÂCHES ===== -->
   <div id="taskbar">
@@ -524,12 +491,7 @@
       <p class="welcome-subtitle">FMTTN — Mr. Van Damme</p>
       <div class="welcome-objective">
         <div class="obj-title">🎯 Quel est l'objectif ?</div>
-        <p>
-          Explore un <strong style="color:var(--olive-dark)">bureau d'ordinateur virtuel</strong> en désordre.
-          Chaque fichier a une <strong style="color:var(--olive-dark)">extension</strong>
-          (<code style="color:var(--olive)">.pdf</code>, <code style="color:var(--olive)">.mp3</code>…)
-          et une <strong style="color:var(--olive-dark)">taille</strong>. Apprends à les reconnaître !
-        </p>
+        <p>Explore un <strong style="color:var(--olive-dark)">bureau en désordre</strong>. Chaque fichier a une <strong style="color:var(--olive-dark)">extension</strong> (<code style="color:var(--olive)">.pdf</code>, <code style="color:var(--olive)">.mp3</code>…) et une <strong style="color:var(--olive-dark)">taille</strong>. Apprends à les reconnaître !</p>
       </div>
       <div class="welcome-steps">
         <div class="welcome-step">
@@ -543,7 +505,7 @@
           <div class="ws-icon">📁</div>
           <div>
             <div class="ws-title">Explore les dossiers</div>
-            <div class="ws-desc">Ouvre les dossiers pour découvrir les fichiers cachés dedans !</div>
+            <div class="ws-desc">Ouvre les dossiers pour trouver les fichiers cachés dedans !</div>
           </div>
         </div>
         <div class="welcome-step">
@@ -551,6 +513,13 @@
           <div>
             <div class="ws-title">Repère les extensions inconnues</div>
             <div class="ws-desc">Certains fichiers ont des extensions que Windows ne reconnaît pas.</div>
+          </div>
+        </div>
+        <div class="welcome-step">
+          <div class="ws-icon" id="ws-drag-icon">↔️</div>
+          <div>
+            <div class="ws-title" id="ws-drag-title">Déplace les fichiers</div>
+            <div class="ws-desc" id="ws-drag-desc">Glisse-dépose les icônes pour réorganiser le bureau.</div>
           </div>
         </div>
       </div>
@@ -566,8 +535,8 @@
       <button class="info-close-btn" onclick="document.getElementById('info-modal').classList.remove('open')">✕</button>
       <h2>📚 Les extensions de fichiers</h2>
       <h3>🔤 C'est quoi une extension ?</h3>
-      <p>C'est la partie après le dernier <strong>point</strong> dans le nom du fichier. Dans <code style="color:var(--olive);font-weight:800;">musique.mp3</code>, l'extension est <strong>.mp3</strong>. Elle indique à l'ordinateur quel programme utiliser.</p>
-      <div class="analogy-card">🎮 C'est comme une étiquette sur une boîte : <strong>.mp3</strong> = boîte de musique, <strong>.pdf</strong> = boîte de document.</div>
+      <p>C'est la partie après le dernier <strong>point</strong> dans le nom du fichier. Dans <code style="color:var(--olive);font-weight:800;">musique.mp3</code>, l'extension est <strong>.mp3</strong>.</p>
+      <div class="analogy-card">🎮 C'est comme une étiquette sur une boîte : <strong>.mp3</strong> = musique, <strong>.pdf</strong> = document.</div>
       <h3>📏 Les unités de taille</h3>
       <div class="analogy-card">
         <strong style="color:var(--green)">ko</strong> → un SMS<br>
@@ -593,7 +562,7 @@
       </div>
       <h3>❓ Extensions inconnues</h3>
       <p>Sur ce bureau, plusieurs fichiers ont des extensions <strong style="color:var(--red)">inventées</strong> (.cca, .luc, .ryt, .kit, .be, .rbt…). Repère-les !</p>
-      <div class="analogy-card">⚠️ Dans la vraie vie, <strong>ne jamais ouvrir</strong> un fichier avec une extension inconnue reçu par e-mail — c'est souvent un virus !</div>
+      <div class="analogy-card">⚠️ Dans la vraie vie, <strong>ne jamais ouvrir</strong> un fichier inconnu reçu par e-mail — c'est souvent un virus !</div>
     </div>
   </div>
 
@@ -624,17 +593,14 @@
     <div class="ctx-item" onclick="hideCtxMenu(); showToast('🔄 Bureau actualisé')">🔄 Actualiser</div>
     <div class="ctx-item disabled">📋 Coller</div>
     <div class="ctx-sep"></div>
-    <div class="ctx-item" onclick="hideCtxMenu(); showToast('🔡 Tri par nom effectué !')">🔡 Trier par nom</div>
-    <div class="ctx-item" onclick="hideCtxMenu(); showToast('📏 Tri par taille effectué !')">📏 Trier par taille</div>
-    <div class="ctx-item" onclick="hideCtxMenu(); showToast('📅 Tri par date effectué !')">📅 Trier par date</div>
+    <div class="ctx-item" onclick="hideCtxMenu(); showToast('🔡 Tri par nom !')">🔡 Trier par nom</div>
+    <div class="ctx-item" onclick="hideCtxMenu(); showToast('📏 Tri par taille !')">📏 Trier par taille</div>
+    <div class="ctx-item" onclick="hideCtxMenu(); showToast('📅 Tri par date !')">📅 Trier par date</div>
     <div class="ctx-sep"></div>
     <div class="ctx-item" onclick="hideCtxMenu(); document.getElementById('info-modal').classList.add('open')">📚 Aide — extensions</div>
   </div>
 
   <script>
-  // ================================================================
-  // DATA
-  // ================================================================
   const FILES = [
     { name:'Vacances.txt',   size:'345 ko',   date:'13-12', author:'Jordan',   ext:'txt',  icon:'📄', type:'Fichier texte (Bloc-notes)',         x:4,   y:7   },
     { name:'Vacances.pdf',   size:'1,2 To',   date:'12-03', author:'Armand',   ext:'pdf',  icon:'📕', type:'Document PDF',                       x:7,   y:34,  sizeWarn:true },
@@ -675,7 +641,7 @@
         { name:'Photo1.jpg',   size:'3,2 Mo',  date:'14-07', author:'Lucas',   ext:'jpg',  icon:'🖼️', type:'Image JPEG' },
         { name:'Capture.png',  size:'870 ko',  date:'22-08', author:'Chloé',   ext:'png',  icon:'🖼️', type:'Image PNG' },
         { name:'Dessin.svg',   size:'45 ko',   date:'03-09', author:'Romain',  ext:'svg',  icon:'🎨', type:'Image vectorielle SVG' },
-        { name:'Photo2.bmp',   size:'12,4 Mo', date:'11-09', author:'Seb',     ext:'bmp',  icon:'🖼️', type:'Image Bitmap non compressée' },
+        { name:'Photo2.bmp',   size:'12,4 Mo', date:'11-09', author:'Seb',     ext:'bmp',  icon:'🖼️', type:'Image Bitmap' },
         { name:'logo.xrp',     size:'2,1 Mo',  date:'17-09', author:'Armand',  ext:'xrp',  icon:'❓', type:'Fichier inconnu', unknown:true },
       ]
     },
@@ -685,7 +651,7 @@
         { name:'Setup.exe',    size:'45 Mo',   date:'01-10', author:'Inconnu',  ext:'exe',  icon:'⚠️', type:'Programme exécutable (DANGER)' },
         { name:'Musique.flac', size:'28 Mo',   date:'05-10', author:'Lucas',    ext:'flac', icon:'🎵', type:'Audio FLAC (haute qualité)' },
         { name:'Archive.tar',  size:'156 Mo',  date:'08-10', author:'Loïc',     ext:'tar',  icon:'🗜️', type:'Archive TAR (Linux/Mac)' },
-        { name:'Données.csv',  size:'234 ko',  date:'12-10', author:'Delphine', ext:'csv',  icon:'📊', type:'Fichier CSV (tableur texte)' },
+        { name:'Données.csv',  size:'234 ko',  date:'12-10', author:'Delphine', ext:'csv',  icon:'📊', type:'Fichier CSV' },
         { name:'inconnu.wvp',  size:'78 Mo',   date:'15-10', author:'???',      ext:'wvp',  icon:'❓', type:'Fichier inconnu', unknown:true },
       ]
     },
@@ -696,71 +662,37 @@
   // ================================================================
   const MOBILE = window.innerWidth <= 640;
 
-  // Adapter le texte de la modal de bienvenue
   if (MOBILE) {
-    document.getElementById('ws-click-title').textContent = 'Appuie sur un fichier';
+    document.getElementById('ws-click-title').textContent = 'Appuie une fois sur un fichier';
+    document.getElementById('ws-drag-title').textContent  = 'Déplace les fichiers';
+    document.getElementById('ws-drag-desc').textContent   = 'Appuie longuement et glisse pour bouger les icônes.';
   }
 
   // ================================================================
-  // RENDU DU BUREAU
+  // RENDU — positions absolues identiques desktop & mobile
   // ================================================================
-  const desktop = document.getElementById('desktop');
+  const inner = document.getElementById('desktop-inner');
 
-  if (MOBILE) {
-    // ── MOBILE : affichage en grille scrollable ──
-    const labelDossiers = document.createElement('div');
-    labelDossiers.className = 'mobile-section-label';
-    labelDossiers.textContent = '📁 Dossiers';
-    desktop.appendChild(labelDossiers);
-
-    FOLDERS.forEach((folder) => {
-      const el = createIcon('folder-icon', folder.icon, folder.name);
-      el.addEventListener('click', (e) => { e.stopPropagation(); openFolder(folder); });
-      desktop.appendChild(el);
-    });
-
-    const labelFichiers = document.createElement('div');
-    labelFichiers.className = 'mobile-section-label';
-    labelFichiers.textContent = '📄 Fichiers';
-    desktop.appendChild(labelFichiers);
-
-    FILES.forEach((f) => {
-      const el = createIcon('file-icon' + (f.unknown ? ' unknown' : ''), f.icon, f.name);
-      el.addEventListener('click', (e) => { e.stopPropagation(); showProp(f); });
-      desktop.appendChild(el);
-    });
-
-  } else {
-    // ── DESKTOP : icônes absolues en désordre ──
-    FILES.forEach((f) => {
-      const el = createIcon('file-icon' + (f.unknown ? ' unknown' : ''), f.icon, f.name);
-      el.style.left = f.x + '%';
-      el.style.top  = f.y + '%';
-      setupDblClick(el, () => showProp(f));
-      makeDraggable(el);
-      desktop.appendChild(el);
-    });
-
-    FOLDERS.forEach((folder) => {
-      const el = createIcon('folder-icon', folder.icon, folder.name);
-      el.style.left = folder.x + '%';
-      el.style.top  = folder.y + '%';
-      setupDblClick(el, () => openFolder(folder));
-      makeDraggable(el);
-      desktop.appendChild(el);
-    });
-  }
-
-  function createIcon(className, icon, name) {
+  [...FILES, ...FOLDERS].forEach((item) => {
+    const isFolder = !!item.files;
     const el = document.createElement('div');
-    el.className = className;
-    el.innerHTML = `<span class="icon-img">${icon}</span><span class="icon-label">${name}</span>`;
-    el.style.webkitTapHighlightColor = 'transparent';
-    return el;
-  }
+    el.className = isFolder ? 'folder-icon' : ('file-icon' + (item.unknown ? ' unknown' : ''));
+    el.style.left = item.x + '%';
+    el.style.top  = item.y + '%';
+    el.innerHTML  = `<span class="icon-img">${item.icon}</span><span class="icon-label">${item.name}</span>`;
+
+    if (MOBILE) {
+      makeTouchIcon(el, isFolder ? () => openFolder(item) : () => showProp(item));
+    } else {
+      setupDblClick(el, isFolder ? () => openFolder(item) : () => showProp(item));
+      makeDraggable(el);
+    }
+
+    inner.appendChild(el);
+  });
 
   // ================================================================
-  // SÉLECTION + DOUBLE-CLIC (desktop uniquement)
+  // INTERACTIONS DESKTOP — double-clic + drag souris
   // ================================================================
   let selectedEl = null;
 
@@ -775,9 +707,76 @@
     });
   }
 
-  function onDesktopClick() {
+  function makeDraggable(el) {
+    let dragging = false, sx, sy, il, it;
+    el.addEventListener('mousedown', (e) => {
+      if (e.button !== 0) return;
+      dragging = false; sx = e.clientX; sy = e.clientY; il = el.offsetLeft; it = el.offsetTop;
+      const move = (e) => {
+        const dx = e.clientX - sx, dy = e.clientY - sy;
+        if (!dragging && (Math.abs(dx) > 5 || Math.abs(dy) > 5)) {
+          dragging = true; el.style.left = il + 'px'; el.style.top = it + 'px';
+        }
+        if (dragging) {
+          el.style.left = Math.max(0, il + dx) + 'px';
+          el.style.top  = Math.max(0, it + dy) + 'px';
+        }
+      };
+      const up = () => { document.removeEventListener('mousemove', move); document.removeEventListener('mouseup', up); };
+      document.addEventListener('mousemove', move); document.addEventListener('mouseup', up);
+    });
+  }
+
+  function onDesktopClick(e) {
     if (selectedEl) { selectedEl.classList.remove('selected'); selectedEl = null; }
     hideCtxMenu();
+  }
+
+  // ================================================================
+  // INTERACTIONS MOBILE — tap simple + drag tactile
+  // ================================================================
+  function makeTouchIcon(el, onTap) {
+    let startX, startY, startLeft, startTop, moved;
+
+    el.addEventListener('touchstart', (e) => {
+      const t = e.touches[0];
+      startX    = t.clientX;
+      startY    = t.clientY;
+      startLeft = el.offsetLeft;
+      startTop  = el.offsetTop;
+      moved     = false;
+
+      // Scroll position at start (desktop div scrolls)
+      const desk = document.getElementById('desktop');
+      const scrollAtStart = desk.scrollTop;
+
+      const onMove = (e) => {
+        const t = e.touches[0];
+        const dx = t.clientX - startX;
+        const dy = t.clientY - startY;
+        if (Math.abs(dx) > 8 || Math.abs(dy) > 8) {
+          moved = true;
+          // Drag: move icon, prevent scroll
+          e.preventDefault();
+          el.style.left = Math.max(0, startLeft + dx) + 'px';
+          el.style.top  = Math.max(0, startTop  + dy + (desk.scrollTop - scrollAtStart)) + 'px';
+        }
+      };
+
+      const onEnd = () => {
+        el.removeEventListener('touchmove', onMove);
+        el.removeEventListener('touchend', onEnd);
+        if (!moved) {
+          // Simple tap → ouvrir
+          if (selectedEl) selectedEl.classList.remove('selected');
+          selectedEl = el; el.classList.add('selected');
+          onTap();
+        }
+      };
+
+      el.addEventListener('touchmove', onMove, { passive: false });
+      el.addEventListener('touchend', onEnd);
+    }, { passive: true });
   }
 
   // ================================================================
@@ -795,35 +794,19 @@
       : `<span class="prop-value">${f.type}</span>`;
 
     let extras = '';
-    if (f.unknown) extras += `<div class="prop-alert danger">⚠️ Windows ne reconnaît pas <strong>.${f.ext}</strong>. Aucun programme associé.</div>`;
+    if (f.unknown)   extras += `<div class="prop-alert danger">⚠️ Windows ne reconnaît pas <strong>.${f.ext}</strong>. Aucun programme associé.</div>`;
     if (f.sizeWarn) extras += `<div class="prop-alert warning">⚠️ Fichier <strong>très volumineux</strong> (${f.size}) !</div>`;
 
     document.getElementById('prop-rows').innerHTML = `
-      <div class="prop-row">
-        <span class="prop-label">📎 Extension</span>
-        <span class="prop-value ${f.unknown ? 'unknown' : ''}">.${f.ext}</span>
-      </div>
-      <div class="prop-row">
-        <span class="prop-label">🏷️ Type</span>
-        ${typeLabel}
-      </div>
-      <div class="prop-row">
-        <span class="prop-label">📏 Taille</span>
-        <span class="prop-value ${f.sizeWarn ? 'warn' : ''}">${f.size}</span>
-      </div>
-      <div class="prop-row">
-        <span class="prop-label">📅 Date</span>
-        <span class="prop-value">${f.date}</span>
-      </div>
-      <div class="prop-row">
-        <span class="prop-label">👤 Auteur</span>
-        <span class="prop-value">${f.author}</span>
-      </div>
+      <div class="prop-row"><span class="prop-label">📎 Extension</span><span class="prop-value ${f.unknown ? 'unknown' : ''}">.${f.ext}</span></div>
+      <div class="prop-row"><span class="prop-label">🏷️ Type</span>${typeLabel}</div>
+      <div class="prop-row"><span class="prop-label">📏 Taille</span><span class="prop-value ${f.sizeWarn ? 'warn' : ''}">${f.size}</span></div>
+      <div class="prop-row"><span class="prop-label">📅 Date</span><span class="prop-value">${f.date}</span></div>
+      <div class="prop-row"><span class="prop-label">👤 Auteur</span><span class="prop-value">${f.author}</span></div>
       ${extras}
     `;
     document.getElementById('prop-overlay').style.display = 'flex';
   }
-
   function closeProp() { document.getElementById('prop-overlay').style.display = 'none'; }
 
   // ================================================================
@@ -838,16 +821,11 @@
     const win = document.createElement('div');
     win.className = 'folder-window';
     win.style.zIndex = ++zTop;
-
-    if (MOBILE) {
-      win.style.left = '0'; win.style.top = '0';
-    } else {
-      win.style.left = Math.round(15 + Math.random() * 25) + '%';
-      win.style.top  = Math.round(10 + Math.random() * 20) + '%';
-    }
+    win.style.left = MOBILE ? '0' : Math.round(15 + Math.random() * 25) + '%';
+    win.style.top  = MOBILE ? '0' : Math.round(10 + Math.random() * 20) + '%';
 
     win.innerHTML = `
-      <div class="folder-titlebar" ${MOBILE ? '' : 'onmousedown="dragWindow(event, this.parentElement)"'}>
+      <div class="folder-titlebar" ${MOBILE ? '' : 'onmousedown="dragWindow(event,this.parentElement)"'}>
         <span class="folder-title-icon">📂</span>
         <span class="folder-title-text">${folder.name}</span>
         <button class="btn-x" onclick="closeFolder('${folder.name}')">✕</button>
@@ -867,20 +845,21 @@
       item.className = 'ff-item' + (f.unknown ? ' unknown' : '');
       item.innerHTML = `<span class="ficon">${f.icon}</span><span class="fname">${f.name}</span>`;
 
+      const activate = () => {
+        content.querySelectorAll('.ff-item').forEach(i => i.classList.remove('selected'));
+        item.classList.add('selected');
+        showProp(f);
+      };
+
       if (MOBILE) {
-        item.addEventListener('click', (e) => {
-          e.stopPropagation();
-          content.querySelectorAll('.ff-item').forEach(i => i.classList.remove('selected'));
-          item.classList.add('selected');
-          showProp(f);
-        });
+        item.addEventListener('click', (e) => { e.stopPropagation(); activate(); });
       } else {
         let timer = null;
         item.addEventListener('click', (e) => {
           e.stopPropagation();
           content.querySelectorAll('.ff-item').forEach(i => i.classList.remove('selected'));
           item.classList.add('selected');
-          if (timer) { clearTimeout(timer); timer = null; showProp(f); }
+          if (timer) { clearTimeout(timer); timer = null; activate(); }
           else timer = setTimeout(() => { timer = null; }, 320);
         });
       }
@@ -899,38 +878,9 @@
   function dragWindow(e, win) {
     if (e.target.tagName === 'BUTTON') return;
     const ox = e.clientX - win.offsetLeft, oy = e.clientY - win.offsetTop;
-    const move = (e) => {
-      win.style.left = (e.clientX - ox) + 'px';
-      win.style.top  = Math.max(0, e.clientY - oy) + 'px';
-    };
-    const up = () => { document.removeEventListener('mousemove', move); document.removeEventListener('mouseup', up); };
-    document.addEventListener('mousemove', move);
-    document.addEventListener('mouseup', up);
-  }
-
-  // ================================================================
-  // DRAG & DROP (desktop uniquement)
-  // ================================================================
-  function makeDraggable(el) {
-    let dragging = false, sx, sy, il, it;
-    el.addEventListener('mousedown', (e) => {
-      if (e.button !== 0) return;
-      dragging = false;
-      sx = e.clientX; sy = e.clientY; il = el.offsetLeft; it = el.offsetTop;
-      const move = (e) => {
-        const dx = e.clientX - sx, dy = e.clientY - sy;
-        if (!dragging && (Math.abs(dx) > 5 || Math.abs(dy) > 5)) {
-          dragging = true; el.style.left = il + 'px'; el.style.top = it + 'px';
-        }
-        if (dragging) {
-          el.style.left = Math.max(0, il + dx) + 'px';
-          el.style.top  = Math.max(0, it + dy) + 'px';
-        }
-      };
-      const up = () => { document.removeEventListener('mousemove', move); document.removeEventListener('mouseup', up); };
-      document.addEventListener('mousemove', move);
-      document.addEventListener('mouseup', up);
-    });
+    const move = (e) => { win.style.left = (e.clientX - ox) + 'px'; win.style.top = Math.max(0, e.clientY - oy) + 'px'; };
+    const up   = () => { document.removeEventListener('mousemove', move); document.removeEventListener('mouseup', up); };
+    document.addEventListener('mousemove', move); document.addEventListener('mouseup', up);
   }
 
   // ================================================================
@@ -963,9 +913,8 @@
 
   function showToast(msg) {
     const t = document.createElement('div');
-    t.className = 'toast'; t.textContent = msg;
-    document.body.appendChild(t);
-    setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity 0.3s'; setTimeout(() => t.remove(), 300); }, 2500);
+    t.className = 'toast'; t.textContent = msg; document.body.appendChild(t);
+    setTimeout(() => { t.style.opacity='0'; t.style.transition='opacity 0.3s'; setTimeout(()=>t.remove(),300); }, 2500);
   }
   </script>
 </body>
