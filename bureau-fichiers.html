@@ -8,28 +8,35 @@
   <meta property="og:title" content="FMTTN — Bureau Virtuel">
   <meta property="og:description" content="Explore un bureau en désordre et apprends à reconnaître les extensions de fichiers et leurs tailles.">
   <meta property="og:type" content="website">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
+    /* ── Variables charte Rosas ── */
     :root {
-      --bg: #0f0f13;
-      --surface: #1a1a22;
-      --surface2: #22222e;
-      --border: rgba(255,255,255,0.08);
-      --border2: rgba(255,255,255,0.15);
-      --text: #f0f0f5;
-      --muted: #888899;
-      --accent: #7c6eff;
-      --accent2: #a78bfa;
-      --green: #34d399;
-      --amber: #fbbf24;
-      --red: #f87171;
+      --olive:        #6b7c2d;
+      --olive-dark:   #4f5e18;
+      --olive-mid:    #8fa84e;
+      --olive-light:  #f4f6e8;
+      --olive-border: #dde2b5;
+      --bg:     #f7f8fc;
+      --white:  #ffffff;
+      --ink:    #1e1e2e;
+      --muted:  #6b7280;
+      --border: #e8eaf0;
+      --shadow: 0 2px 16px rgba(0,0,0,0.08);
       --radius: 14px;
-      --radius-sm: 8px;
+      --radius-sm: 9px;
+      /* alertes */
+      --red:   #dc2626;
+      --amber: #d97706;
+      --green: #16a34a;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: 'Nunito', 'Segoe UI', sans-serif;
       overflow: hidden;
       width: 100vw;
       height: 100vh;
@@ -37,7 +44,7 @@
       -webkit-user-select: none;
     }
 
-    /* ========== DESKTOP ========== */
+    /* ========== DESKTOP (Windows — inchangé) ========== */
     #desktop {
       position: fixed;
       top: 0; left: 0; right: 0;
@@ -49,7 +56,6 @@
         linear-gradient(160deg, #1565c0 0%, #0d47a1 20%, #1a237e 50%, #0d1b5e 75%, #060d30 100%);
       overflow: hidden;
     }
-
     #desktop::after {
       content: '';
       position: absolute;
@@ -58,7 +64,7 @@
       pointer-events: none;
     }
 
-    /* ========== FILE ICONS ========== */
+    /* ========== ICÔNES BUREAU ========== */
     .file-icon {
       position: absolute;
       width: 76px;
@@ -70,7 +76,6 @@
       z-index: 10;
       transition: background 0.1s;
     }
-
     .file-icon .icon-img {
       font-size: 38px;
       line-height: 1;
@@ -78,27 +83,24 @@
       margin-bottom: 3px;
       filter: drop-shadow(0 2px 6px rgba(0,0,0,0.6));
     }
-
     .file-icon .icon-label {
       font-size: 11px;
+      font-weight: 700;
       color: white;
       text-shadow: 0 1px 4px rgba(0,0,0,0.9), 0 0 10px rgba(0,0,0,0.6);
       word-break: break-all;
       line-height: 1.3;
       display: block;
     }
-
     .file-icon.selected {
       background: rgba(100,160,255,0.22);
       border: 1px solid rgba(100,180,255,0.45);
       outline: 1px solid rgba(60,130,255,0.3);
     }
-
     .file-icon.unknown .icon-img {
-      filter: drop-shadow(0 2px 6px rgba(255,80,80,0.35));
+      filter: drop-shadow(0 2px 6px rgba(220,38,38,0.4));
     }
 
-    /* ========== FOLDER ICONS ========== */
     .folder-icon {
       position: absolute;
       width: 80px;
@@ -109,27 +111,25 @@
       -webkit-tap-highlight-color: transparent;
       z-index: 10;
     }
-
     .folder-icon .icon-img {
       font-size: 44px;
       display: block;
       filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
     }
-
     .folder-icon .icon-label {
       font-size: 11px;
+      font-weight: 700;
       color: white;
       text-shadow: 0 1px 4px rgba(0,0,0,0.9);
       word-break: break-word;
       line-height: 1.3;
     }
-
     .folder-icon.selected {
       background: rgba(100,160,255,0.22);
       border: 1px solid rgba(100,180,255,0.45);
     }
 
-    /* ========== TASKBAR ========== */
+    /* ========== BARRE DES TÂCHES (Windows — inchangé) ========== */
     #taskbar {
       position: fixed;
       bottom: 0; left: 0; right: 0;
@@ -142,502 +142,354 @@
       z-index: 1000;
       border-top: 0.5px solid rgba(255,255,255,0.1);
     }
-
     #start-btn {
-      width: 50px;
-      height: 42px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 20px;
-      color: #90c8ff;
+      width: 50px; height: 42px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 20px; color: #90c8ff;
       transition: background 0.15s;
     }
     #start-btn:hover { background: rgba(255,255,255,0.1); }
-
     #taskbar-apps {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      gap: 2px;
-      padding: 0 4px;
+      flex: 1; display: flex; align-items: center; gap: 2px; padding: 0 4px;
     }
-
     .taskbar-app {
-      width: 46px;
-      height: 38px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 20px;
-      color: rgba(255,255,255,0.75);
-      transition: background 0.12s;
+      width: 46px; height: 38px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 4px; cursor: pointer; font-size: 20px;
+      color: rgba(255,255,255,0.75); transition: background 0.12s;
     }
     .taskbar-app:hover { background: rgba(255,255,255,0.1); }
-
     #taskbar-right {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 0 14px;
+      display: flex; align-items: center; gap: 10px; padding: 0 14px;
     }
-
     #taskbar-icons {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      font-size: 15px;
-      color: rgba(255,255,255,0.65);
+      display: flex; gap: 8px; align-items: center;
+      font-size: 15px; color: rgba(255,255,255,0.65);
     }
+    #clock { text-align: right; line-height: 1.35; cursor: default; }
+    #clk-time { font-size: 13px; color: rgba(255,255,255,0.9); font-weight: 700; }
+    #clk-date  { font-size: 10px; color: rgba(255,255,255,0.55); }
 
-    #clock {
-      text-align: right;
-      line-height: 1.35;
+    /* ========== BADGE FMTTN & BOUTON ? ========== */
+    #fmttn-badge {
+      position: fixed;
+      top: 10px; left: 10px;
+      background: var(--olive);
+      border-radius: 10px;
+      padding: 5px 12px;
+      font-size: 11px;
+      font-weight: 800;
+      color: white;
+      letter-spacing: 0.3px;
+      z-index: 3000;
+      box-shadow: 0 4px 14px rgba(107,124,45,0.4);
       cursor: default;
     }
-    #clock-time { font-size: 13px; color: rgba(255,255,255,0.9); font-weight: 500; }
-    #clock-date { font-size: 10px; color: rgba(255,255,255,0.55); }
+    #info-btn {
+      position: fixed;
+      top: 10px; right: 10px;
+      width: 34px; height: 34px;
+      background: var(--olive);
+      border: none; border-radius: 50%;
+      color: white; font-size: 16px; font-weight: 900;
+      cursor: pointer; z-index: 3000;
+      box-shadow: 0 4px 14px rgba(107,124,45,0.4);
+      font-family: 'Nunito', sans-serif;
+      transition: background 0.12s;
+    }
+    #info-btn:hover { background: var(--olive-dark); }
 
-    /* ========== PROPERTIES POPUP ========== */
+    /* ========== POPUP PROPRIÉTÉS ========== */
     .prop-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.65);
+      background: rgba(0,0,0,0.45);
       z-index: 5000;
       display: flex;
       align-items: center;
       justify-content: center;
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
     }
-
     .prop-window {
-      background: #1c1c28;
-      border: 0.5px solid rgba(255,255,255,0.18);
-      border-radius: 10px;
-      width: 350px;
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      width: 360px;
       max-width: 95vw;
-      box-shadow: 0 24px 70px rgba(0,0,0,0.7);
+      box-shadow: 0 8px 40px rgba(0,0,0,0.15);
       overflow: hidden;
       animation: popIn 0.18s cubic-bezier(0.34,1.5,0.64,1);
     }
-
     @keyframes popIn {
-      from { transform: scale(0.82); opacity: 0; }
+      from { transform: scale(0.85); opacity: 0; }
       to   { transform: scale(1);    opacity: 1; }
     }
-
     .prop-titlebar {
-      background: #252533;
-      padding: 11px 14px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      border-bottom: 0.5px solid rgba(255,255,255,0.1);
+      background: var(--olive-light);
+      border-bottom: 1.5px solid var(--olive-border);
+      padding: 12px 16px;
+      display: flex; align-items: center; gap: 10px;
     }
     .prop-titlebar .t-icon { font-size: 17px; }
-    .prop-titlebar .t-text { flex: 1; font-size: 13px; color: #f0f0f5; font-weight: 600; }
-
+    .prop-titlebar .t-text { flex: 1; font-size: 13px; color: var(--olive-dark); font-weight: 800; }
     .btn-x {
-      width: 26px; height: 26px;
-      border-radius: 6px;
-      background: rgba(200,50,50,0.25);
-      color: #f87171;
-      border: 0.5px solid rgba(200,50,50,0.4);
-      cursor: pointer;
-      font-size: 11px;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: inherit;
+      width: 26px; height: 26px; border-radius: 6px;
+      background: rgba(220,38,38,0.1); color: var(--red);
+      border: 1px solid rgba(220,38,38,0.25);
+      cursor: pointer; font-size: 11px; font-weight: 900;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Nunito', sans-serif;
     }
-    .btn-x:hover { background: rgba(200,50,50,0.5); }
-
+    .btn-x:hover { background: rgba(220,38,38,0.2); }
     .prop-hero {
       padding: 20px 20px 16px;
-      display: flex;
-      align-items: center;
-      gap: 18px;
-      border-bottom: 0.5px solid rgba(255,255,255,0.07);
+      display: flex; align-items: center; gap: 18px;
+      border-bottom: 1.5px solid var(--border);
     }
     .prop-big-icon { font-size: 54px; flex-shrink: 0; }
-    .prop-filename { font-size: 15px; font-weight: 700; color: #f0f0f5; margin-bottom: 3px; }
-    .prop-ftype    { font-size: 12px; color: #888899; }
-
-    .prop-rows { padding: 14px 20px; display: flex; flex-direction: column; gap: 1px; }
-
+    .prop-filename { font-size: 15px; font-weight: 800; color: var(--ink); margin-bottom: 3px; }
+    .prop-ftype    { font-size: 12px; color: var(--muted); font-weight: 600; }
+    .prop-rows { padding: 12px 20px; display: flex; flex-direction: column; }
     .prop-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      display: flex; justify-content: space-between; align-items: center;
       padding: 9px 0;
-      border-bottom: 0.5px solid rgba(255,255,255,0.05);
+      border-bottom: 1px solid var(--border);
       gap: 12px;
     }
     .prop-row:last-child { border-bottom: none; }
-    .prop-label { font-size: 12px; color: #888899; white-space: nowrap; }
-    .prop-value { font-size: 13px; color: #f0f0f5; text-align: right; font-weight: 500; }
-    .prop-value.unknown  { color: #f87171; }
-    .prop-value.warn     { color: #fbbf24; }
-
+    .prop-label { font-size: 12px; color: var(--muted); font-weight: 700; white-space: nowrap; }
+    .prop-value { font-size: 13px; color: var(--ink); text-align: right; font-weight: 700; }
+    .prop-value.unknown { color: var(--red); }
+    .prop-value.warn    { color: var(--amber); }
     .prop-alert {
-      margin: 8px 0 0;
-      border-radius: 7px;
-      padding: 9px 12px;
-      font-size: 12px;
-      line-height: 1.55;
+      margin: 8px 0 0; border-radius: var(--radius-sm);
+      padding: 9px 12px; font-size: 12px; font-weight: 700; line-height: 1.55;
     }
-    .prop-alert.danger  { background: rgba(248,113,113,0.1); border: 0.5px solid rgba(248,113,113,0.3); color: #f87171; }
-    .prop-alert.warning { background: rgba(251,191,36,0.1);  border: 0.5px solid rgba(251,191,36,0.3);  color: #fbbf24; }
-
+    .prop-alert.danger  { background: #fef2f2; border: 1.5px solid #fecaca; color: var(--red); }
+    .prop-alert.warning { background: #fffbeb; border: 1.5px solid #fde68a; color: var(--amber); }
     .prop-footer {
-      padding: 11px 20px;
-      display: flex;
-      justify-content: flex-end;
-      background: rgba(0,0,0,0.25);
-      border-top: 0.5px solid rgba(255,255,255,0.06);
+      padding: 12px 20px; display: flex; justify-content: flex-end;
+      background: var(--bg); border-top: 1.5px solid var(--border);
     }
-
     .btn-ok {
       padding: 8px 22px;
-      background: var(--accent);
-      color: white;
-      border: none;
-      border-radius: 7px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: inherit;
-      transition: background 0.12s;
+      background: linear-gradient(135deg, var(--olive), var(--olive-dark));
+      color: white; border: none; border-radius: var(--radius-sm);
+      font-size: 13px; font-weight: 800; cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      box-shadow: 0 4px 12px rgba(107,124,45,0.3);
+      transition: opacity 0.15s;
     }
-    .btn-ok:hover { background: var(--accent2); }
+    .btn-ok:hover { opacity: 0.88; }
 
-    /* ========== FOLDER WINDOW ========== */
+    /* ========== FENÊTRES DOSSIERS ========== */
     .folder-window {
       position: fixed;
-      background: #18181f;
-      border: 0.5px solid rgba(255,255,255,0.13);
-      border-radius: 10px;
-      box-shadow: 0 24px 70px rgba(0,0,0,0.75);
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 8px 40px rgba(0,0,0,0.15);
       z-index: 2000;
       width: 500px;
       max-width: 96vw;
       overflow: hidden;
       animation: popIn 0.15s ease;
     }
-
     .folder-titlebar {
-      background: #20202c;
+      background: var(--olive-light);
+      border-bottom: 1.5px solid var(--olive-border);
       padding: 10px 14px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      border-bottom: 0.5px solid rgba(255,255,255,0.08);
+      display: flex; align-items: center; gap: 8px;
       cursor: move;
     }
     .folder-title-icon { font-size: 16px; }
-    .folder-title-text { flex: 1; font-size: 13px; color: #f0f0f5; font-weight: 600; }
-
+    .folder-title-text { flex: 1; font-size: 13px; color: var(--olive-dark); font-weight: 800; }
     .folder-toolbar {
-      background: #1b1b26;
-      padding: 6px 14px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      border-bottom: 0.5px solid rgba(255,255,255,0.06);
+      background: var(--bg); padding: 6px 14px;
+      display: flex; align-items: center; gap: 8px;
+      border-bottom: 1.5px solid var(--border);
     }
     .folder-path-bar {
-      background: rgba(255,255,255,0.06);
-      border: 0.5px solid rgba(255,255,255,0.1);
-      border-radius: 5px;
-      padding: 4px 10px;
-      flex: 1;
-      font-size: 12px;
-      color: #f0f0f5;
+      background: var(--white); border: 1.5px solid var(--border);
+      border-radius: 6px; padding: 4px 10px; flex: 1;
+      font-size: 12px; font-weight: 700; color: var(--ink);
     }
     .tb-btn {
-      font-size: 14px;
-      color: rgba(255,255,255,0.5);
-      cursor: pointer;
-      padding: 4px 6px;
-      border-radius: 4px;
+      font-size: 14px; color: var(--muted);
+      cursor: pointer; padding: 4px 6px; border-radius: 4px;
     }
-    .tb-btn:hover { background: rgba(255,255,255,0.08); }
-
+    .tb-btn:hover { background: var(--olive-light); }
     .folder-content {
-      padding: 14px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      min-height: 200px;
-      max-height: 340px;
-      overflow-y: auto;
+      padding: 14px; display: flex; flex-wrap: wrap; gap: 10px;
+      min-height: 200px; max-height: 340px; overflow-y: auto;
+      background: var(--white);
     }
-
     .ff-item {
-      width: 72px;
-      text-align: center;
-      cursor: pointer;
-      padding: 6px 4px;
-      border-radius: 7px;
+      width: 72px; text-align: center; cursor: pointer;
+      padding: 6px 4px; border-radius: 8px;
       transition: background 0.1s;
     }
-    .ff-item:hover { background: rgba(255,255,255,0.07); }
-    .ff-item.selected { background: rgba(124,110,255,0.2); border: 0.5px solid var(--accent); }
+    .ff-item:hover   { background: var(--olive-light); }
+    .ff-item.selected {
+      background: var(--olive-light);
+      border: 1.5px solid var(--olive-border);
+    }
     .ff-item .ficon { font-size: 34px; display: block; margin-bottom: 4px; }
-    .ff-item .fname { font-size: 11px; color: #f0f0f5; word-break: break-all; line-height: 1.3; }
-    .ff-item.unknown .fname { color: #f87171; }
-
+    .ff-item .fname { font-size: 11px; font-weight: 700; color: var(--ink); word-break: break-all; line-height: 1.3; }
+    .ff-item.unknown .fname { color: var(--red); }
     .folder-status {
-      padding: 6px 16px;
-      font-size: 11px;
-      color: rgba(255,255,255,0.3);
-      background: rgba(0,0,0,0.3);
-      border-top: 0.5px solid rgba(255,255,255,0.05);
+      padding: 6px 16px; font-size: 11px; font-weight: 700;
+      color: var(--muted); background: var(--bg);
+      border-top: 1.5px solid var(--border);
     }
 
-    /* ========== CONTEXT MENU ========== */
+    /* ========== MENU CONTEXTUEL ========== */
     .ctx-menu {
       position: fixed;
-      background: #1e1e2b;
-      border: 0.5px solid rgba(255,255,255,0.16);
-      border-radius: 9px;
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
       padding: 5px;
       z-index: 9000;
-      min-width: 190px;
-      box-shadow: 0 10px 36px rgba(0,0,0,0.6);
+      min-width: 195px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.12);
       animation: fadeIn 0.1s ease;
     }
     @keyframes fadeIn {
       from { opacity: 0; transform: scale(0.94); }
       to   { opacity: 1; transform: scale(1); }
     }
-
     .ctx-item {
-      padding: 9px 14px;
-      font-size: 13px;
-      color: #f0f0f5;
-      border-radius: 5px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 10px;
+      padding: 9px 14px; font-size: 13px; font-weight: 700;
+      color: var(--ink); border-radius: 5px;
+      cursor: pointer; display: flex; align-items: center; gap: 10px;
     }
-    .ctx-item:hover { background: rgba(124,110,255,0.22); }
-    .ctx-item.disabled { color: #444455; cursor: default; }
-    .ctx-item.disabled:hover { background: transparent; }
-    .ctx-sep { height: 0.5px; background: rgba(255,255,255,0.1); margin: 4px 8px; }
+    .ctx-item:hover { background: var(--olive-light); color: var(--olive-dark); }
+    .ctx-item.disabled { color: #c4c4c8; cursor: default; }
+    .ctx-item.disabled:hover { background: transparent; color: #c4c4c8; }
+    .ctx-sep { height: 1px; background: var(--border); margin: 4px 8px; }
 
-    /* ========== WELCOME MODAL ========== */
+    /* ========== MODAL DE BIENVENUE ========== */
     .welcome-bg {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.78);
+      position: fixed; inset: 0;
+      background: rgba(30,30,46,0.55);
       z-index: 8000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      display: flex; align-items: center; justify-content: center;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
     }
-
     .welcome-box {
-      background: var(--surface);
-      border: 0.5px solid var(--border2);
-      border-radius: var(--radius);
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 18px;
       padding: 28px 24px 22px;
-      width: 420px;
-      max-width: 95vw;
-      max-height: 92vh;
-      overflow-y: auto;
-      text-align: center;
+      width: 430px; max-width: 95vw; max-height: 92vh;
+      overflow-y: auto; text-align: center;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.15);
       animation: popIn 0.25s cubic-bezier(0.34,1.5,0.64,1);
     }
-
-    .welcome-emoji { font-size: 50px; margin-bottom: 12px; }
-    .welcome-box h2 { font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
-    .welcome-subtitle { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
-
+    .welcome-emoji { font-size: 52px; margin-bottom: 12px; }
+    .welcome-box h2 { font-size: 20px; font-weight: 900; color: var(--ink); margin-bottom: 4px; letter-spacing: -0.3px; }
+    .welcome-subtitle { font-size: 13px; color: var(--muted); font-weight: 600; margin-bottom: 20px; }
     .welcome-objective {
-      background: var(--surface2);
-      border-radius: var(--radius-sm);
-      padding: 13px 16px;
-      margin-bottom: 18px;
-      text-align: left;
+      background: var(--olive-light); border: 1.5px solid var(--olive-border);
+      border-radius: var(--radius-sm); padding: 13px 16px; margin-bottom: 16px; text-align: left;
     }
-    .welcome-objective .obj-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
-    .welcome-objective p { font-size: 13px; color: var(--muted); line-height: 1.65; }
-
-    .welcome-steps { display: flex; flex-direction: column; gap: 9px; margin-bottom: 20px; }
+    .welcome-objective .obj-title { font-size: 14px; font-weight: 800; color: var(--olive-dark); margin-bottom: 6px; }
+    .welcome-objective p { font-size: 13px; color: var(--muted); font-weight: 600; line-height: 1.65; }
+    .welcome-steps { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
     .welcome-step {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      background: var(--surface2);
-      border-radius: var(--radius-sm);
-      padding: 10px 13px;
-      text-align: left;
+      display: flex; align-items: flex-start; gap: 12px;
+      background: var(--bg); border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm); padding: 10px 13px; text-align: left;
     }
-    .ws-icon { font-size: 22px; flex-shrink: 0; }
-    .ws-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
-    .ws-desc  { font-size: 12px; color: var(--muted); line-height: 1.5; }
-
+    .ws-icon  { font-size: 22px; flex-shrink: 0; }
+    .ws-title { font-size: 13px; font-weight: 800; color: var(--ink); margin-bottom: 2px; }
+    .ws-desc  { font-size: 12px; color: var(--muted); font-weight: 600; line-height: 1.5; }
     .btn-welcome {
-      width: 100%;
-      padding: 13px;
-      background: var(--accent);
-      color: white;
-      border: none;
-      border-radius: var(--radius);
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-      font-family: inherit;
-      margin-bottom: 10px;
-      transition: background 0.15s;
+      width: 100%; padding: 13px;
+      background: linear-gradient(135deg, var(--olive), var(--olive-dark));
+      color: white; border: none; border-radius: var(--radius);
+      font-size: 15px; font-weight: 800; cursor: pointer;
+      font-family: 'Nunito', sans-serif; margin-bottom: 10px;
+      box-shadow: 0 4px 14px rgba(107,124,45,0.35);
+      transition: opacity 0.15s, transform 0.15s;
     }
-    .btn-welcome:hover { background: var(--accent2); }
+    .btn-welcome:hover  { opacity: 0.88; transform: translateY(-1px); }
+    .btn-welcome:active { transform: translateY(0); }
+    .welcome-note { font-size: 12px; color: var(--muted); font-weight: 600; }
 
-    .welcome-note { font-size: 12px; color: var(--muted); }
-
-    /* ========== INFO MODAL ========== */
+    /* ========== PANNEAU D'AIDE ========== */
     .info-modal-bg {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.72);
-      z-index: 7000;
-      display: none;
-      align-items: flex-end;
-      justify-content: center;
-      backdrop-filter: blur(5px);
-      -webkit-backdrop-filter: blur(5px);
+      position: fixed; inset: 0;
+      background: rgba(30,30,46,0.5);
+      z-index: 7000; display: none;
+      align-items: flex-end; justify-content: center;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
     }
     .info-modal-bg.open { display: flex; }
-
     .info-modal {
-      background: var(--surface);
-      border: 0.5px solid var(--border2);
-      border-top-left-radius: var(--radius);
-      border-top-right-radius: var(--radius);
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-top-left-radius: 18px;
+      border-top-right-radius: 18px;
       padding: 20px 22px 36px;
-      width: 520px;
-      max-width: 100vw;
-      max-height: 80vh;
-      overflow-y: auto;
-      position: relative;
+      width: 520px; max-width: 100vw; max-height: 80vh;
+      overflow-y: auto; position: relative;
+      box-shadow: 0 -4px 30px rgba(0,0,0,0.1);
       animation: slideUp 0.2s ease;
     }
     @keyframes slideUp {
       from { transform: translateY(40px); opacity: 0; }
       to   { transform: translateY(0);    opacity: 1; }
     }
-
     .info-handle {
       width: 40px; height: 4px;
-      background: rgba(255,255,255,0.2);
-      border-radius: 2px;
+      background: var(--border); border-radius: 2px;
       margin: 0 auto 18px;
     }
-
     .info-close-btn {
-      position: absolute;
-      top: 16px; right: 16px;
+      position: absolute; top: 16px; right: 16px;
       width: 28px; height: 28px;
-      background: var(--surface2);
-      border: 0.5px solid var(--border2);
-      border-radius: 50%;
-      color: var(--text);
-      cursor: pointer;
-      font-size: 12px;
+      background: var(--bg); border: 1.5px solid var(--border);
+      border-radius: 50%; color: var(--muted);
+      cursor: pointer; font-size: 12px; font-weight: 900;
       display: flex; align-items: center; justify-content: center;
-      font-family: inherit;
+      font-family: 'Nunito', sans-serif;
     }
-
-    .info-modal h2 { font-size: 18px; color: var(--text); margin-bottom: 16px; }
-    .info-modal h3 { font-size: 14px; color: var(--accent2); margin: 18px 0 7px; font-weight: 600; }
-    .info-modal p  { font-size: 13px; color: var(--muted); line-height: 1.65; margin-bottom: 8px; }
-
+    .info-close-btn:hover { background: #fef2f2; color: var(--red); border-color: #fecaca; }
+    .info-modal h2 { font-size: 18px; font-weight: 900; color: var(--ink); margin-bottom: 16px; }
+    .info-modal h3 { font-size: 13px; font-weight: 800; color: var(--olive); text-transform: uppercase; letter-spacing: 0.8px; margin: 18px 0 7px; }
+    .info-modal p  { font-size: 13px; font-weight: 600; color: var(--muted); line-height: 1.65; margin-bottom: 8px; }
     .analogy-card {
-      background: var(--surface2);
-      border-left: 3px solid var(--accent);
+      background: var(--olive-light);
+      border-left: 3px solid var(--olive);
       border-radius: 0 8px 8px 0;
-      padding: 10px 14px;
-      font-size: 12px;
-      color: var(--text);
-      margin: 8px 0;
-      line-height: 1.6;
+      padding: 10px 14px; font-size: 13px; font-weight: 600;
+      color: var(--ink); margin: 8px 0; line-height: 1.65;
     }
-
-    .ext-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6px;
-      margin-top: 8px;
-    }
+    .ext-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 8px; }
     .ext-chip {
-      background: var(--surface2);
-      border: 0.5px solid var(--border);
-      border-radius: 7px;
-      padding: 7px 10px;
-      font-size: 12px;
-      color: var(--text);
+      background: var(--bg); border: 1.5px solid var(--border);
+      border-radius: 8px; padding: 7px 10px;
+      font-size: 12px; font-weight: 700; color: var(--ink);
     }
-    .ext-chip strong { color: var(--accent2); }
-
-    /* ========== FLOATING BADGES ========== */
-    #fmttn-badge {
-      position: fixed;
-      top: 10px; left: 10px;
-      background: rgba(124,110,255,0.88);
-      backdrop-filter: blur(10px);
-      border-radius: 9px;
-      padding: 5px 11px;
-      font-size: 11px;
-      color: white;
-      font-weight: 700;
-      z-index: 3000;
-      letter-spacing: 0.3px;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.3);
-      cursor: default;
-    }
-
-    #info-btn {
-      position: fixed;
-      top: 10px; right: 10px;
-      width: 34px; height: 34px;
-      background: rgba(124,110,255,0.88);
-      backdrop-filter: blur(10px);
-      border: none;
-      border-radius: 50%;
-      color: white;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      z-index: 3000;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.3);
-      font-family: inherit;
-      transition: background 0.12s;
-    }
-    #info-btn:hover { background: var(--accent2); }
+    .ext-chip strong { color: var(--olive); }
 
     /* ========== TOAST ========== */
     .toast {
       position: fixed;
       bottom: 54px; right: 14px;
-      background: rgba(28,28,40,0.97);
-      border: 0.5px solid rgba(255,255,255,0.15);
+      background: var(--white);
+      border: 1.5px solid var(--border);
       border-radius: 10px;
       padding: 11px 16px;
-      font-size: 13px;
-      color: #f0f0f5;
-      z-index: 6000;
-      box-shadow: 0 6px 24px rgba(0,0,0,0.5);
-      max-width: 290px;
-      line-height: 1.45;
+      font-size: 13px; font-weight: 700;
+      color: var(--ink); z-index: 6000;
+      box-shadow: var(--shadow);
+      max-width: 290px; line-height: 1.45;
       animation: toastIn 0.2s ease;
     }
     @keyframes toastIn {
@@ -648,23 +500,23 @@
     /* ========== SCROLLBAR ========== */
     ::-webkit-scrollbar { width: 5px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb { background: var(--olive-border); border-radius: 3px; }
   </style>
 </head>
 <body>
 
-  <!-- FMTTN Badge -->
+  <!-- Badge FMTTN -->
   <div id="fmttn-badge">💻 FMTTN — Mr. Van Damme</div>
 
-  <!-- Help button -->
+  <!-- Bouton aide -->
   <button id="info-btn" onclick="document.getElementById('info-modal').classList.add('open')" title="Aide — extensions de fichiers">?</button>
 
-  <!-- ===== DESKTOP ===== -->
+  <!-- ===== BUREAU ===== -->
   <div id="desktop" oncontextmenu="showCtxMenu(event)" onclick="onDesktopClick(event)">
-    <!-- Icons injected by JS -->
+    <!-- Icônes injectées par JS -->
   </div>
 
-  <!-- ===== TASKBAR ===== -->
+  <!-- ===== BARRE DES TÂCHES ===== -->
   <div id="taskbar">
     <div id="start-btn" title="Démarrer">⊞</div>
     <div id="taskbar-apps">
@@ -686,19 +538,20 @@
     </div>
   </div>
 
-  <!-- ===== WELCOME MODAL ===== -->
+  <!-- ===== MODAL DE BIENVENUE ===== -->
   <div class="welcome-bg" id="welcome-modal">
     <div class="welcome-box">
       <div class="welcome-emoji">💻</div>
-      <h2>FMTTN — Bureau Virtuel</h2>
-      <p class="welcome-subtitle">Mr. Van Damme</p>
+      <h2>Bureau Virtuel</h2>
+      <p class="welcome-subtitle">FMTTN — Mr. Van Damme</p>
 
       <div class="welcome-objective">
         <div class="obj-title">🎯 Quel est l'objectif ?</div>
         <p>
-          Tu vas explorer un <strong style="color:var(--accent2)">bureau d'ordinateur virtuel</strong> en désordre.
-          Chaque fichier possède une <strong style="color:var(--accent2)">extension</strong> (comme <code style="color:var(--green)">.pdf</code>, <code style="color:var(--green)">.mp3</code>…)
-          et une <strong style="color:var(--accent2)">taille</strong>. Apprends à les reconnaître et à comprendre les unités !
+          Tu vas explorer un <strong style="color:var(--olive-dark)">bureau d'ordinateur virtuel</strong> en désordre.
+          Chaque fichier possède une <strong style="color:var(--olive-dark)">extension</strong>
+          (comme <code style="color:var(--olive)">.pdf</code>, <code style="color:var(--olive)">.mp3</code>…)
+          et une <strong style="color:var(--olive-dark)">taille</strong>. Apprends à les reconnaître et à comprendre les unités !
         </p>
       </div>
 
@@ -738,7 +591,7 @@
     </div>
   </div>
 
-  <!-- ===== INFO MODAL ===== -->
+  <!-- ===== PANNEAU D'AIDE ===== -->
   <div class="info-modal-bg" id="info-modal" onclick="if(event.target===this)this.classList.remove('open')">
     <div class="info-modal">
       <div class="info-handle"></div>
@@ -747,41 +600,41 @@
       <h2>📚 Les extensions de fichiers — Guide complet</h2>
 
       <h3>🔤 C'est quoi une extension ?</h3>
-      <p>L'extension, c'est la partie après le dernier <strong>point</strong> dans le nom d'un fichier. Dans <code style="color:var(--green)">musique.mp3</code>, l'extension est <strong>.mp3</strong>. Elle indique à l'ordinateur quel programme utiliser pour l'ouvrir.</p>
+      <p>L'extension, c'est la partie après le dernier <strong>point</strong> dans le nom d'un fichier. Dans <code style="color:var(--olive);font-weight:800;">musique.mp3</code>, l'extension est <strong>.mp3</strong>. Elle indique à l'ordinateur quel programme utiliser pour l'ouvrir.</p>
       <div class="analogy-card">🎮 C'est comme une étiquette sur une boîte : <strong>.mp3</strong> = boîte de musique, <strong>.pdf</strong> = boîte de document, <strong>.zip</strong> = boîte fermée à clé.</div>
 
-      <h3>📏 Les unités de taille (du plus petit au plus grand)</h3>
+      <h3>📏 Les unités de taille</h3>
       <div class="analogy-card">
         <strong style="color:var(--green)">ko (kilooctet)</strong> → un SMS, un petit texte<br>
-        <strong style="color:var(--amber)">Mo (mégaoctet)</strong> → une photo, une chanson<br>
-        <strong style="color:#f97316">Go (gigaoctet)</strong> → un film, un jeu<br>
+        <strong style="color:var(--olive)">Mo (mégaoctet)</strong> → une photo, une chanson<br>
+        <strong style="color:var(--amber)">Go (gigaoctet)</strong> → un film, un jeu<br>
         <strong style="color:var(--red)">To (téraoctet)</strong> → des centaines de films !<br>
         <em style="font-size:11px;color:var(--muted)">1 To = 1 000 Go = 1 000 000 Mo = 1 000 000 000 ko</em>
       </div>
 
-      <h3>📋 Les extensions courantes</h3>
+      <h3>📋 Extensions courantes</h3>
       <div class="ext-grid">
-        <div class="ext-chip"><strong>.txt</strong> — Texte brut (Bloc-notes)</div>
+        <div class="ext-chip"><strong>.txt</strong> — Texte brut</div>
         <div class="ext-chip"><strong>.pdf</strong> — Document portable</div>
-        <div class="ext-chip"><strong>.doc / .docx</strong> — Word (Microsoft)</div>
-        <div class="ext-chip"><strong>.xls / .xlsx</strong> — Excel (tableur)</div>
+        <div class="ext-chip"><strong>.doc / .docx</strong> — Word</div>
+        <div class="ext-chip"><strong>.xls / .xlsx</strong> — Excel</div>
         <div class="ext-chip"><strong>.mp3</strong> — Audio compressé</div>
         <div class="ext-chip"><strong>.flac</strong> — Audio haute qualité</div>
         <div class="ext-chip"><strong>.avi / .mov</strong> — Vidéo</div>
         <div class="ext-chip"><strong>.html</strong> — Page web</div>
-        <div class="ext-chip"><strong>.zip / .tar</strong> — Archive compressée</div>
+        <div class="ext-chip"><strong>.zip / .tar</strong> — Archive</div>
         <div class="ext-chip"><strong>.tif / .jpg / .png</strong> — Images</div>
-        <div class="ext-chip"><strong>.pub</strong> — Publisher (Microsoft)</div>
-        <div class="ext-chip"><strong>.mpp</strong> — Project (Microsoft)</div>
+        <div class="ext-chip"><strong>.pub</strong> — Publisher</div>
+        <div class="ext-chip"><strong>.mpp</strong> — Project</div>
       </div>
 
       <h3>❓ Extensions inconnues — Attention !</h3>
-      <p>Quand Windows ne reconnaît pas une extension, il affiche une icône générique et ne sait pas quel programme utiliser. Sur ce bureau virtuel, tu trouveras plusieurs fichiers avec des extensions <strong style="color:var(--red)">inventées</strong> (.cca, .luc, .ryt, .kit, .be, .rbt…).</p>
-      <div class="analogy-card">⚠️ Dans la vraie vie, <strong>ne jamais ouvrir</strong> un fichier avec une extension inconnue reçu par e-mail ou trouvé sur une clé USB inconnue — c'est souvent un virus !</div>
+      <p>Quand Windows ne reconnaît pas une extension, il affiche une icône générique. Sur ce bureau, plusieurs fichiers ont des extensions <strong style="color:var(--red)">inventées</strong> (.cca, .luc, .ryt, .kit, .be, .rbt…). Repère-les !</p>
+      <div class="analogy-card">⚠️ Dans la vraie vie, <strong>ne jamais ouvrir</strong> un fichier avec une extension inconnue reçu par e-mail — c'est souvent un virus !</div>
     </div>
   </div>
 
-  <!-- ===== PROPERTIES POPUP ===== -->
+  <!-- ===== POPUP PROPRIÉTÉS ===== -->
   <div class="prop-overlay" id="prop-overlay" style="display:none;" onclick="if(event.target===this)closeProp()">
     <div class="prop-window">
       <div class="prop-titlebar">
@@ -803,7 +656,7 @@
     </div>
   </div>
 
-  <!-- ===== CONTEXT MENU ===== -->
+  <!-- ===== MENU CONTEXTUEL ===== -->
   <div class="ctx-menu" id="ctx-menu" style="display:none;">
     <div class="ctx-item" onclick="hideCtxMenu(); showToast('🔄 Bureau actualisé')">🔄 Actualiser</div>
     <div class="ctx-item disabled">📋 Coller</div>
@@ -820,7 +673,6 @@
   // DATA
   // ================================================================
   const FILES = [
-    // Groupe 1 — bureau principal
     { name:'Vacances.txt',   size:'345 ko',   date:'13-12', author:'Jordan',   ext:'txt',  icon:'📄', type:'Fichier texte (Bloc-notes)',         x:4,   y:7   },
     { name:'Vacances.pdf',   size:'1,2 To',   date:'12-03', author:'Armand',   ext:'pdf',  icon:'📕', type:'Document PDF',                       x:7,   y:34,  sizeWarn:true },
     { name:'école.avi',      size:'0,7 Go',   date:'07-10', author:'Loïc',     ext:'avi',  icon:'🎬', type:'Vidéo AVI',                          x:16,  y:57  },
@@ -828,7 +680,6 @@
     { name:'pokjh.doc',      size:'12 ko',    date:'25-08', author:'Delphine', ext:'doc',  icon:'📝', type:'Document Word (ancien format)',       x:27,  y:17  },
     { name:'ojihg.zip',      size:'54 Mo',    date:'06-09', author:'Romain',   ext:'zip',  icon:'🗜️', type:'Archive compressée ZIP',             x:13,  y:45  },
     { name:'Fibre.cca',      size:'2 Go',     date:'18-03', author:'Elise',    ext:'cca',  icon:'❓', type:'Fichier inconnu',                    x:36,  y:63,  unknown:true },
-    // Groupe 2
     { name:'fête.tif',       size:'0,9 To',   date:'09-02', author:'Seb',      ext:'tif',  icon:'🖼️', type:'Image TIFF (haute qualité)',         x:47,  y:9,   sizeWarn:true },
     { name:'local.luc',      size:'97 ko',    date:'13-08', author:'Lucas',    ext:'luc',  icon:'❓', type:'Fichier inconnu',                    x:58,  y:26,  unknown:true },
     { name:'étude.docx',     size:'34 Mo',    date:'31-05', author:'Chloé',    ext:'docx', icon:'📝', type:'Document Word',                      x:41,  y:48  },
@@ -846,9 +697,7 @@
 
   const FOLDERS = [
     {
-      name:'Cours',
-      icon:'📁',
-      x:88, y:5,
+      name:'Cours', icon:'📁', x:88, y:5,
       files:[
         { name:'Leçon1.pdf',     size:'2,3 Mo',  date:'01-09', author:'Mr. Van Damme', ext:'pdf',  icon:'📕', type:'Document PDF' },
         { name:'Exercices.docx', size:'540 ko',  date:'05-09', author:'Mr. Van Damme', ext:'docx', icon:'📝', type:'Document Word' },
@@ -858,37 +707,33 @@
       ]
     },
     {
-      name:'Images',
-      icon:'📁',
-      x:88, y:47,
+      name:'Images', icon:'📁', x:88, y:47,
       files:[
-        { name:'Photo1.jpg',    size:'3,2 Mo',  date:'14-07', author:'Lucas',   ext:'jpg',  icon:'🖼️', type:'Image JPEG' },
-        { name:'Capture.png',   size:'870 ko',  date:'22-08', author:'Chloé',   ext:'png',  icon:'🖼️', type:'Image PNG' },
-        { name:'Dessin.svg',    size:'45 ko',   date:'03-09', author:'Romain',  ext:'svg',  icon:'🎨', type:'Image vectorielle SVG' },
-        { name:'Photo2.bmp',    size:'12,4 Mo', date:'11-09', author:'Seb',     ext:'bmp',  icon:'🖼️', type:'Image Bitmap non compressée' },
-        { name:'logo.xrp',      size:'2,1 Mo',  date:'17-09', author:'Armand',  ext:'xrp',  icon:'❓', type:'Fichier inconnu', unknown:true },
+        { name:'Photo1.jpg',   size:'3,2 Mo',  date:'14-07', author:'Lucas',   ext:'jpg',  icon:'🖼️', type:'Image JPEG' },
+        { name:'Capture.png',  size:'870 ko',  date:'22-08', author:'Chloé',   ext:'png',  icon:'🖼️', type:'Image PNG' },
+        { name:'Dessin.svg',   size:'45 ko',   date:'03-09', author:'Romain',  ext:'svg',  icon:'🎨', type:'Image vectorielle SVG' },
+        { name:'Photo2.bmp',   size:'12,4 Mo', date:'11-09', author:'Seb',     ext:'bmp',  icon:'🖼️', type:'Image Bitmap non compressée' },
+        { name:'logo.xrp',     size:'2,1 Mo',  date:'17-09', author:'Armand',  ext:'xrp',  icon:'❓', type:'Fichier inconnu', unknown:true },
       ]
     },
     {
-      name:'Téléchargements',
-      icon:'📁',
-      x:88, y:68,
+      name:'Téléchargements', icon:'📁', x:88, y:68,
       files:[
-        { name:'Setup.exe',     size:'45 Mo',   date:'01-10', author:'Inconnu', ext:'exe',  icon:'⚠️', type:'Programme exécutable (DANGER)' },
-        { name:'Musique.flac',  size:'28 Mo',   date:'05-10', author:'Lucas',   ext:'flac', icon:'🎵', type:'Audio FLAC (haute qualité)' },
-        { name:'Archive.tar',   size:'156 Mo',  date:'08-10', author:'Loïc',    ext:'tar',  icon:'🗜️', type:'Archive TAR (Linux/Mac)' },
-        { name:'Données.csv',   size:'234 ko',  date:'12-10', author:'Delphine',ext:'csv',  icon:'📊', type:'Fichier CSV (tableur texte)' },
-        { name:'inconnu.wvp',   size:'78 Mo',   date:'15-10', author:'???',     ext:'wvp',  icon:'❓', type:'Fichier inconnu', unknown:true },
+        { name:'Setup.exe',    size:'45 Mo',   date:'01-10', author:'Inconnu',  ext:'exe',  icon:'⚠️', type:'Programme exécutable (DANGER)' },
+        { name:'Musique.flac', size:'28 Mo',   date:'05-10', author:'Lucas',    ext:'flac', icon:'🎵', type:'Audio FLAC (haute qualité)' },
+        { name:'Archive.tar',  size:'156 Mo',  date:'08-10', author:'Loïc',     ext:'tar',  icon:'🗜️', type:'Archive TAR (Linux/Mac)' },
+        { name:'Données.csv',  size:'234 ko',  date:'12-10', author:'Delphine', ext:'csv',  icon:'📊', type:'Fichier CSV (tableur texte)' },
+        { name:'inconnu.wvp',  size:'78 Mo',   date:'15-10', author:'???',      ext:'wvp',  icon:'❓', type:'Fichier inconnu', unknown:true },
       ]
     },
   ];
 
   // ================================================================
-  // RENDER DESKTOP
+  // RENDU DU BUREAU
   // ================================================================
   const desktop = document.getElementById('desktop');
 
-  FILES.forEach((f, i) => {
+  FILES.forEach((f) => {
     const el = document.createElement('div');
     el.className = 'file-icon' + (f.unknown ? ' unknown' : '');
     el.style.left = f.x + '%';
@@ -911,7 +756,7 @@
   });
 
   // ================================================================
-  // SELECTION + DOUBLE-CLICK
+  // SÉLECTION + DOUBLE-CLIC
   // ================================================================
   let selectedEl = null;
 
@@ -921,8 +766,7 @@
       e.stopPropagation();
       selectEl(el);
       if (timer) {
-        clearTimeout(timer);
-        timer = null;
+        clearTimeout(timer); timer = null;
         onDblClick();
       } else {
         timer = setTimeout(() => { timer = null; }, 320);
@@ -936,13 +780,13 @@
     el.classList.add('selected');
   }
 
-  function onDesktopClick(e) {
+  function onDesktopClick() {
     if (selectedEl) { selectedEl.classList.remove('selected'); selectedEl = null; }
     hideCtxMenu();
   }
 
   // ================================================================
-  // PROPERTIES POPUP
+  // POPUP PROPRIÉTÉS
   // ================================================================
   function showProp(f) {
     document.getElementById('pt-icon').textContent = f.icon;
@@ -956,7 +800,6 @@
       : `<span class="prop-value">${f.type}</span>`;
 
     const sizeClass = f.sizeWarn ? 'warn' : '';
-
     let extras = '';
     if (f.unknown) extras += `<div class="prop-alert danger">⚠️ Windows ne reconnaît pas l'extension <strong>.${f.ext}</strong>. Aucun programme n'est associé à ce type de fichier.</div>`;
     if (f.sizeWarn) extras += `<div class="prop-alert warning">⚠️ Ce fichier est <strong>très volumineux</strong> (${f.size}) — cela représente énormément d'espace de stockage !</div>`;
@@ -984,25 +827,19 @@
       </div>
       ${extras}
     `;
-
     document.getElementById('prop-overlay').style.display = 'flex';
   }
 
-  function closeProp() {
-    document.getElementById('prop-overlay').style.display = 'none';
-  }
+  function closeProp() { document.getElementById('prop-overlay').style.display = 'none'; }
 
   // ================================================================
-  // FOLDER WINDOWS
+  // FENÊTRES DOSSIERS
   // ================================================================
   const openWindows = {};
   let zTop = 2000;
 
   function openFolder(folder) {
-    if (openWindows[folder.name]) {
-      openWindows[folder.name].style.zIndex = ++zTop;
-      return;
-    }
+    if (openWindows[folder.name]) { openWindows[folder.name].style.zIndex = ++zTop; return; }
 
     const win = document.createElement('div');
     win.className = 'folder-window';
@@ -1020,7 +857,7 @@
         <span class="tb-btn">⬅</span>
         <span class="tb-btn">➡</span>
         <span class="tb-btn">⬆</span>
-        <div class="folder-path-bar">Ce PC &rsaquo; Bureau &rsaquo; ${folder.name}</div>
+        <div class="folder-path-bar">Ce PC › Bureau › ${folder.name}</div>
         <span class="tb-btn">🔍</span>
       </div>
       <div class="folder-content" id="fc-${folder.name}"></div>
@@ -1037,13 +874,8 @@
         e.stopPropagation();
         content.querySelectorAll('.ff-item').forEach(i => i.classList.remove('selected'));
         item.classList.add('selected');
-        if (timer) {
-          clearTimeout(timer);
-          timer = null;
-          showProp(f);
-        } else {
-          timer = setTimeout(() => { timer = null; }, 320);
-        }
+        if (timer) { clearTimeout(timer); timer = null; showProp(f); }
+        else timer = setTimeout(() => { timer = null; }, 320);
       });
       content.appendChild(item);
     });
@@ -1059,57 +891,44 @@
 
   function dragWindow(e, win) {
     if (e.target.tagName === 'BUTTON') return;
-    const ox = e.clientX - win.offsetLeft;
-    const oy = e.clientY - win.offsetTop;
+    const ox = e.clientX - win.offsetLeft, oy = e.clientY - win.offsetTop;
     const move = (e) => {
       win.style.left = (e.clientX - ox) + 'px';
       win.style.top  = Math.max(0, e.clientY - oy) + 'px';
     };
-    const up = () => {
-      document.removeEventListener('mousemove', move);
-      document.removeEventListener('mouseup', up);
-    };
+    const up = () => { document.removeEventListener('mousemove', move); document.removeEventListener('mouseup', up); };
     document.addEventListener('mousemove', move);
     document.addEventListener('mouseup', up);
   }
 
   // ================================================================
-  // DRAG & DROP — Desktop Icons
+  // DRAG & DROP ICÔNES
   // ================================================================
   function makeDraggable(el) {
     let dragging = false, sx, sy, il, it;
-
     el.addEventListener('mousedown', (e) => {
       if (e.button !== 0) return;
       dragging = false;
       sx = e.clientX; sy = e.clientY;
       il = el.offsetLeft; it = el.offsetTop;
-
       const move = (e) => {
         const dx = e.clientX - sx, dy = e.clientY - sy;
         if (!dragging && (Math.abs(dx) > 5 || Math.abs(dy) > 5)) {
-          dragging = true;
-          el.style.left = il + 'px';
-          el.style.top  = it + 'px';
+          dragging = true; el.style.left = il + 'px'; el.style.top = it + 'px';
         }
         if (dragging) {
           el.style.left = Math.max(0, il + dx) + 'px';
-          el.style.top  = Math.max(0, il + dy < 0 ? 0 : it + dy) + 'px';
+          el.style.top  = Math.max(0, it + dy) + 'px';
         }
       };
-
-      const up = () => {
-        document.removeEventListener('mousemove', move);
-        document.removeEventListener('mouseup', up);
-      };
-
+      const up = () => { document.removeEventListener('mousemove', move); document.removeEventListener('mouseup', up); };
       document.addEventListener('mousemove', move);
       document.addEventListener('mouseup', up);
     });
   }
 
   // ================================================================
-  // CONTEXT MENU
+  // MENU CONTEXTUEL
   // ================================================================
   function showCtxMenu(e) {
     e.preventDefault();
@@ -1122,11 +941,10 @@
   document.addEventListener('click', hideCtxMenu);
 
   // ================================================================
-  // CLOCK
+  // HORLOGE
   // ================================================================
   function tick() {
-    const n = new Date();
-    const pad = x => String(x).padStart(2, '0');
+    const n = new Date(), pad = x => String(x).padStart(2, '0');
     document.getElementById('clk-time').textContent = pad(n.getHours()) + ':' + pad(n.getMinutes());
     document.getElementById('clk-date').textContent = pad(n.getDate()) + '/' + pad(n.getMonth()+1) + '/' + n.getFullYear();
   }
@@ -1134,17 +952,13 @@
   setInterval(tick, 10000);
 
   // ================================================================
-  // WELCOME
+  // BIENVENUE + TOAST
   // ================================================================
   function closeWelcome() { document.getElementById('welcome-modal').style.display = 'none'; }
 
-  // ================================================================
-  // TOAST
-  // ================================================================
   function showToast(msg) {
     const t = document.createElement('div');
-    t.className = 'toast';
-    t.textContent = msg;
+    t.className = 'toast'; t.textContent = msg;
     document.body.appendChild(t);
     setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity 0.3s'; setTimeout(() => t.remove(), 300); }, 2500);
   }
