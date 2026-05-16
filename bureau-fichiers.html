@@ -12,7 +12,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    /* ── Variables charte Rosas ── */
     :root {
       --olive:        #6b7c2d;
       --olive-dark:   #4f5e18;
@@ -27,7 +26,6 @@
       --shadow: 0 2px 16px rgba(0,0,0,0.08);
       --radius: 14px;
       --radius-sm: 9px;
-      /* alertes */
       --red:   #dc2626;
       --amber: #d97706;
       --green: #16a34a;
@@ -44,7 +42,7 @@
       -webkit-user-select: none;
     }
 
-    /* ========== DESKTOP (Windows — inchangé) ========== */
+    /* ========== BUREAU (desktop — fond Windows) ========== */
     #desktop {
       position: fixed;
       top: 0; left: 0; right: 0;
@@ -58,13 +56,12 @@
     }
     #desktop::after {
       content: '';
-      position: absolute;
-      inset: 0;
+      position: absolute; inset: 0;
       background: radial-gradient(ellipse at 40% 40%, rgba(255,255,255,0.04) 0%, transparent 60%);
       pointer-events: none;
     }
 
-    /* ========== ICÔNES BUREAU ========== */
+    /* ========== ICÔNES (desktop) ========== */
     .file-icon {
       position: absolute;
       width: 76px;
@@ -77,76 +74,56 @@
       transition: background 0.1s;
     }
     .file-icon .icon-img {
-      font-size: 38px;
-      line-height: 1;
-      display: block;
-      margin-bottom: 3px;
+      font-size: 38px; line-height: 1;
+      display: block; margin-bottom: 3px;
       filter: drop-shadow(0 2px 6px rgba(0,0,0,0.6));
     }
     .file-icon .icon-label {
-      font-size: 11px;
-      font-weight: 700;
-      color: white;
+      font-size: 11px; font-weight: 700; color: white;
       text-shadow: 0 1px 4px rgba(0,0,0,0.9), 0 0 10px rgba(0,0,0,0.6);
-      word-break: break-all;
-      line-height: 1.3;
-      display: block;
+      word-break: break-all; line-height: 1.3; display: block;
     }
     .file-icon.selected {
       background: rgba(100,160,255,0.22);
       border: 1px solid rgba(100,180,255,0.45);
       outline: 1px solid rgba(60,130,255,0.3);
     }
-    .file-icon.unknown .icon-img {
-      filter: drop-shadow(0 2px 6px rgba(220,38,38,0.4));
-    }
+    .file-icon.unknown .icon-img { filter: drop-shadow(0 2px 6px rgba(220,38,38,0.4)); }
 
     .folder-icon {
       position: absolute;
-      width: 80px;
-      text-align: center;
-      cursor: pointer;
-      padding: 5px 3px;
+      width: 80px; text-align: center;
+      cursor: pointer; padding: 5px 3px;
       border-radius: 5px;
-      -webkit-tap-highlight-color: transparent;
-      z-index: 10;
+      -webkit-tap-highlight-color: transparent; z-index: 10;
     }
     .folder-icon .icon-img {
-      font-size: 44px;
-      display: block;
+      font-size: 44px; display: block;
       filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
     }
     .folder-icon .icon-label {
-      font-size: 11px;
-      font-weight: 700;
-      color: white;
+      font-size: 11px; font-weight: 700; color: white;
       text-shadow: 0 1px 4px rgba(0,0,0,0.9);
-      word-break: break-word;
-      line-height: 1.3;
+      word-break: break-word; line-height: 1.3;
     }
     .folder-icon.selected {
       background: rgba(100,160,255,0.22);
       border: 1px solid rgba(100,180,255,0.45);
     }
 
-    /* ========== BARRE DES TÂCHES (Windows — inchangé) ========== */
+    /* ========== BARRE DES TÂCHES ========== */
     #taskbar {
       position: fixed;
-      bottom: 0; left: 0; right: 0;
-      height: 42px;
+      bottom: 0; left: 0; right: 0; height: 42px;
       background: rgba(12,12,18,0.92);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      display: flex;
-      align-items: center;
-      z-index: 1000;
-      border-top: 0.5px solid rgba(255,255,255,0.1);
+      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+      display: flex; align-items: center;
+      z-index: 1000; border-top: 0.5px solid rgba(255,255,255,0.1);
     }
     #start-btn {
       width: 50px; height: 42px;
       display: flex; align-items: center; justify-content: center;
-      cursor: pointer; font-size: 20px; color: #90c8ff;
-      transition: background 0.15s;
+      cursor: pointer; font-size: 20px; color: #90c8ff; transition: background 0.15s;
     }
     #start-btn:hover { background: rgba(255,255,255,0.1); }
     #taskbar-apps {
@@ -159,67 +136,46 @@
       color: rgba(255,255,255,0.75); transition: background 0.12s;
     }
     .taskbar-app:hover { background: rgba(255,255,255,0.1); }
-    #taskbar-right {
-      display: flex; align-items: center; gap: 10px; padding: 0 14px;
-    }
-    #taskbar-icons {
-      display: flex; gap: 8px; align-items: center;
-      font-size: 15px; color: rgba(255,255,255,0.65);
-    }
+    #taskbar-right { display: flex; align-items: center; gap: 10px; padding: 0 14px; }
+    #taskbar-icons { display: flex; gap: 8px; align-items: center; font-size: 15px; color: rgba(255,255,255,0.65); }
     #clock { text-align: right; line-height: 1.35; cursor: default; }
     #clk-time { font-size: 13px; color: rgba(255,255,255,0.9); font-weight: 700; }
     #clk-date  { font-size: 10px; color: rgba(255,255,255,0.55); }
 
-    /* ========== BADGE FMTTN & BOUTON ? ========== */
+    /* ========== BOUTONS FLOTTANTS ========== */
+    #back-btn {
+      position: fixed; top: 10px; left: 10px;
+      display: flex; align-items: center; gap: 5px;
+      padding: 6px 12px;
+      background: var(--olive); color: white;
+      font-size: 11px; font-weight: 800;
+      text-decoration: none; border-radius: 10px;
+      z-index: 3000; box-shadow: 0 4px 14px rgba(107,124,45,0.4);
+      letter-spacing: 0.2px; transition: background 0.12s, transform 0.15s;
+    }
+    #back-btn:hover { background: var(--olive-dark); transform: translateY(-1px); }
     #info-btn {
-      position: fixed;
-      top: 10px; right: 10px;
+      position: fixed; top: 10px; right: 10px;
       width: 34px; height: 34px;
-      background: var(--olive);
-      border: none; border-radius: 50%;
+      background: var(--olive); border: none; border-radius: 50%;
       color: white; font-size: 16px; font-weight: 900;
       cursor: pointer; z-index: 3000;
       box-shadow: 0 4px 14px rgba(107,124,45,0.4);
-      font-family: 'Nunito', sans-serif;
-      transition: background 0.12s;
+      font-family: 'Nunito', sans-serif; transition: background 0.12s;
     }
     #info-btn:hover { background: var(--olive-dark); }
 
-    #back-btn {
-      position: fixed;
-      top: 10px; left: 10px;
-      display: flex; align-items: center; gap: 5px;
-      padding: 6px 12px;
-      background: var(--olive);
-      color: white; font-size: 11px; font-weight: 800;
-      text-decoration: none; border-radius: 10px;
-      z-index: 3000;
-      box-shadow: 0 4px 14px rgba(107,124,45,0.4);
-      letter-spacing: 0.2px;
-      transition: background 0.12s, transform 0.15s;
-    }
-    #back-btn:hover { background: var(--olive-dark); transform: translateY(-1px); }
-
     /* ========== POPUP PROPRIÉTÉS ========== */
     .prop-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.45);
-      z-index: 5000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.45); z-index: 5000;
+      display: flex; align-items: center; justify-content: center;
+      backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
     }
     .prop-window {
-      background: var(--white);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius);
-      width: 360px;
-      max-width: 95vw;
-      box-shadow: 0 8px 40px rgba(0,0,0,0.15);
-      overflow: hidden;
+      background: var(--white); border: 1.5px solid var(--border);
+      border-radius: var(--radius); width: 360px; max-width: 95vw;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.15); overflow: hidden;
       animation: popIn 0.18s cubic-bezier(0.34,1.5,0.64,1);
     }
     @keyframes popIn {
@@ -227,10 +183,8 @@
       to   { transform: scale(1);    opacity: 1; }
     }
     .prop-titlebar {
-      background: var(--olive-light);
-      border-bottom: 1.5px solid var(--olive-border);
-      padding: 12px 16px;
-      display: flex; align-items: center; gap: 10px;
+      background: var(--olive-light); border-bottom: 1.5px solid var(--olive-border);
+      padding: 12px 16px; display: flex; align-items: center; gap: 10px;
     }
     .prop-titlebar .t-icon { font-size: 17px; }
     .prop-titlebar .t-text { flex: 1; font-size: 13px; color: var(--olive-dark); font-weight: 800; }
@@ -244,8 +198,7 @@
     }
     .btn-x:hover { background: rgba(220,38,38,0.2); }
     .prop-hero {
-      padding: 20px 20px 16px;
-      display: flex; align-items: center; gap: 18px;
+      padding: 20px 20px 16px; display: flex; align-items: center; gap: 18px;
       border-bottom: 1.5px solid var(--border);
     }
     .prop-big-icon { font-size: 54px; flex-shrink: 0; }
@@ -254,9 +207,7 @@
     .prop-rows { padding: 12px 20px; display: flex; flex-direction: column; }
     .prop-row {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 9px 0;
-      border-bottom: 1px solid var(--border);
-      gap: 12px;
+      padding: 9px 0; border-bottom: 1px solid var(--border); gap: 12px;
     }
     .prop-row:last-child { border-bottom: none; }
     .prop-label { font-size: 12px; color: var(--muted); font-weight: 700; white-space: nowrap; }
@@ -279,82 +230,58 @@
       color: white; border: none; border-radius: var(--radius-sm);
       font-size: 13px; font-weight: 800; cursor: pointer;
       font-family: 'Nunito', sans-serif;
-      box-shadow: 0 4px 12px rgba(107,124,45,0.3);
-      transition: opacity 0.15s;
+      box-shadow: 0 4px 12px rgba(107,124,45,0.3); transition: opacity 0.15s;
     }
     .btn-ok:hover { opacity: 0.88; }
 
     /* ========== FENÊTRES DOSSIERS ========== */
     .folder-window {
-      position: fixed;
-      background: var(--white);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: 0 8px 40px rgba(0,0,0,0.15);
-      z-index: 2000;
-      width: 500px;
-      max-width: 96vw;
-      overflow: hidden;
+      position: fixed; background: var(--white);
+      border: 1.5px solid var(--border); border-radius: var(--radius);
+      box-shadow: 0 8px 40px rgba(0,0,0,0.15); z-index: 2000;
+      width: 500px; max-width: 96vw; overflow: hidden;
       animation: popIn 0.15s ease;
     }
     .folder-titlebar {
-      background: var(--olive-light);
-      border-bottom: 1.5px solid var(--olive-border);
-      padding: 10px 14px;
-      display: flex; align-items: center; gap: 8px;
-      cursor: move;
+      background: var(--olive-light); border-bottom: 1.5px solid var(--olive-border);
+      padding: 10px 14px; display: flex; align-items: center; gap: 8px; cursor: move;
     }
     .folder-title-icon { font-size: 16px; }
     .folder-title-text { flex: 1; font-size: 13px; color: var(--olive-dark); font-weight: 800; }
     .folder-toolbar {
       background: var(--bg); padding: 6px 14px;
-      display: flex; align-items: center; gap: 8px;
-      border-bottom: 1.5px solid var(--border);
+      display: flex; align-items: center; gap: 8px; border-bottom: 1.5px solid var(--border);
     }
     .folder-path-bar {
       background: var(--white); border: 1.5px solid var(--border);
       border-radius: 6px; padding: 4px 10px; flex: 1;
       font-size: 12px; font-weight: 700; color: var(--ink);
     }
-    .tb-btn {
-      font-size: 14px; color: var(--muted);
-      cursor: pointer; padding: 4px 6px; border-radius: 4px;
-    }
+    .tb-btn { font-size: 14px; color: var(--muted); cursor: pointer; padding: 4px 6px; border-radius: 4px; }
     .tb-btn:hover { background: var(--olive-light); }
     .folder-content {
       padding: 14px; display: flex; flex-wrap: wrap; gap: 10px;
-      min-height: 200px; max-height: 340px; overflow-y: auto;
-      background: var(--white);
+      min-height: 180px; max-height: 340px; overflow-y: auto; background: var(--white);
     }
     .ff-item {
       width: 72px; text-align: center; cursor: pointer;
-      padding: 6px 4px; border-radius: 8px;
-      transition: background 0.1s;
+      padding: 6px 4px; border-radius: 8px; transition: background 0.1s;
     }
-    .ff-item:hover   { background: var(--olive-light); }
-    .ff-item.selected {
-      background: var(--olive-light);
-      border: 1.5px solid var(--olive-border);
-    }
+    .ff-item:hover    { background: var(--olive-light); }
+    .ff-item.selected { background: var(--olive-light); border: 1.5px solid var(--olive-border); }
     .ff-item .ficon { font-size: 34px; display: block; margin-bottom: 4px; }
     .ff-item .fname { font-size: 11px; font-weight: 700; color: var(--ink); word-break: break-all; line-height: 1.3; }
     .ff-item.unknown .fname { color: var(--red); }
     .folder-status {
       padding: 6px 16px; font-size: 11px; font-weight: 700;
-      color: var(--muted); background: var(--bg);
-      border-top: 1.5px solid var(--border);
+      color: var(--muted); background: var(--bg); border-top: 1.5px solid var(--border);
     }
 
     /* ========== MENU CONTEXTUEL ========== */
     .ctx-menu {
-      position: fixed;
-      background: var(--white);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 5px;
-      z-index: 9000;
-      min-width: 195px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+      position: fixed; background: var(--white); border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm); padding: 5px; z-index: 9000;
+      min-width: 195px; box-shadow: 0 8px 30px rgba(0,0,0,0.12);
       animation: fadeIn 0.1s ease;
     }
     @keyframes fadeIn {
@@ -362,29 +289,23 @@
       to   { opacity: 1; transform: scale(1); }
     }
     .ctx-item {
-      padding: 9px 14px; font-size: 13px; font-weight: 700;
-      color: var(--ink); border-radius: 5px;
-      cursor: pointer; display: flex; align-items: center; gap: 10px;
+      padding: 9px 14px; font-size: 13px; font-weight: 700; color: var(--ink);
+      border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 10px;
     }
     .ctx-item:hover { background: var(--olive-light); color: var(--olive-dark); }
     .ctx-item.disabled { color: #c4c4c8; cursor: default; }
     .ctx-item.disabled:hover { background: transparent; color: #c4c4c8; }
     .ctx-sep { height: 1px; background: var(--border); margin: 4px 8px; }
 
-    /* ========== MODAL DE BIENVENUE ========== */
+    /* ========== MODAL BIENVENUE ========== */
     .welcome-bg {
-      position: fixed; inset: 0;
-      background: rgba(30,30,46,0.55);
-      z-index: 8000;
+      position: fixed; inset: 0; background: rgba(30,30,46,0.55); z-index: 8000;
       display: flex; align-items: center; justify-content: center;
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
     }
     .welcome-box {
-      background: var(--white);
-      border: 1.5px solid var(--border);
-      border-radius: 18px;
-      padding: 28px 24px 22px;
+      background: var(--white); border: 1.5px solid var(--border);
+      border-radius: 18px; padding: 28px 24px 22px;
       width: 430px; max-width: 95vw; max-height: 92vh;
       overflow-y: auto; text-align: center;
       box-shadow: 0 8px 40px rgba(0,0,0,0.15);
@@ -423,22 +344,16 @@
 
     /* ========== PANNEAU D'AIDE ========== */
     .info-modal-bg {
-      position: fixed; inset: 0;
-      background: rgba(30,30,46,0.5);
-      z-index: 7000; display: none;
-      align-items: flex-end; justify-content: center;
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
+      position: fixed; inset: 0; background: rgba(30,30,46,0.5);
+      z-index: 7000; display: none; align-items: flex-end; justify-content: center;
+      backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
     }
     .info-modal-bg.open { display: flex; }
     .info-modal {
-      background: var(--white);
-      border: 1.5px solid var(--border);
-      border-top-left-radius: 18px;
-      border-top-right-radius: 18px;
-      padding: 20px 22px 36px;
-      width: 520px; max-width: 100vw; max-height: 80vh;
-      overflow-y: auto; position: relative;
+      background: var(--white); border: 1.5px solid var(--border);
+      border-top-left-radius: 18px; border-top-right-radius: 18px;
+      padding: 20px 22px 36px; width: 520px; max-width: 100vw;
+      max-height: 80vh; overflow-y: auto; position: relative;
       box-shadow: 0 -4px 30px rgba(0,0,0,0.1);
       animation: slideUp 0.2s ease;
     }
@@ -446,17 +361,11 @@
       from { transform: translateY(40px); opacity: 0; }
       to   { transform: translateY(0);    opacity: 1; }
     }
-    .info-handle {
-      width: 40px; height: 4px;
-      background: var(--border); border-radius: 2px;
-      margin: 0 auto 18px;
-    }
+    .info-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 18px; }
     .info-close-btn {
-      position: absolute; top: 16px; right: 16px;
-      width: 28px; height: 28px;
-      background: var(--bg); border: 1.5px solid var(--border);
-      border-radius: 50%; color: var(--muted);
-      cursor: pointer; font-size: 12px; font-weight: 900;
+      position: absolute; top: 16px; right: 16px; width: 28px; height: 28px;
+      background: var(--bg); border: 1.5px solid var(--border); border-radius: 50%;
+      color: var(--muted); cursor: pointer; font-size: 12px; font-weight: 900;
       display: flex; align-items: center; justify-content: center;
       font-family: 'Nunito', sans-serif;
     }
@@ -465,33 +374,25 @@
     .info-modal h3 { font-size: 13px; font-weight: 800; color: var(--olive); text-transform: uppercase; letter-spacing: 0.8px; margin: 18px 0 7px; }
     .info-modal p  { font-size: 13px; font-weight: 600; color: var(--muted); line-height: 1.65; margin-bottom: 8px; }
     .analogy-card {
-      background: var(--olive-light);
-      border-left: 3px solid var(--olive);
-      border-radius: 0 8px 8px 0;
-      padding: 10px 14px; font-size: 13px; font-weight: 600;
-      color: var(--ink); margin: 8px 0; line-height: 1.65;
+      background: var(--olive-light); border-left: 3px solid var(--olive);
+      border-radius: 0 8px 8px 0; padding: 10px 14px;
+      font-size: 13px; font-weight: 600; color: var(--ink); margin: 8px 0; line-height: 1.65;
     }
     .ext-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 8px; }
     .ext-chip {
       background: var(--bg); border: 1.5px solid var(--border);
-      border-radius: 8px; padding: 7px 10px;
-      font-size: 12px; font-weight: 700; color: var(--ink);
+      border-radius: 8px; padding: 7px 10px; font-size: 12px; font-weight: 700; color: var(--ink);
     }
     .ext-chip strong { color: var(--olive); }
 
     /* ========== TOAST ========== */
     .toast {
-      position: fixed;
-      bottom: 54px; right: 14px;
-      background: var(--white);
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      padding: 11px 16px;
-      font-size: 13px; font-weight: 700;
-      color: var(--ink); z-index: 6000;
-      box-shadow: var(--shadow);
-      max-width: 290px; line-height: 1.45;
-      animation: toastIn 0.2s ease;
+      position: fixed; bottom: 54px; right: 14px;
+      background: var(--white); border: 1.5px solid var(--border);
+      border-radius: 10px; padding: 11px 16px;
+      font-size: 13px; font-weight: 700; color: var(--ink);
+      z-index: 6000; box-shadow: var(--shadow); max-width: 290px;
+      line-height: 1.45; animation: toastIn 0.2s ease;
     }
     @keyframes toastIn {
       from { transform: translateX(120%); opacity: 0; }
@@ -502,27 +403,103 @@
     ::-webkit-scrollbar { width: 5px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: var(--olive-border); border-radius: 3px; }
+
+    /* ============================================================
+       RESPONSIVE MOBILE (≤ 640px)
+       ============================================================ */
+    @media (max-width: 640px) {
+
+      body { overflow: hidden; }
+
+      /* Bureau = conteneur scrollable en flex */
+      #desktop {
+        overflow-y: auto;
+        overflow-x: hidden;
+        display: flex;
+        flex-wrap: wrap;
+        align-content: flex-start;
+        gap: 6px;
+        padding: 54px 10px 14px;
+      }
+      #desktop::after { display: none; }
+
+      /* Icônes en flux normal (position absolue annulée par JS sur mobile) */
+      .file-icon,
+      .folder-icon {
+        position: relative;
+        width: calc(25% - 6px);
+        min-width: 72px;
+        flex-shrink: 0;
+      }
+      .file-icon .icon-img,
+      .folder-icon .icon-img { font-size: 34px; }
+      .file-icon .icon-label,
+      .folder-icon .icon-label { font-size: 10px; }
+
+      /* Séparateur de section mobile */
+      .mobile-section-label {
+        width: 100%;
+        font-size: 10px; font-weight: 800;
+        color: rgba(255,255,255,0.55);
+        text-transform: uppercase; letter-spacing: 1px;
+        padding: 10px 2px 2px;
+        text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+      }
+
+      /* Fenêtre dossier = plein écran */
+      .folder-window {
+        width: 100% !important;
+        max-width: 100% !important;
+        left: 0 !important;
+        top: 0 !important;
+        bottom: 42px;
+        border-radius: 0;
+        border-left: none; border-right: none; border-top: none;
+        display: flex; flex-direction: column;
+      }
+      .folder-titlebar { cursor: default; }
+      .folder-content { flex: 1; max-height: none; }
+      .folder-toolbar { display: none; }
+
+      /* Popup propriétés : prend toute la largeur */
+      .prop-window { width: 98vw; max-width: 98vw; }
+      .prop-hero   { padding: 14px 16px 12px; gap: 12px; }
+      .prop-big-icon { font-size: 42px; }
+      .prop-rows { padding: 8px 16px; }
+      .prop-footer { padding: 10px 16px; }
+
+      /* Barre des tâches mobile : cacher les apps, garder horloge */
+      #taskbar-apps { display: none; }
+      #taskbar-right { padding: 0 10px; }
+
+      /* Boutons flottants plus petits */
+      #back-btn { font-size: 10px; padding: 5px 10px; top: 8px; left: 8px; }
+      #info-btn { width: 30px; height: 30px; font-size: 14px; top: 8px; right: 8px; }
+
+      /* Toast en bas au centre sur mobile */
+      .toast { left: 10px; right: 10px; max-width: none; bottom: 50px; }
+
+      /* Welcome : padding réduit */
+      .welcome-box { padding: 22px 18px 18px; }
+      .welcome-emoji { font-size: 42px; margin-bottom: 8px; }
+      .welcome-box h2 { font-size: 18px; }
+    }
   </style>
 </head>
 <body>
 
-  <!-- Bouton retour accueil -->
   <a href="index.html" id="back-btn" title="Retour au menu principal">← Accueil</a>
-
-  <!-- Bouton aide -->
-  <button id="info-btn" onclick="document.getElementById('info-modal').classList.add('open')" title="Aide — extensions de fichiers">?</button>
+  <button id="info-btn" onclick="document.getElementById('info-modal').classList.add('open')" title="Aide">?</button>
 
   <!-- ===== BUREAU ===== -->
-  <div id="desktop" oncontextmenu="showCtxMenu(event)" onclick="onDesktopClick(event)">
-    <!-- Icônes injectées par JS -->
-  </div>
+  <div id="desktop" oncontextmenu="showCtxMenu(event)" onclick="onDesktopClick(event)"></div>
 
   <!-- ===== BARRE DES TÂCHES ===== -->
   <div id="taskbar">
     <div id="start-btn" title="Démarrer">⊞</div>
     <div id="taskbar-apps">
-      <div class="taskbar-app" title="Explorateur de fichiers">🗂️</div>
-      <div class="taskbar-app" title="Navigateur web">🌐</div>
+      <div class="taskbar-app" title="Explorateur">🗂️</div>
+      <div class="taskbar-app" title="Navigateur">🌐</div>
       <div class="taskbar-app" title="Paramètres">⚙️</div>
       <div class="taskbar-app" title="Corbeille">🗑️</div>
     </div>
@@ -539,56 +516,46 @@
     </div>
   </div>
 
-  <!-- ===== MODAL DE BIENVENUE ===== -->
+  <!-- ===== MODAL BIENVENUE ===== -->
   <div class="welcome-bg" id="welcome-modal">
     <div class="welcome-box">
       <div class="welcome-emoji">💻</div>
       <h2>Bureau Virtuel</h2>
       <p class="welcome-subtitle">FMTTN — Mr. Van Damme</p>
-
       <div class="welcome-objective">
         <div class="obj-title">🎯 Quel est l'objectif ?</div>
         <p>
-          Tu vas explorer un <strong style="color:var(--olive-dark)">bureau d'ordinateur virtuel</strong> en désordre.
-          Chaque fichier possède une <strong style="color:var(--olive-dark)">extension</strong>
-          (comme <code style="color:var(--olive)">.pdf</code>, <code style="color:var(--olive)">.mp3</code>…)
-          et une <strong style="color:var(--olive-dark)">taille</strong>. Apprends à les reconnaître et à comprendre les unités !
+          Explore un <strong style="color:var(--olive-dark)">bureau d'ordinateur virtuel</strong> en désordre.
+          Chaque fichier a une <strong style="color:var(--olive-dark)">extension</strong>
+          (<code style="color:var(--olive)">.pdf</code>, <code style="color:var(--olive)">.mp3</code>…)
+          et une <strong style="color:var(--olive-dark)">taille</strong>. Apprends à les reconnaître !
         </p>
       </div>
-
       <div class="welcome-steps">
         <div class="welcome-step">
           <div class="ws-icon">🖱️</div>
           <div>
-            <div class="ws-title">Double-clique sur un fichier</div>
-            <div class="ws-desc">Une fenêtre "Propriétés" s'ouvre avec l'extension, le type, la taille et l'auteur.</div>
+            <div class="ws-title" id="ws-click-title">Double-clique sur un fichier</div>
+            <div class="ws-desc">Ouvre les propriétés : extension, type, taille et auteur.</div>
           </div>
         </div>
         <div class="welcome-step">
           <div class="ws-icon">📁</div>
           <div>
             <div class="ws-title">Explore les dossiers</div>
-            <div class="ws-desc">Double-clique sur les dossiers pour les ouvrir — des fichiers supplémentaires s'y cachent !</div>
+            <div class="ws-desc">Ouvre les dossiers pour découvrir les fichiers cachés dedans !</div>
           </div>
         </div>
         <div class="welcome-step">
           <div class="ws-icon">❓</div>
           <div>
             <div class="ws-title">Repère les extensions inconnues</div>
-            <div class="ws-desc">Certains fichiers ont des extensions que Windows ne reconnaît pas. Sauras-tu les trouver ?</div>
-          </div>
-        </div>
-        <div class="welcome-step">
-          <div class="ws-icon">↔️</div>
-          <div>
-            <div class="ws-title">Réorganise le bureau</div>
-            <div class="ws-desc">Glisse-dépose les fichiers pour ranger le bureau à ta façon !</div>
+            <div class="ws-desc">Certains fichiers ont des extensions que Windows ne reconnaît pas.</div>
           </div>
         </div>
       </div>
-
       <button class="btn-welcome" onclick="closeWelcome()">C'est parti ! 🚀</button>
-      <div class="welcome-note">Clique sur le <strong>?</strong> en haut à droite pour de l'aide sur les extensions.</div>
+      <div class="welcome-note">Clique sur <strong>?</strong> en haut à droite pour de l'aide.</div>
     </div>
   </div>
 
@@ -597,22 +564,18 @@
     <div class="info-modal">
       <div class="info-handle"></div>
       <button class="info-close-btn" onclick="document.getElementById('info-modal').classList.remove('open')">✕</button>
-
-      <h2>📚 Les extensions de fichiers — Guide complet</h2>
-
+      <h2>📚 Les extensions de fichiers</h2>
       <h3>🔤 C'est quoi une extension ?</h3>
-      <p>L'extension, c'est la partie après le dernier <strong>point</strong> dans le nom d'un fichier. Dans <code style="color:var(--olive);font-weight:800;">musique.mp3</code>, l'extension est <strong>.mp3</strong>. Elle indique à l'ordinateur quel programme utiliser pour l'ouvrir.</p>
-      <div class="analogy-card">🎮 C'est comme une étiquette sur une boîte : <strong>.mp3</strong> = boîte de musique, <strong>.pdf</strong> = boîte de document, <strong>.zip</strong> = boîte fermée à clé.</div>
-
+      <p>C'est la partie après le dernier <strong>point</strong> dans le nom du fichier. Dans <code style="color:var(--olive);font-weight:800;">musique.mp3</code>, l'extension est <strong>.mp3</strong>. Elle indique à l'ordinateur quel programme utiliser.</p>
+      <div class="analogy-card">🎮 C'est comme une étiquette sur une boîte : <strong>.mp3</strong> = boîte de musique, <strong>.pdf</strong> = boîte de document.</div>
       <h3>📏 Les unités de taille</h3>
       <div class="analogy-card">
-        <strong style="color:var(--green)">ko (kilooctet)</strong> → un SMS, un petit texte<br>
-        <strong style="color:var(--olive)">Mo (mégaoctet)</strong> → une photo, une chanson<br>
-        <strong style="color:var(--amber)">Go (gigaoctet)</strong> → un film, un jeu<br>
-        <strong style="color:var(--red)">To (téraoctet)</strong> → des centaines de films !<br>
-        <em style="font-size:11px;color:var(--muted)">1 To = 1 000 Go = 1 000 000 Mo = 1 000 000 000 ko</em>
+        <strong style="color:var(--green)">ko</strong> → un SMS<br>
+        <strong style="color:var(--olive)">Mo</strong> → une photo<br>
+        <strong style="color:var(--amber)">Go</strong> → un film<br>
+        <strong style="color:var(--red)">To</strong> → des centaines de films<br>
+        <em style="font-size:11px;color:var(--muted)">1 To = 1 000 Go = 1 000 000 Mo</em>
       </div>
-
       <h3>📋 Extensions courantes</h3>
       <div class="ext-grid">
         <div class="ext-chip"><strong>.txt</strong> — Texte brut</div>
@@ -628,9 +591,8 @@
         <div class="ext-chip"><strong>.pub</strong> — Publisher</div>
         <div class="ext-chip"><strong>.mpp</strong> — Project</div>
       </div>
-
-      <h3>❓ Extensions inconnues — Attention !</h3>
-      <p>Quand Windows ne reconnaît pas une extension, il affiche une icône générique. Sur ce bureau, plusieurs fichiers ont des extensions <strong style="color:var(--red)">inventées</strong> (.cca, .luc, .ryt, .kit, .be, .rbt…). Repère-les !</p>
+      <h3>❓ Extensions inconnues</h3>
+      <p>Sur ce bureau, plusieurs fichiers ont des extensions <strong style="color:var(--red)">inventées</strong> (.cca, .luc, .ryt, .kit, .be, .rbt…). Repère-les !</p>
       <div class="analogy-card">⚠️ Dans la vraie vie, <strong>ne jamais ouvrir</strong> un fichier avec une extension inconnue reçu par e-mail — c'est souvent un virus !</div>
     </div>
   </div>
@@ -666,7 +628,7 @@
     <div class="ctx-item" onclick="hideCtxMenu(); showToast('📏 Tri par taille effectué !')">📏 Trier par taille</div>
     <div class="ctx-item" onclick="hideCtxMenu(); showToast('📅 Tri par date effectué !')">📅 Trier par date</div>
     <div class="ctx-sep"></div>
-    <div class="ctx-item" onclick="hideCtxMenu(); document.getElementById('info-modal').classList.add('open')">📚 Aide — extensions de fichiers</div>
+    <div class="ctx-item" onclick="hideCtxMenu(); document.getElementById('info-modal').classList.add('open')">📚 Aide — extensions</div>
   </div>
 
   <script>
@@ -730,55 +692,87 @@
   ];
 
   // ================================================================
+  // DÉTECTION MOBILE
+  // ================================================================
+  const MOBILE = window.innerWidth <= 640;
+
+  // Adapter le texte de la modal de bienvenue
+  if (MOBILE) {
+    document.getElementById('ws-click-title').textContent = 'Appuie sur un fichier';
+  }
+
+  // ================================================================
   // RENDU DU BUREAU
   // ================================================================
   const desktop = document.getElementById('desktop');
 
-  FILES.forEach((f) => {
-    const el = document.createElement('div');
-    el.className = 'file-icon' + (f.unknown ? ' unknown' : '');
-    el.style.left = f.x + '%';
-    el.style.top  = f.y + '%';
-    el.innerHTML  = `<span class="icon-img">${f.icon}</span><span class="icon-label">${f.name}</span>`;
-    setupIconBehavior(el, () => showProp(f));
-    makeDraggable(el);
-    desktop.appendChild(el);
-  });
+  if (MOBILE) {
+    // ── MOBILE : affichage en grille scrollable ──
+    const labelDossiers = document.createElement('div');
+    labelDossiers.className = 'mobile-section-label';
+    labelDossiers.textContent = '📁 Dossiers';
+    desktop.appendChild(labelDossiers);
 
-  FOLDERS.forEach((folder) => {
-    const el = document.createElement('div');
-    el.className = 'folder-icon';
-    el.style.left = folder.x + '%';
-    el.style.top  = folder.y + '%';
-    el.innerHTML  = `<span class="icon-img">${folder.icon}</span><span class="icon-label">${folder.name}</span>`;
-    setupIconBehavior(el, () => openFolder(folder));
-    makeDraggable(el);
-    desktop.appendChild(el);
-  });
+    FOLDERS.forEach((folder) => {
+      const el = createIcon('folder-icon', folder.icon, folder.name);
+      el.addEventListener('click', (e) => { e.stopPropagation(); openFolder(folder); });
+      desktop.appendChild(el);
+    });
 
-  // ================================================================
-  // SÉLECTION + DOUBLE-CLIC
-  // ================================================================
-  let selectedEl = null;
+    const labelFichiers = document.createElement('div');
+    labelFichiers.className = 'mobile-section-label';
+    labelFichiers.textContent = '📄 Fichiers';
+    desktop.appendChild(labelFichiers);
 
-  function setupIconBehavior(el, onDblClick) {
-    let timer = null;
-    el.addEventListener('click', (e) => {
-      e.stopPropagation();
-      selectEl(el);
-      if (timer) {
-        clearTimeout(timer); timer = null;
-        onDblClick();
-      } else {
-        timer = setTimeout(() => { timer = null; }, 320);
-      }
+    FILES.forEach((f) => {
+      const el = createIcon('file-icon' + (f.unknown ? ' unknown' : ''), f.icon, f.name);
+      el.addEventListener('click', (e) => { e.stopPropagation(); showProp(f); });
+      desktop.appendChild(el);
+    });
+
+  } else {
+    // ── DESKTOP : icônes absolues en désordre ──
+    FILES.forEach((f) => {
+      const el = createIcon('file-icon' + (f.unknown ? ' unknown' : ''), f.icon, f.name);
+      el.style.left = f.x + '%';
+      el.style.top  = f.y + '%';
+      setupDblClick(el, () => showProp(f));
+      makeDraggable(el);
+      desktop.appendChild(el);
+    });
+
+    FOLDERS.forEach((folder) => {
+      const el = createIcon('folder-icon', folder.icon, folder.name);
+      el.style.left = folder.x + '%';
+      el.style.top  = folder.y + '%';
+      setupDblClick(el, () => openFolder(folder));
+      makeDraggable(el);
+      desktop.appendChild(el);
     });
   }
 
-  function selectEl(el) {
-    if (selectedEl) selectedEl.classList.remove('selected');
-    selectedEl = el;
-    el.classList.add('selected');
+  function createIcon(className, icon, name) {
+    const el = document.createElement('div');
+    el.className = className;
+    el.innerHTML = `<span class="icon-img">${icon}</span><span class="icon-label">${name}</span>`;
+    el.style.webkitTapHighlightColor = 'transparent';
+    return el;
+  }
+
+  // ================================================================
+  // SÉLECTION + DOUBLE-CLIC (desktop uniquement)
+  // ================================================================
+  let selectedEl = null;
+
+  function setupDblClick(el, onActivate) {
+    let timer = null;
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (selectedEl) selectedEl.classList.remove('selected');
+      selectedEl = el; el.classList.add('selected');
+      if (timer) { clearTimeout(timer); timer = null; onActivate(); }
+      else timer = setTimeout(() => { timer = null; }, 320);
+    });
   }
 
   function onDesktopClick() {
@@ -800,10 +794,9 @@
       ? '<span class="prop-value unknown">⚠️ Extension non reconnue</span>'
       : `<span class="prop-value">${f.type}</span>`;
 
-    const sizeClass = f.sizeWarn ? 'warn' : '';
     let extras = '';
-    if (f.unknown) extras += `<div class="prop-alert danger">⚠️ Windows ne reconnaît pas l'extension <strong>.${f.ext}</strong>. Aucun programme n'est associé à ce type de fichier.</div>`;
-    if (f.sizeWarn) extras += `<div class="prop-alert warning">⚠️ Ce fichier est <strong>très volumineux</strong> (${f.size}) — cela représente énormément d'espace de stockage !</div>`;
+    if (f.unknown) extras += `<div class="prop-alert danger">⚠️ Windows ne reconnaît pas <strong>.${f.ext}</strong>. Aucun programme associé.</div>`;
+    if (f.sizeWarn) extras += `<div class="prop-alert warning">⚠️ Fichier <strong>très volumineux</strong> (${f.size}) !</div>`;
 
     document.getElementById('prop-rows').innerHTML = `
       <div class="prop-row">
@@ -816,10 +809,10 @@
       </div>
       <div class="prop-row">
         <span class="prop-label">📏 Taille</span>
-        <span class="prop-value ${sizeClass}">${f.size}</span>
+        <span class="prop-value ${f.sizeWarn ? 'warn' : ''}">${f.size}</span>
       </div>
       <div class="prop-row">
-        <span class="prop-label">📅 Date de modification</span>
+        <span class="prop-label">📅 Date</span>
         <span class="prop-value">${f.date}</span>
       </div>
       <div class="prop-row">
@@ -845,19 +838,22 @@
     const win = document.createElement('div');
     win.className = 'folder-window';
     win.style.zIndex = ++zTop;
-    win.style.left = Math.round(15 + Math.random() * 25) + '%';
-    win.style.top  = Math.round(10 + Math.random() * 20) + '%';
+
+    if (MOBILE) {
+      win.style.left = '0'; win.style.top = '0';
+    } else {
+      win.style.left = Math.round(15 + Math.random() * 25) + '%';
+      win.style.top  = Math.round(10 + Math.random() * 20) + '%';
+    }
 
     win.innerHTML = `
-      <div class="folder-titlebar" onmousedown="dragWindow(event, this.parentElement)">
+      <div class="folder-titlebar" ${MOBILE ? '' : 'onmousedown="dragWindow(event, this.parentElement)"'}>
         <span class="folder-title-icon">📂</span>
         <span class="folder-title-text">${folder.name}</span>
         <button class="btn-x" onclick="closeFolder('${folder.name}')">✕</button>
       </div>
       <div class="folder-toolbar">
-        <span class="tb-btn">⬅</span>
-        <span class="tb-btn">➡</span>
-        <span class="tb-btn">⬆</span>
+        <span class="tb-btn">⬅</span><span class="tb-btn">➡</span><span class="tb-btn">⬆</span>
         <div class="folder-path-bar">Ce PC › Bureau › ${folder.name}</div>
         <span class="tb-btn">🔍</span>
       </div>
@@ -870,14 +866,24 @@
       const item = document.createElement('div');
       item.className = 'ff-item' + (f.unknown ? ' unknown' : '');
       item.innerHTML = `<span class="ficon">${f.icon}</span><span class="fname">${f.name}</span>`;
-      let timer = null;
-      item.addEventListener('click', (e) => {
-        e.stopPropagation();
-        content.querySelectorAll('.ff-item').forEach(i => i.classList.remove('selected'));
-        item.classList.add('selected');
-        if (timer) { clearTimeout(timer); timer = null; showProp(f); }
-        else timer = setTimeout(() => { timer = null; }, 320);
-      });
+
+      if (MOBILE) {
+        item.addEventListener('click', (e) => {
+          e.stopPropagation();
+          content.querySelectorAll('.ff-item').forEach(i => i.classList.remove('selected'));
+          item.classList.add('selected');
+          showProp(f);
+        });
+      } else {
+        let timer = null;
+        item.addEventListener('click', (e) => {
+          e.stopPropagation();
+          content.querySelectorAll('.ff-item').forEach(i => i.classList.remove('selected'));
+          item.classList.add('selected');
+          if (timer) { clearTimeout(timer); timer = null; showProp(f); }
+          else timer = setTimeout(() => { timer = null; }, 320);
+        });
+      }
       content.appendChild(item);
     });
 
@@ -903,15 +909,14 @@
   }
 
   // ================================================================
-  // DRAG & DROP ICÔNES
+  // DRAG & DROP (desktop uniquement)
   // ================================================================
   function makeDraggable(el) {
     let dragging = false, sx, sy, il, it;
     el.addEventListener('mousedown', (e) => {
       if (e.button !== 0) return;
       dragging = false;
-      sx = e.clientX; sy = e.clientY;
-      il = el.offsetLeft; it = el.offsetTop;
+      sx = e.clientX; sy = e.clientY; il = el.offsetLeft; it = el.offsetTop;
       const move = (e) => {
         const dx = e.clientX - sx, dy = e.clientY - sy;
         if (!dragging && (Math.abs(dx) > 5 || Math.abs(dy) > 5)) {
@@ -949,8 +954,7 @@
     document.getElementById('clk-time').textContent = pad(n.getHours()) + ':' + pad(n.getMinutes());
     document.getElementById('clk-date').textContent = pad(n.getDate()) + '/' + pad(n.getMonth()+1) + '/' + n.getFullYear();
   }
-  tick();
-  setInterval(tick, 10000);
+  tick(); setInterval(tick, 10000);
 
   // ================================================================
   // BIENVENUE + TOAST
