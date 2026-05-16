@@ -51,6 +51,18 @@ body {
   line-height: 1.2;
 }
 .header-text p { font-size: 0.83em; color: #6b7280; margin-top: 3px; }
+.back-btn {
+  display: flex; align-items: center; gap: 5px;
+  padding: 7px 13px;
+  background: var(--olive-light); color: var(--olive-dark);
+  border: 1.5px solid var(--olive-border);
+  border-radius: 9px;
+  font-size: 0.82em; font-weight: 800;
+  text-decoration: none; white-space: nowrap;
+  transition: background 0.15s, transform 0.15s;
+  flex-shrink: 0;
+}
+.back-btn:hover { background: var(--olive-border); transform: translateY(-1px); }
 
 /* ── LAYOUT ── */
 .main {
@@ -314,6 +326,9 @@ canvas#radar { width: 100%; aspect-ratio: 1 / 1; display: block; }
     <h1>Rosas de compétences numériques</h1>
     <p>Coche les compétences que tu maîtrises — ta rosas évolue en temps réel !</p>
   </div>
+  <a href="index.html" class="back-btn" title="Retour au menu principal">
+    <span>←</span> Accueil
+  </a>
 </div>
 
 <div class="main">
