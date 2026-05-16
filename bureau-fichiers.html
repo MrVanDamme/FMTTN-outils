@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>FMTTN — Bureau Virtuel</title>
+  <meta name="description" content="Bureau virtuel interactif pour apprendre les extensions de fichiers et les tailles — FMTTN Mr. Van Damme">
+  <meta property="og:title" content="FMTTN — Bureau Virtuel">
+  <meta property="og:description" content="Explore un bureau en désordre et apprends à reconnaître les extensions de fichiers et leurs tailles.">
+  <meta property="og:type" content="website">
+  <style>
+    :root {
+      --bg: #0f0f13;
+      --surface: #1a1a22;
+      --surface2: #22222e;
+      --border: rgba(255,255,255,0.08);
+      --border2: rgba(255,255,255,0.15);
+      --text: #f0f0f5;
+      --muted: #888899;
+      --accent: #7c6eff;
+      --accent2: #a78bfa;
+      --green: #34d399;
+      --amber: #fbbf24;
+      --red: #f87171;
+      --radius: 14px;
+      --radius-sm: 8px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    /* ========== DESKTOP ========== */
+    #desktop {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      bottom: 42px;
+      background:
+        radial-gradient(ellipse at 20% 60%, rgba(0,80,180,0.5) 0%, transparent 55%),
+        radial-gradient(ellipse at 75% 30%, rgba(0,120,220,0.35) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 90%, rgba(5,30,100,0.6) 0%, transparent 60%),
+        linear-gradient(160deg, #1565c0 0%, #0d47a1 20%, #1a237e 50%, #0d1b5e 75%, #060d30 100%);
+      overflow: hidden;
+    }
+
+    #desktop::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 40% 40%, rgba(255,255,255,0.04) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    /* ========== FILE ICONS ========== */
+    .file-icon {
+      position: absolute;
+      width: 76px;
+      text-align: center;
+      cursor: pointer;
+      padding: 5px 3px;
+      border-radius: 5px;
+      -webkit-tap-highlight-color: transparent;
+      z-index: 10;
+      transition: background 0.1s;
+    }
+
+    .file-icon .icon-img {
+      font-size: 38px;
+      line-height: 1;
+      display: block;
+      margin-bottom: 3px;
+      filter: drop-shadow(0 2px 6px rgba(0,0,0,0.6));
+    }
+
+    .file-icon .icon-label {
+      font-size: 11px;
+      color: white;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.9), 0 0 10px rgba(0,0,0,0.6);
+      word-break: break-all;
+      line-height: 1.3;
+      display: block;
+    }
+
+    .file-icon.selected {
+      background: rgba(100,160,255,0.22);
+      border: 1px solid rgba(100,180,255,0.45);
+      outline: 1px solid rgba(60,130,255,0.3);
+    }
+
+    .file-icon.unknown .icon-img {
+      filter: drop-shadow(0 2px 6px rgba(255,80,80,0.35));
+    }
+
+    /* ========== FOLDER ICONS ========== */
+    .folder-icon {
+      position: absolute;
+      width: 80px;
+      text-align: center;
+      cursor: pointer;
+      padding: 5px 3px;
+      border-radius: 5px;
+      -webkit-tap-highlight-color: transparent;
+      z-index: 10;
+    }
+
+    .folder-icon .icon-img {
+      font-size: 44px;
+      display: block;
+      filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
+    }
+
+    .folder-icon .icon-label {
+      font-size: 11px;
+      color: white;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.9);
+      word-break: break-word;
+      line-height: 1.3;
+    }
+
+    .folder-icon.selected {
+      background: rgba(100,160,255,0.22);
+      border: 1px solid rgba(100,180,255,0.45);
+    }
+
+    /* ========== TASKBAR ========== */
+    #taskbar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 42px;
+      background: rgba(12,12,18,0.92);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      display: flex;
+      align-items: center;
+      z-index: 1000;
+      border-top: 0.5px solid rgba(255,255,255,0.1);
+    }
+
+    #start-btn {
+      width: 50px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 20px;
+      color: #90c8ff;
+      transition: background 0.15s;
+    }
+    #start-btn:hover { background: rgba(255,255,255,0.1); }
+
+    #taskbar-apps {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      padding: 0 4px;
+    }
+
+    .taskbar-app {
+      width: 46px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 20px;
+      color: rgba(255,255,255,0.75);
+      transition: background 0.12s;
+    }
+    .taskbar-app:hover { background: rgba(255,255,255,0.1); }
+
+    #taskbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 14px;
+    }
+
+    #taskbar-icons {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      font-size: 15px;
+      color: rgba(255,255,255,0.65);
+    }
+
+    #clock {
+      text-align: right;
+      line-height: 1.35;
+      cursor: default;
+    }
+    #clock-time { font-size: 13px; color: rgba(255,255,255,0.9); font-weight: 500; }
+    #clock-date { font-size: 10px; color: rgba(255,255,255,0.55); }
+
+    /* ========== PROPERTIES POPUP ========== */
+    .prop-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.65);
+      z-index: 5000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    .prop-window {
+      background: #1c1c28;
+      border: 0.5px solid rgba(255,255,255,0.18);
+      border-radius: 10px;
+      width: 350px;
+      max-width: 95vw;
+      box-shadow: 0 24px 70px rgba(0,0,0,0.7);
+      overflow: hidden;
+      animation: popIn 0.18s cubic-bezier(0.34,1.5,0.64,1);
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0.82); opacity: 0; }
+      to   { transform: scale(1);    opacity: 1; }
+    }
+
+    .prop-titlebar {
+      background: #252533;
+      padding: 11px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 0.5px solid rgba(255,255,255,0.1);
+    }
+    .prop-titlebar .t-icon { font-size: 17px; }
+    .prop-titlebar .t-text { flex: 1; font-size: 13px; color: #f0f0f5; font-weight: 600; }
+
+    .btn-x {
+      width: 26px; height: 26px;
+      border-radius: 6px;
+      background: rgba(200,50,50,0.25);
+      color: #f87171;
+      border: 0.5px solid rgba(200,50,50,0.4);
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: inherit;
+    }
+    .btn-x:hover { background: rgba(200,50,50,0.5); }
+
+    .prop-hero {
+      padding: 20px 20px 16px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      border-bottom: 0.5px solid rgba(255,255,255,0.07);
+    }
+    .prop-big-icon { font-size: 54px; flex-shrink: 0; }
+    .prop-filename { font-size: 15px; font-weight: 700; color: #f0f0f5; margin-bottom: 3px; }
+    .prop-ftype    { font-size: 12px; color: #888899; }
+
+    .prop-rows { padding: 14px 20px; display: flex; flex-direction: column; gap: 1px; }
+
+    .prop-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 9px 0;
+      border-bottom: 0.5px solid rgba(255,255,255,0.05);
+      gap: 12px;
+    }
+    .prop-row:last-child { border-bottom: none; }
+    .prop-label { font-size: 12px; color: #888899; white-space: nowrap; }
+    .prop-value { font-size: 13px; color: #f0f0f5; text-align: right; font-weight: 500; }
+    .prop-value.unknown  { color: #f87171; }
+    .prop-value.warn     { color: #fbbf24; }
+
+    .prop-alert {
+      margin: 8px 0 0;
+      border-radius: 7px;
+      padding: 9px 12px;
+      font-size: 12px;
+      line-height: 1.55;
+    }
+    .prop-alert.danger  { background: rgba(248,113,113,0.1); border: 0.5px solid rgba(248,113,113,0.3); color: #f87171; }
+    .prop-alert.warning { background: rgba(251,191,36,0.1);  border: 0.5px solid rgba(251,191,36,0.3);  color: #fbbf24; }
+
+    .prop-footer {
+      padding: 11px 20px;
+      display: flex;
+      justify-content: flex-end;
+      background: rgba(0,0,0,0.25);
+      border-top: 0.5px solid rgba(255,255,255,0.06);
+    }
+
+    .btn-ok {
+      padding: 8px 22px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 7px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.12s;
+    }
+    .btn-ok:hover { background: var(--accent2); }
+
+    /* ========== FOLDER WINDOW ========== */
+    .folder-window {
+      position: fixed;
+      background: #18181f;
+      border: 0.5px solid rgba(255,255,255,0.13);
+      border-radius: 10px;
+      box-shadow: 0 24px 70px rgba(0,0,0,0.75);
+      z-index: 2000;
+      width: 500px;
+      max-width: 96vw;
+      overflow: hidden;
+      animation: popIn 0.15s ease;
+    }
+
+    .folder-titlebar {
+      background: #20202c;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 0.5px solid rgba(255,255,255,0.08);
+      cursor: move;
+    }
+    .folder-title-icon { font-size: 16px; }
+    .folder-title-text { flex: 1; font-size: 13px; color: #f0f0f5; font-weight: 600; }
+
+    .folder-toolbar {
+      background: #1b1b26;
+      padding: 6px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 0.5px solid rgba(255,255,255,0.06);
+    }
+    .folder-path-bar {
+      background: rgba(255,255,255,0.06);
+      border: 0.5px solid rgba(255,255,255,0.1);
+      border-radius: 5px;
+      padding: 4px 10px;
+      flex: 1;
+      font-size: 12px;
+      color: #f0f0f5;
+    }
+    .tb-btn {
+      font-size: 14px;
+      color: rgba(255,255,255,0.5);
+      cursor: pointer;
+      padding: 4px 6px;
+      border-radius: 4px;
+    }
+    .tb-btn:hover { background: rgba(255,255,255,0.08); }
+
+    .folder-content {
+      padding: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      min-height: 200px;
+      max-height: 340px;
+      overflow-y: auto;
+    }
+
+    .ff-item {
+      width: 72px;
+      text-align: center;
+      cursor: pointer;
+      padding: 6px 4px;
+      border-radius: 7px;
+      transition: background 0.1s;
+    }
+    .ff-item:hover { background: rgba(255,255,255,0.07); }
+    .ff-item.selected { background: rgba(124,110,255,0.2); border: 0.5px solid var(--accent); }
+    .ff-item .ficon { font-size: 34px; display: block; margin-bottom: 4px; }
+    .ff-item .fname { font-size: 11px; color: #f0f0f5; word-break: break-all; line-height: 1.3; }
+    .ff-item.unknown .fname { color: #f87171; }
+
+    .folder-status {
+      padding: 6px 16px;
+      font-size: 11px;
+      color: rgba(255,255,255,0.3);
+      background: rgba(0,0,0,0.3);
+      border-top: 0.5px solid rgba(255,255,255,0.05);
+    }
+
+    /* ========== CONTEXT MENU ========== */
+    .ctx-menu {
+      position: fixed;
+      background: #1e1e2b;
+      border: 0.5px solid rgba(255,255,255,0.16);
+      border-radius: 9px;
+      padding: 5px;
+      z-index: 9000;
+      min-width: 190px;
+      box-shadow: 0 10px 36px rgba(0,0,0,0.6);
+      animation: fadeIn 0.1s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.94); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    .ctx-item {
+      padding: 9px 14px;
+      font-size: 13px;
+      color: #f0f0f5;
+      border-radius: 5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .ctx-item:hover { background: rgba(124,110,255,0.22); }
+    .ctx-item.disabled { color: #444455; cursor: default; }
+    .ctx-item.disabled:hover { background: transparent; }
+    .ctx-sep { height: 0.5px; background: rgba(255,255,255,0.1); margin: 4px 8px; }
+
+    /* ========== WELCOME MODAL ========== */
+    .welcome-bg {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.78);
+      z-index: 8000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .welcome-box {
+      background: var(--surface);
+      border: 0.5px solid var(--border2);
+      border-radius: var(--radius);
+      padding: 28px 24px 22px;
+      width: 420px;
+      max-width: 95vw;
+      max-height: 92vh;
+      overflow-y: auto;
+      text-align: center;
+      animation: popIn 0.25s cubic-bezier(0.34,1.5,0.64,1);
+    }
+
+    .welcome-emoji { font-size: 50px; margin-bottom: 12px; }
+    .welcome-box h2 { font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .welcome-subtitle { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+
+    .welcome-objective {
+      background: var(--surface2);
+      border-radius: var(--radius-sm);
+      padding: 13px 16px;
+      margin-bottom: 18px;
+      text-align: left;
+    }
+    .welcome-objective .obj-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+    .welcome-objective p { font-size: 13px; color: var(--muted); line-height: 1.65; }
+
+    .welcome-steps { display: flex; flex-direction: column; gap: 9px; margin-bottom: 20px; }
+    .welcome-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      background: var(--surface2);
+      border-radius: var(--radius-sm);
+      padding: 10px 13px;
+      text-align: left;
+    }
+    .ws-icon { font-size: 22px; flex-shrink: 0; }
+    .ws-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+    .ws-desc  { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+    .btn-welcome {
+      width: 100%;
+      padding: 13px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      margin-bottom: 10px;
+      transition: background 0.15s;
+    }
+    .btn-welcome:hover { background: var(--accent2); }
+
+    .welcome-note { font-size: 12px; color: var(--muted); }
+
+    /* ========== INFO MODAL ========== */
+    .info-modal-bg {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.72);
+      z-index: 7000;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+    }
+    .info-modal-bg.open { display: flex; }
+
+    .info-modal {
+      background: var(--surface);
+      border: 0.5px solid var(--border2);
+      border-top-left-radius: var(--radius);
+      border-top-right-radius: var(--radius);
+      padding: 20px 22px 36px;
+      width: 520px;
+      max-width: 100vw;
+      max-height: 80vh;
+      overflow-y: auto;
+      position: relative;
+      animation: slideUp 0.2s ease;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(40px); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+
+    .info-handle {
+      width: 40px; height: 4px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 2px;
+      margin: 0 auto 18px;
+    }
+
+    .info-close-btn {
+      position: absolute;
+      top: 16px; right: 16px;
+      width: 28px; height: 28px;
+      background: var(--surface2);
+      border: 0.5px solid var(--border2);
+      border-radius: 50%;
+      color: var(--text);
+      cursor: pointer;
+      font-size: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: inherit;
+    }
+
+    .info-modal h2 { font-size: 18px; color: var(--text); margin-bottom: 16px; }
+    .info-modal h3 { font-size: 14px; color: var(--accent2); margin: 18px 0 7px; font-weight: 600; }
+    .info-modal p  { font-size: 13px; color: var(--muted); line-height: 1.65; margin-bottom: 8px; }
+
+    .analogy-card {
+      background: var(--surface2);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 10px 14px;
+      font-size: 12px;
+      color: var(--text);
+      margin: 8px 0;
+      line-height: 1.6;
+    }
+
+    .ext-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .ext-chip {
+      background: var(--surface2);
+      border: 0.5px solid var(--border);
+      border-radius: 7px;
+      padding: 7px 10px;
+      font-size: 12px;
+      color: var(--text);
+    }
+    .ext-chip strong { color: var(--accent2); }
+
+    /* ========== FLOATING BADGES ========== */
+    #fmttn-badge {
+      position: fixed;
+      top: 10px; left: 10px;
+      background: rgba(124,110,255,0.88);
+      backdrop-filter: blur(10px);
+      border-radius: 9px;
+      padding: 5px 11px;
+      font-size: 11px;
+      color: white;
+      font-weight: 700;
+      z-index: 3000;
+      letter-spacing: 0.3px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+      cursor: default;
+    }
+
+    #info-btn {
+      position: fixed;
+      top: 10px; right: 10px;
+      width: 34px; height: 34px;
+      background: rgba(124,110,255,0.88);
+      backdrop-filter: blur(10px);
+      border: none;
+      border-radius: 50%;
+      color: white;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      z-index: 3000;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+      font-family: inherit;
+      transition: background 0.12s;
+    }
+    #info-btn:hover { background: var(--accent2); }
+
+    /* ========== TOAST ========== */
+    .toast {
+      position: fixed;
+      bottom: 54px; right: 14px;
+      background: rgba(28,28,40,0.97);
+      border: 0.5px solid rgba(255,255,255,0.15);
+      border-radius: 10px;
+      padding: 11px 16px;
+      font-size: 13px;
+      color: #f0f0f5;
+      z-index: 6000;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.5);
+      max-width: 290px;
+      line-height: 1.45;
+      animation: toastIn 0.2s ease;
+    }
+    @keyframes toastIn {
+      from { transform: translateX(120%); opacity: 0; }
+      to   { transform: translateX(0);    opacity: 1; }
+    }
+
+    /* ========== SCROLLBAR ========== */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+  <!-- FMTTN Badge -->
+  <div id="fmttn-badge">💻 FMTTN — Mr. Van Damme</div>
+
+  <!-- Help button -->
+  <button id="info-btn" onclick="document.getElementById('info-modal').classList.add('open')" title="Aide — extensions de fichiers">?</button>
+
+  <!-- ===== DESKTOP ===== -->
+  <div id="desktop" oncontextmenu="showCtxMenu(event)" onclick="onDesktopClick(event)">
+    <!-- Icons injected by JS -->
+  </div>
+
+  <!-- ===== TASKBAR ===== -->
+  <div id="taskbar">
+    <div id="start-btn" title="Démarrer">⊞</div>
+    <div id="taskbar-apps">
+      <div class="taskbar-app" title="Explorateur de fichiers">🗂️</div>
+      <div class="taskbar-app" title="Navigateur web">🌐</div>
+      <div class="taskbar-app" title="Paramètres">⚙️</div>
+      <div class="taskbar-app" title="Corbeille">🗑️</div>
+    </div>
+    <div id="taskbar-right">
+      <div id="taskbar-icons">
+        <span title="Wi-Fi">📶</span>
+        <span title="Volume">🔊</span>
+        <span title="Batterie">🔋</span>
+      </div>
+      <div id="clock">
+        <div id="clk-time">00:00</div>
+        <div id="clk-date">01/01/2026</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== WELCOME MODAL ===== -->
+  <div class="welcome-bg" id="welcome-modal">
+    <div class="welcome-box">
+      <div class="welcome-emoji">💻</div>
+      <h2>FMTTN — Bureau Virtuel</h2>
+      <p class="welcome-subtitle">Mr. Van Damme</p>
+
+      <div class="welcome-objective">
+        <div class="obj-title">🎯 Quel est l'objectif ?</div>
+        <p>
+          Tu vas explorer un <strong style="color:var(--accent2)">bureau d'ordinateur virtuel</strong> en désordre.
+          Chaque fichier possède une <strong style="color:var(--accent2)">extension</strong> (comme <code style="color:var(--green)">.pdf</code>, <code style="color:var(--green)">.mp3</code>…)
+          et une <strong style="color:var(--accent2)">taille</strong>. Apprends à les reconnaître et à comprendre les unités !
+        </p>
+      </div>
+
+      <div class="welcome-steps">
+        <div class="welcome-step">
+          <div class="ws-icon">🖱️</div>
+          <div>
+            <div class="ws-title">Double-clique sur un fichier</div>
+            <div class="ws-desc">Une fenêtre "Propriétés" s'ouvre avec l'extension, le type, la taille et l'auteur.</div>
+          </div>
+        </div>
+        <div class="welcome-step">
+          <div class="ws-icon">📁</div>
+          <div>
+            <div class="ws-title">Explore les dossiers</div>
+            <div class="ws-desc">Double-clique sur les dossiers pour les ouvrir — des fichiers supplémentaires s'y cachent !</div>
+          </div>
+        </div>
+        <div class="welcome-step">
+          <div class="ws-icon">❓</div>
+          <div>
+            <div class="ws-title">Repère les extensions inconnues</div>
+            <div class="ws-desc">Certains fichiers ont des extensions que Windows ne reconnaît pas. Sauras-tu les trouver ?</div>
+          </div>
+        </div>
+        <div class="welcome-step">
+          <div class="ws-icon">↔️</div>
+          <div>
+            <div class="ws-title">Réorganise le bureau</div>
+            <div class="ws-desc">Glisse-dépose les fichiers pour ranger le bureau à ta façon !</div>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-welcome" onclick="closeWelcome()">C'est parti ! 🚀</button>
+      <div class="welcome-note">Clique sur le <strong>?</strong> en haut à droite pour de l'aide sur les extensions.</div>
+    </div>
+  </div>
+
+  <!-- ===== INFO MODAL ===== -->
+  <div class="info-modal-bg" id="info-modal" onclick="if(event.target===this)this.classList.remove('open')">
+    <div class="info-modal">
+      <div class="info-handle"></div>
+      <button class="info-close-btn" onclick="document.getElementById('info-modal').classList.remove('open')">✕</button>
+
+      <h2>📚 Les extensions de fichiers — Guide complet</h2>
+
+      <h3>🔤 C'est quoi une extension ?</h3>
+      <p>L'extension, c'est la partie après le dernier <strong>point</strong> dans le nom d'un fichier. Dans <code style="color:var(--green)">musique.mp3</code>, l'extension est <strong>.mp3</strong>. Elle indique à l'ordinateur quel programme utiliser pour l'ouvrir.</p>
+      <div class="analogy-card">🎮 C'est comme une étiquette sur une boîte : <strong>.mp3</strong> = boîte de musique, <strong>.pdf</strong> = boîte de document, <strong>.zip</strong> = boîte fermée à clé.</div>
+
+      <h3>📏 Les unités de taille (du plus petit au plus grand)</h3>
+      <div class="analogy-card">
+        <strong style="color:var(--green)">ko (kilooctet)</strong> → un SMS, un petit texte<br>
+        <strong style="color:var(--amber)">Mo (mégaoctet)</strong> → une photo, une chanson<br>
+        <strong style="color:#f97316">Go (gigaoctet)</strong> → un film, un jeu<br>
+        <strong style="color:var(--red)">To (téraoctet)</strong> → des centaines de films !<br>
+        <em style="font-size:11px;color:var(--muted)">1 To = 1 000 Go = 1 000 000 Mo = 1 000 000 000 ko</em>
+      </div>
+
+      <h3>📋 Les extensions courantes</h3>
+      <div class="ext-grid">
+        <div class="ext-chip"><strong>.txt</strong> — Texte brut (Bloc-notes)</div>
+        <div class="ext-chip"><strong>.pdf</strong> — Document portable</div>
+        <div class="ext-chip"><strong>.doc / .docx</strong> — Word (Microsoft)</div>
+        <div class="ext-chip"><strong>.xls / .xlsx</strong> — Excel (tableur)</div>
+        <div class="ext-chip"><strong>.mp3</strong> — Audio compressé</div>
+        <div class="ext-chip"><strong>.flac</strong> — Audio haute qualité</div>
+        <div class="ext-chip"><strong>.avi / .mov</strong> — Vidéo</div>
+        <div class="ext-chip"><strong>.html</strong> — Page web</div>
+        <div class="ext-chip"><strong>.zip / .tar</strong> — Archive compressée</div>
+        <div class="ext-chip"><strong>.tif / .jpg / .png</strong> — Images</div>
+        <div class="ext-chip"><strong>.pub</strong> — Publisher (Microsoft)</div>
+        <div class="ext-chip"><strong>.mpp</strong> — Project (Microsoft)</div>
+      </div>
+
+      <h3>❓ Extensions inconnues — Attention !</h3>
+      <p>Quand Windows ne reconnaît pas une extension, il affiche une icône générique et ne sait pas quel programme utiliser. Sur ce bureau virtuel, tu trouveras plusieurs fichiers avec des extensions <strong style="color:var(--red)">inventées</strong> (.cca, .luc, .ryt, .kit, .be, .rbt…).</p>
+      <div class="analogy-card">⚠️ Dans la vraie vie, <strong>ne jamais ouvrir</strong> un fichier avec une extension inconnue reçu par e-mail ou trouvé sur une clé USB inconnue — c'est souvent un virus !</div>
+    </div>
+  </div>
+
+  <!-- ===== PROPERTIES POPUP ===== -->
+  <div class="prop-overlay" id="prop-overlay" style="display:none;" onclick="if(event.target===this)closeProp()">
+    <div class="prop-window">
+      <div class="prop-titlebar">
+        <span class="t-icon" id="pt-icon">📄</span>
+        <span class="t-text" id="pt-text">Propriétés</span>
+        <button class="btn-x" onclick="closeProp()">✕</button>
+      </div>
+      <div class="prop-hero">
+        <div class="prop-big-icon" id="pb-icon">📄</div>
+        <div>
+          <div class="prop-filename" id="pb-name">fichier.txt</div>
+          <div class="prop-ftype"   id="pb-type">Fichier texte</div>
+        </div>
+      </div>
+      <div class="prop-rows" id="prop-rows"></div>
+      <div class="prop-footer">
+        <button class="btn-ok" onclick="closeProp()">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CONTEXT MENU ===== -->
+  <div class="ctx-menu" id="ctx-menu" style="display:none;">
+    <div class="ctx-item" onclick="hideCtxMenu(); showToast('🔄 Bureau actualisé')">🔄 Actualiser</div>
+    <div class="ctx-item disabled">📋 Coller</div>
+    <div class="ctx-sep"></div>
+    <div class="ctx-item" onclick="hideCtxMenu(); showToast('🔡 Tri par nom effectué !')">🔡 Trier par nom</div>
+    <div class="ctx-item" onclick="hideCtxMenu(); showToast('📏 Tri par taille effectué !')">📏 Trier par taille</div>
+    <div class="ctx-item" onclick="hideCtxMenu(); showToast('📅 Tri par date effectué !')">📅 Trier par date</div>
+    <div class="ctx-sep"></div>
+    <div class="ctx-item" onclick="hideCtxMenu(); document.getElementById('info-modal').classList.add('open')">📚 Aide — extensions de fichiers</div>
+  </div>
+
+  <script>
+  // ================================================================
+  // DATA
+  // ================================================================
+  const FILES = [
+    // Groupe 1 — bureau principal
+    { name:'Vacances.txt',   size:'345 ko',   date:'13-12', author:'Jordan',   ext:'txt',  icon:'📄', type:'Fichier texte (Bloc-notes)',         x:4,   y:7   },
+    { name:'Vacances.pdf',   size:'1,2 To',   date:'12-03', author:'Armand',   ext:'pdf',  icon:'📕', type:'Document PDF',                       x:7,   y:34,  sizeWarn:true },
+    { name:'école.avi',      size:'0,7 Go',   date:'07-10', author:'Loïc',     ext:'avi',  icon:'🎬', type:'Vidéo AVI',                          x:16,  y:57  },
+    { name:'JHNBV.html',     size:'290 Mo',   date:'24-09', author:'Marie',    ext:'html', icon:'🌐', type:'Page Web HTML',                      x:3,   y:73  },
+    { name:'pokjh.doc',      size:'12 ko',    date:'25-08', author:'Delphine', ext:'doc',  icon:'📝', type:'Document Word (ancien format)',       x:27,  y:17  },
+    { name:'ojihg.zip',      size:'54 Mo',    date:'06-09', author:'Romain',   ext:'zip',  icon:'🗜️', type:'Archive compressée ZIP',             x:13,  y:45  },
+    { name:'Fibre.cca',      size:'2 Go',     date:'18-03', author:'Elise',    ext:'cca',  icon:'❓', type:'Fichier inconnu',                    x:36,  y:63,  unknown:true },
+    // Groupe 2
+    { name:'fête.tif',       size:'0,9 To',   date:'09-02', author:'Seb',      ext:'tif',  icon:'🖼️', type:'Image TIFF (haute qualité)',         x:47,  y:9,   sizeWarn:true },
+    { name:'local.luc',      size:'97 ko',    date:'13-08', author:'Lucas',    ext:'luc',  icon:'❓', type:'Fichier inconnu',                    x:58,  y:26,  unknown:true },
+    { name:'étude.docx',     size:'34 Mo',    date:'31-05', author:'Chloé',    ext:'docx', icon:'📝', type:'Document Word',                      x:41,  y:48  },
+    { name:'Topsecret.mp3',  size:'35 ko',    date:'13-12', author:'Jordan',   ext:'mp3',  icon:'🎵', type:'Fichier audio MP3',                  x:62,  y:58  },
+    { name:'téléphone.pub',  size:'0,12 To',  date:'12-03', author:'Armand',   ext:'pub',  icon:'📰', type:'Publication Microsoft Publisher',     x:71,  y:13  },
+    { name:'Alarme.mpp',     size:'6 Go',     date:'07-10', author:'Loïc',     ext:'mpp',  icon:'📊', type:'Projet Microsoft Project',           x:76,  y:37  },
+    { name:'Chaise.ryt',     size:'29 Mo',    date:'24-09', author:'Marie',    ext:'ryt',  icon:'❓', type:'Fichier inconnu',                    x:22,  y:83,  unknown:true },
+    { name:'Table.kit',      size:'120 ko',   date:'25-08', author:'Delphine', ext:'kit',  icon:'❓', type:'Fichier inconnu',                    x:52,  y:80,  unknown:true },
+    { name:'Pêche.cgi',      size:'14 Mo',    date:'06-09', author:'Romain',   ext:'cgi',  icon:'⚙️', type:'Script CGI (web)',                   x:37,  y:33  },
+    { name:'Zik.bib',        size:'5 Go',     date:'18-03', author:'Elise',    ext:'bib',  icon:'📚', type:'Bibliographie BibTeX',               x:66,  y:77  },
+    { name:'Fric.be',        size:'0,07 To',  date:'09-02', author:'Seb',      ext:'be',   icon:'❓', type:'Fichier inconnu',                    x:81,  y:83,  unknown:true },
+    { name:'Devoir.mov',     size:'77 ko',    date:'13-08', author:'Lucas',    ext:'mov',  icon:'🎬', type:'Vidéo QuickTime (MOV)',               x:19,  y:87  },
+    { name:'Film.rbt',       size:'44 Mo',    date:'31-05', author:'Chloé',    ext:'rbt',  icon:'❓', type:'Fichier inconnu',                    x:87,  y:55,  unknown:true },
+  ];
+
+  const FOLDERS = [
+    {
+      name:'Cours',
+      icon:'📁',
+      x:88, y:5,
+      files:[
+        { name:'Leçon1.pdf',     size:'2,3 Mo',  date:'01-09', author:'Mr. Van Damme', ext:'pdf',  icon:'📕', type:'Document PDF' },
+        { name:'Exercices.docx', size:'540 ko',  date:'05-09', author:'Mr. Van Damme', ext:'docx', icon:'📝', type:'Document Word' },
+        { name:'Formules.xlsx',  size:'128 ko',  date:'10-09', author:'Mr. Van Damme', ext:'xlsx', icon:'📊', type:'Tableur Excel' },
+        { name:'Notes.txt',      size:'18 ko',   date:'15-09', author:'Jordan',         ext:'txt',  icon:'📄', type:'Fichier texte' },
+        { name:'résumé.gyk',     size:'890 ko',  date:'20-09', author:'Marie',          ext:'gyk',  icon:'❓', type:'Fichier inconnu', unknown:true },
+      ]
+    },
+    {
+      name:'Images',
+      icon:'📁',
+      x:88, y:47,
+      files:[
+        { name:'Photo1.jpg',    size:'3,2 Mo',  date:'14-07', author:'Lucas',   ext:'jpg',  icon:'🖼️', type:'Image JPEG' },
+        { name:'Capture.png',   size:'870 ko',  date:'22-08', author:'Chloé',   ext:'png',  icon:'🖼️', type:'Image PNG' },
+        { name:'Dessin.svg',    size:'45 ko',   date:'03-09', author:'Romain',  ext:'svg',  icon:'🎨', type:'Image vectorielle SVG' },
+        { name:'Photo2.bmp',    size:'12,4 Mo', date:'11-09', author:'Seb',     ext:'bmp',  icon:'🖼️', type:'Image Bitmap non compressée' },
+        { name:'logo.xrp',      size:'2,1 Mo',  date:'17-09', author:'Armand',  ext:'xrp',  icon:'❓', type:'Fichier inconnu', unknown:true },
+      ]
+    },
+    {
+      name:'Téléchargements',
+      icon:'📁',
+      x:88, y:68,
+      files:[
+        { name:'Setup.exe',     size:'45 Mo',   date:'01-10', author:'Inconnu', ext:'exe',  icon:'⚠️', type:'Programme exécutable (DANGER)' },
+        { name:'Musique.flac',  size:'28 Mo',   date:'05-10', author:'Lucas',   ext:'flac', icon:'🎵', type:'Audio FLAC (haute qualité)' },
+        { name:'Archive.tar',   size:'156 Mo',  date:'08-10', author:'Loïc',    ext:'tar',  icon:'🗜️', type:'Archive TAR (Linux/Mac)' },
+        { name:'Données.csv',   size:'234 ko',  date:'12-10', author:'Delphine',ext:'csv',  icon:'📊', type:'Fichier CSV (tableur texte)' },
+        { name:'inconnu.wvp',   size:'78 Mo',   date:'15-10', author:'???',     ext:'wvp',  icon:'❓', type:'Fichier inconnu', unknown:true },
+      ]
+    },
+  ];
+
+  // ================================================================
+  // RENDER DESKTOP
+  // ================================================================
+  const desktop = document.getElementById('desktop');
+
+  FILES.forEach((f, i) => {
+    const el = document.createElement('div');
+    el.className = 'file-icon' + (f.unknown ? ' unknown' : '');
+    el.style.left = f.x + '%';
+    el.style.top  = f.y + '%';
+    el.innerHTML  = `<span class="icon-img">${f.icon}</span><span class="icon-label">${f.name}</span>`;
+    setupIconBehavior(el, () => showProp(f));
+    makeDraggable(el);
+    desktop.appendChild(el);
+  });
+
+  FOLDERS.forEach((folder) => {
+    const el = document.createElement('div');
+    el.className = 'folder-icon';
+    el.style.left = folder.x + '%';
+    el.style.top  = folder.y + '%';
+    el.innerHTML  = `<span class="icon-img">${folder.icon}</span><span class="icon-label">${folder.name}</span>`;
+    setupIconBehavior(el, () => openFolder(folder));
+    makeDraggable(el);
+    desktop.appendChild(el);
+  });
+
+  // ================================================================
+  // SELECTION + DOUBLE-CLICK
+  // ================================================================
+  let selectedEl = null;
+
+  function setupIconBehavior(el, onDblClick) {
+    let timer = null;
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      selectEl(el);
+      if (timer) {
+        clearTimeout(timer);
+        timer = null;
+        onDblClick();
+      } else {
+        timer = setTimeout(() => { timer = null; }, 320);
+      }
+    });
+  }
+
+  function selectEl(el) {
+    if (selectedEl) selectedEl.classList.remove('selected');
+    selectedEl = el;
+    el.classList.add('selected');
+  }
+
+  function onDesktopClick(e) {
+    if (selectedEl) { selectedEl.classList.remove('selected'); selectedEl = null; }
+    hideCtxMenu();
+  }
+
+  // ================================================================
+  // PROPERTIES POPUP
+  // ================================================================
+  function showProp(f) {
+    document.getElementById('pt-icon').textContent = f.icon;
+    document.getElementById('pt-text').textContent = 'Propriétés — ' + f.name;
+    document.getElementById('pb-icon').textContent = f.icon;
+    document.getElementById('pb-name').textContent = f.name;
+    document.getElementById('pb-type').textContent = f.type;
+
+    const typeLabel = f.unknown
+      ? '<span class="prop-value unknown">⚠️ Extension non reconnue</span>'
+      : `<span class="prop-value">${f.type}</span>`;
+
+    const sizeClass = f.sizeWarn ? 'warn' : '';
+
+    let extras = '';
+    if (f.unknown) extras += `<div class="prop-alert danger">⚠️ Windows ne reconnaît pas l'extension <strong>.${f.ext}</strong>. Aucun programme n'est associé à ce type de fichier.</div>`;
+    if (f.sizeWarn) extras += `<div class="prop-alert warning">⚠️ Ce fichier est <strong>très volumineux</strong> (${f.size}) — cela représente énormément d'espace de stockage !</div>`;
+
+    document.getElementById('prop-rows').innerHTML = `
+      <div class="prop-row">
+        <span class="prop-label">📎 Extension</span>
+        <span class="prop-value ${f.unknown ? 'unknown' : ''}">.${f.ext}</span>
+      </div>
+      <div class="prop-row">
+        <span class="prop-label">🏷️ Type</span>
+        ${typeLabel}
+      </div>
+      <div class="prop-row">
+        <span class="prop-label">📏 Taille</span>
+        <span class="prop-value ${sizeClass}">${f.size}</span>
+      </div>
+      <div class="prop-row">
+        <span class="prop-label">📅 Date de modification</span>
+        <span class="prop-value">${f.date}</span>
+      </div>
+      <div class="prop-row">
+        <span class="prop-label">👤 Auteur</span>
+        <span class="prop-value">${f.author}</span>
+      </div>
+      ${extras}
+    `;
+
+    document.getElementById('prop-overlay').style.display = 'flex';
+  }
+
+  function closeProp() {
+    document.getElementById('prop-overlay').style.display = 'none';
+  }
+
+  // ================================================================
+  // FOLDER WINDOWS
+  // ================================================================
+  const openWindows = {};
+  let zTop = 2000;
+
+  function openFolder(folder) {
+    if (openWindows[folder.name]) {
+      openWindows[folder.name].style.zIndex = ++zTop;
+      return;
+    }
+
+    const win = document.createElement('div');
+    win.className = 'folder-window';
+    win.style.zIndex = ++zTop;
+    win.style.left = Math.round(15 + Math.random() * 25) + '%';
+    win.style.top  = Math.round(10 + Math.random() * 20) + '%';
+
+    win.innerHTML = `
+      <div class="folder-titlebar" onmousedown="dragWindow(event, this.parentElement)">
+        <span class="folder-title-icon">📂</span>
+        <span class="folder-title-text">${folder.name}</span>
+        <button class="btn-x" onclick="closeFolder('${folder.name}')">✕</button>
+      </div>
+      <div class="folder-toolbar">
+        <span class="tb-btn">⬅</span>
+        <span class="tb-btn">➡</span>
+        <span class="tb-btn">⬆</span>
+        <div class="folder-path-bar">Ce PC &rsaquo; Bureau &rsaquo; ${folder.name}</div>
+        <span class="tb-btn">🔍</span>
+      </div>
+      <div class="folder-content" id="fc-${folder.name}"></div>
+      <div class="folder-status">${folder.files.length} élément(s)</div>
+    `;
+
+    const content = win.querySelector('#fc-' + folder.name);
+    folder.files.forEach((f) => {
+      const item = document.createElement('div');
+      item.className = 'ff-item' + (f.unknown ? ' unknown' : '');
+      item.innerHTML = `<span class="ficon">${f.icon}</span><span class="fname">${f.name}</span>`;
+      let timer = null;
+      item.addEventListener('click', (e) => {
+        e.stopPropagation();
+        content.querySelectorAll('.ff-item').forEach(i => i.classList.remove('selected'));
+        item.classList.add('selected');
+        if (timer) {
+          clearTimeout(timer);
+          timer = null;
+          showProp(f);
+        } else {
+          timer = setTimeout(() => { timer = null; }, 320);
+        }
+      });
+      content.appendChild(item);
+    });
+
+    win.addEventListener('mousedown', () => { win.style.zIndex = ++zTop; });
+    document.body.appendChild(win);
+    openWindows[folder.name] = win;
+  }
+
+  function closeFolder(name) {
+    if (openWindows[name]) { openWindows[name].remove(); delete openWindows[name]; }
+  }
+
+  function dragWindow(e, win) {
+    if (e.target.tagName === 'BUTTON') return;
+    const ox = e.clientX - win.offsetLeft;
+    const oy = e.clientY - win.offsetTop;
+    const move = (e) => {
+      win.style.left = (e.clientX - ox) + 'px';
+      win.style.top  = Math.max(0, e.clientY - oy) + 'px';
+    };
+    const up = () => {
+      document.removeEventListener('mousemove', move);
+      document.removeEventListener('mouseup', up);
+    };
+    document.addEventListener('mousemove', move);
+    document.addEventListener('mouseup', up);
+  }
+
+  // ================================================================
+  // DRAG & DROP — Desktop Icons
+  // ================================================================
+  function makeDraggable(el) {
+    let dragging = false, sx, sy, il, it;
+
+    el.addEventListener('mousedown', (e) => {
+      if (e.button !== 0) return;
+      dragging = false;
+      sx = e.clientX; sy = e.clientY;
+      il = el.offsetLeft; it = el.offsetTop;
+
+      const move = (e) => {
+        const dx = e.clientX - sx, dy = e.clientY - sy;
+        if (!dragging && (Math.abs(dx) > 5 || Math.abs(dy) > 5)) {
+          dragging = true;
+          el.style.left = il + 'px';
+          el.style.top  = it + 'px';
+        }
+        if (dragging) {
+          el.style.left = Math.max(0, il + dx) + 'px';
+          el.style.top  = Math.max(0, il + dy < 0 ? 0 : it + dy) + 'px';
+        }
+      };
+
+      const up = () => {
+        document.removeEventListener('mousemove', move);
+        document.removeEventListener('mouseup', up);
+      };
+
+      document.addEventListener('mousemove', move);
+      document.addEventListener('mouseup', up);
+    });
+  }
+
+  // ================================================================
+  // CONTEXT MENU
+  // ================================================================
+  function showCtxMenu(e) {
+    e.preventDefault();
+    const m = document.getElementById('ctx-menu');
+    m.style.display = 'block';
+    m.style.left = Math.min(e.clientX, window.innerWidth - 210) + 'px';
+    m.style.top  = Math.min(e.clientY, window.innerHeight - 220) + 'px';
+  }
+  function hideCtxMenu() { document.getElementById('ctx-menu').style.display = 'none'; }
+  document.addEventListener('click', hideCtxMenu);
+
+  // ================================================================
+  // CLOCK
+  // ================================================================
+  function tick() {
+    const n = new Date();
+    const pad = x => String(x).padStart(2, '0');
+    document.getElementById('clk-time').textContent = pad(n.getHours()) + ':' + pad(n.getMinutes());
+    document.getElementById('clk-date').textContent = pad(n.getDate()) + '/' + pad(n.getMonth()+1) + '/' + n.getFullYear();
+  }
+  tick();
+  setInterval(tick, 10000);
+
+  // ================================================================
+  // WELCOME
+  // ================================================================
+  function closeWelcome() { document.getElementById('welcome-modal').style.display = 'none'; }
+
+  // ================================================================
+  // TOAST
+  // ================================================================
+  function showToast(msg) {
+    const t = document.createElement('div');
+    t.className = 'toast';
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity 0.3s'; setTimeout(() => t.remove(), 300); }, 2500);
+  }
+  </script>
+</body>
+</html>
